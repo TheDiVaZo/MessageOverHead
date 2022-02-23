@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group 'io.messageoverhead.thedivazo'
+version '2.2'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+dependencies {
+
+    compileOnly 'org.spigot:spigot:1.17.1'
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
+    annotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
+
+    compileOnly 'me.clip:placeholderapi:2.10.10'
+
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+}
