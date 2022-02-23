@@ -1,0 +1,22 @@
+name: MessageOverHead
+main: io.messageoverhead.thedivazo.Main
+version: 2.1
+prefix: MessageOverHead
+authors: [ TheDiVaZo ]
+softdepend:
+  - PlaceholderAPI
+depend:
+  - ProtocolLib
+commands:
+  moh:
+    description: reload plugin's config
+    permission: moh.reload
+    usage: /<command>
+  messageoverhead:
+    description: reload plugin's config
+    permission: moh.reload
+    usage: /<command>
+permissions:
+  moh.reload:
+    default: op
+    description: "reload plugin's config"
