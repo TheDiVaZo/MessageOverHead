@@ -1,6 +1,7 @@
 
 package thedivazo;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,8 +21,8 @@ public class ReloadConfig implements CommandExecutor {
         }
         this.plugin.reloadConfig();
 
-        this.plugin.saveParam();
-        commandSender.sendMessage("Config has been reloaded");
+        ((Main) this.plugin).saveParam();
+        Bukkit.getLogger().info("Config has been reloaded");
         return true;
     }
 }
