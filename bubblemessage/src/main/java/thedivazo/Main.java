@@ -1,19 +1,11 @@
 
 package thedivazo;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -25,24 +17,21 @@ import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import thedivazo.listener.Listeners;
-
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Это просто вместо plugin.yml. Если на понравится, можешь вернуть обратно как было.
-@Plugin(name = "MessageOverHead", version = "2.2")
+@Plugin(name = "MessageOverHead", version = "2.3")
 @Dependency("ProtocolLib")
 @SoftDependency("PlaceholderAPI")
 @Author("TheDiVaZo")
 @Commands(@Command(name = "messageoverhead", desc = "reload configuration", permission = "moh.reload", usage = "/moh", aliases = {"moh"}))
 @Permissions(@Permission(name = "moh.reload", desc = "reload configuration", defaultValue = PermissionDefault.OP))
-@ApiVersion(ApiVersion.Target.v1_14)
-public class Main extends JavaPlugin implements Listener {
+@ApiVersion(ApiVersion.Target.v1_13)
+public class Main extends JavaPlugin {
 
     public final HashMap<UUID, BubbleMessage> bubbleMessageMap = new HashMap<>();
 
@@ -70,6 +59,7 @@ public class Main extends JavaPlugin implements Listener {
     public String permSee = "moh.see";
 
     public int delay = 4;
+    public int sizeLine = 24;
 
 
     @Override
@@ -82,6 +72,10 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public void saveParam() {
+        if (Bukkit.getPluginManager().getPlugin("ProtocolLib") == null) {
+            Bukkit.getLogger().warning("ProtocolLib not found! Please install ProtocolLib");
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             isPAPILoaded = true;
         }
@@ -117,6 +111,7 @@ public class Main extends JavaPlugin implements Listener {
         permSend = config.getString("messages.settings.permSend");
         permSee = config.getString("messages.settings.permSee");
         delay = config.getInt("messages.settings.delay");
+        sizeLine = config.getInt("messages.settings.sizeLine");
     }
 
     @Override
@@ -130,7 +125,7 @@ public class Main extends JavaPlugin implements Listener {
     public static String makeColors(String s) {
         s = ChatColor.translateAlternateColorCodes('&', s);
         String version = Bukkit.getVersion();
-        if (!version.contains("1.16") && !version.contains("1.17") && !version.contains("1.18")) return s;
+        if (getVersion() < 1.16f) return s;
         Matcher match = HEXPAT.matcher(s);
         while (match.find()) {
             String color = s.substring(match.start(), match.end());
@@ -139,6 +134,16 @@ public class Main extends JavaPlugin implements Listener {
 
         return s;
     }
+    public static Float getVersion() {
+        String version = Bukkit.getVersion();
+        String pattern = "[^0-9\\.\\:]";
+        String versionMinecraft = version.replaceAll(pattern, "");
+        return Float.parseFloat(versionMinecraft.substring(
+                versionMinecraft.indexOf(":")+1,
+                versionMinecraft.lastIndexOf(".")));
+
+    }
+
 
 }
 

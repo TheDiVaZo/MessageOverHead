@@ -65,10 +65,11 @@ public class Listeners implements Listener {
         plugin.bubbleMessageMap.put(player.getUniqueId(), bubbleMessage);
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.getLocation().distance(loc) < plugin.distance) {
-                if (plugin.isVisibleTextForOwner || !onlinePlayer.equals(player)) {
-                    if (onlinePlayer.hasPermission(plugin.permSee))
+            if (onlinePlayer.hasPermission(plugin.permSee)) {
+                if (onlinePlayer.getLocation().distance(loc) < plugin.distance) {
+                    if (plugin.isVisibleTextForOwner || !onlinePlayer.equals(player)) {
                         bubbleMessage.spawn(onlinePlayer);
+                    }
                 }
             }
         }
@@ -94,5 +95,7 @@ public class Listeners implements Listener {
         }.runTaskLater(plugin, plugin.delay * 20L);
         bubbleMessage.removeTask(taskDelete, taskMove);
     }
+
+
 
 }

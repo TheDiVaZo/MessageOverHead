@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -14,17 +13,23 @@ import java.util.regex.Pattern;
 
 public class BubbleMessage {
 
-    List<Bubble> bubbleMessages = new ArrayList<>();
-    Location loc;
-    BukkitTask[] tasksRunnable = null;
-    Main plugin;
+    private final List<Bubble> bubbleMessages = new ArrayList<>();
+    private final Location loc;
+    private BukkitTask[] tasksRunnable = null;
+    private final Main plugin;
 
-    public BubbleMessage(String message, Location loc, JavaPlugin plugin) {
+    public BubbleMessage(String message, Location loc, Main plugin) {
         this.loc = loc;
-        this.plugin = (Main) plugin;
+        this.plugin = plugin;
 
         List<String> bubbleLines = new ArrayList<>();
-        String[] messageLines = message.split(" ");
+        String[] messageLines;
+        if(message.contains(" ")) {
+            messageLines = message.split(" ");
+        }
+        else {
+            messageLines = new String[]{message};
+        }
 
         StringBuilder bubbleLine = new StringBuilder("");
         int sizeColor = 0;
@@ -41,7 +46,8 @@ public class BubbleMessage {
             sizeColor += colors.size() * 2;
             bubbleLine.append(line).append(" ");
 
-            if ((bubbleLine.length() - sizeColor) > 24) {
+
+            if ((bubbleLine.length() - sizeColor) > plugin.sizeLine) {
                 bubbleLines.add(bubbleLine.toString());
                 bubbleLine.setLength(0);
                 sizeColor = 0;
@@ -49,7 +55,7 @@ public class BubbleMessage {
 
             colorOld = String.join("", colors.toArray(new String[0]));
         }
-        if (bubbleLine.length() - sizeColor * 2 != 0) {
+        if (bubbleLine.length()!=0) {
             bubbleLines.add(colorOld + bubbleLine);
         }
 
