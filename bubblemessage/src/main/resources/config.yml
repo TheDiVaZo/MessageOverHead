@@ -3,19 +3,17 @@
 #=========OR==========#
 #===BUBBLE=MESSAGE====#
 #######################
-version: 1.0 #DON'T TOUCH!!!!
-
 messages:
   particle:
     enable: true
-    particleType: CLOUD #https://minecraft.fandom.com/wiki/Particles
+    particleType: CLOUD # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
     count: 4 #count of particle
     offsetX: 0.2 #the maximum random offset on the X axis
     offsetY: 0.2 #the maximum random offset on the X axis
     offsetZ: 0.2 #the maximum random offset on the Z axis
   sound:
     enable: true
-    soundType: BLOCK_ANVIL_STEP #https://www.digminecraft.com/lists/sound_list_pc.php (block.anvil.step -> BLOCK_ANVIL_STEP)
+    soundType: BLOCK_ANVIL_STEP # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
     volume: 3 #The volume of the sound
     pitch: 3 #The pitch of the sound
   settings:
@@ -26,3 +24,4 @@ messages:
     permSend: moh.send
     permSee: moh.see
     delay: 4 #in seconds. Bubble life time
+    sizeLine: 24 #Maximum size of one bubble

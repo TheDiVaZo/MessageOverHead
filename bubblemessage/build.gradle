@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+}
+
+group 'io.messageoverhead.thedivazo'
+version '2.2'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url "https://repo.dmulloy2.net/repository/public/" }
+
+}
+
+dependencies {
+    //compileOnly 'org.spigotmc:spigot:1.13-R0.2-SNAPSHOT'
+
+    compileOnly fileTree(dir: 'libs', include: '*.jar')
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
+    annotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
+
+    compileOnly 'me.clip:placeholderapi:2.10.10'
+
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+
+    //compileOnly 'net.md-5:bungeecord-chat:1.16-R0.4'
+}
