@@ -17,7 +17,14 @@ messages:
     volume: 3 #The volume of the sound
     pitch: 3 #The pitch of the sound
   settings:
-    format: '%player_name% %message%' #Supports PlaceholderAPI and HEX colors (example: &#123456)
+    format: '%player_name% %message%' #Default format! Supports PlaceholderAPI and HEX colors (example: &#123456)
+    #format: #Group format!
+     #default:
+     #'0': #priority
+        #format: '%message%' #default format. format haven't permission
+     #'1':
+        #perm: 'perm.vip' #perm.vip
+        #format: '&cVIP &e%message%' #format of perm.vip
     distance: 10
     biasY: 2.15 #height spawn of Bubble Message. The value is calculated experimentally.
     visibleTextForOwner: true

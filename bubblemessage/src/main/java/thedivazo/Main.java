@@ -5,6 +5,8 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,12 +21,13 @@ import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import thedivazo.listener.Listeners;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Это просто вместо plugin.yml. Если на понравится, можешь вернуть обратно как было.
-@Plugin(name = "MessageOverHead", version = "2.3")
+@Plugin(name = "MessageOverHead", version = "2.2")
 @Dependency("ProtocolLib")
 @SoftDependency("PlaceholderAPI")
 @Author("TheDiVaZo")
@@ -50,7 +53,8 @@ public class Main extends JavaPlugin {
     public int soundVolume = 4;
     public int soundPitch = 4;
 
-    public String sormat = "%player_name% %message%";
+    public static String format = "%player_name% %message%";
+    public static HashMap<Integer, String[]> permissionFormat = new HashMap<>();
     public int distance = 10;
     public double biasY = 2.15;
 
@@ -104,7 +108,23 @@ public class Main extends JavaPlugin {
             soundPitch = config.getInt("messages.sound.pitch");
         }
 
-        sormat = config.getString("messages.settings.format");
+        if(config.isString("messages.settings.format")) {
+            format = config.getString("messages.settings.format");
+        }
+        else {
+            ConfigurationSection permissionsFormat = config.getConfigurationSection("messages.settings.format");
+            for(String priority:permissionsFormat.getKeys(false)) {
+                String[] permFormat = new String[2];
+                permFormat[1] = permissionsFormat.getConfigurationSection(priority).getString("format");
+                if(permissionsFormat.getConfigurationSection(priority).isString("perm")) {
+                    permFormat[0] = permissionsFormat.getConfigurationSection(priority).getString("perm");
+                }
+                permissionFormat.put(
+                        Integer.parseInt(priority),
+                        permFormat);
+            }
+            format = "%player_name% %message%";
+        }
         distance = config.getInt("messages.settings.distance");
         biasY = config.getDouble("messages.settings.biasY");
         isVisibleTextForOwner = config.getBoolean("messages.settings.visibleTextForOwner");
@@ -122,17 +142,16 @@ public class Main extends JavaPlugin {
 
     public final static Pattern HEXPAT = Pattern.compile("&#[a-fA-F0-9]{6}");
 
-    public static String makeColors(String s) {
-        s = ChatColor.translateAlternateColorCodes('&', s);
-        String version = Bukkit.getVersion();
-        if (getVersion() < 1.16f) return s;
-        Matcher match = HEXPAT.matcher(s);
+    public static String makeColors(String message) {
+        message = ChatColor.translateAlternateColorCodes('&', message);
+        if (getVersion() < 1.16f) return message;
+        Matcher match = HEXPAT.matcher(message);
         while (match.find()) {
-            String color = s.substring(match.start(), match.end());
-            s = s.replace(color, ChatColor.of(color.replace("&", "")) + "");
+            String color = message.substring(match.start(), match.end());
+            message = message.replace(color, ChatColor.of(color.replace("&", "")) + "");
         }
 
-        return s;
+        return message;
     }
     public static Float getVersion() {
         String version = Bukkit.getVersion();

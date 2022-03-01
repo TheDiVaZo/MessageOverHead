@@ -67,12 +67,6 @@ public class BubbleMessage {
 
     }
 
-    public void spawn(int distance) {
-        for (Bubble msg : bubbleMessages) {
-            msg.spawn(distance);
-        }
-    }
-
     public void spawn(Player player) {
         for (Bubble msg : bubbleMessages) {
             msg.spawn(player);
@@ -102,12 +96,14 @@ public class BubbleMessage {
 
     public void particle(int distance) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getLocation().distance(loc) <= distance) {
-                player.spawnParticle(plugin.particleType, loc,
-                        plugin.particleCount,
-                        plugin.particleOffsetX,
-                        plugin.particleOffsetY,
-                        plugin.particleOffsetZ);
+            if(player.getWorld().equals(loc.getWorld())) {
+                if (player.getLocation().distance(loc) <= distance) {
+                    player.spawnParticle(plugin.particleType, loc,
+                            plugin.particleCount,
+                            plugin.particleOffsetX,
+                            plugin.particleOffsetY,
+                            plugin.particleOffsetZ);
+                }
             }
         }
     }
@@ -118,11 +114,13 @@ public class BubbleMessage {
 
     public void sound(int distance) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getLocation().distance(loc) <= distance) {
-                player.playSound(loc,
-                        plugin.soundType,
-                        plugin.soundVolume,
-                        plugin.soundPitch);
+            if(player.getWorld().equals(loc.getWorld())) {
+                if (player.getLocation().distance(loc) <= distance) {
+                    player.playSound(loc,
+                            plugin.soundType,
+                            plugin.soundVolume,
+                            plugin.soundPitch);
+                }
             }
         }
     }
