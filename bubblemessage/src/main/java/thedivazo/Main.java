@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Это просто вместо plugin.yml. Если на понравится, можешь вернуть обратно как было.
-@Plugin(name = "MessageOverHead", version = "2.2")
+@Plugin(name = "MessageOverHead", version = "2.3")
 @Dependency("ProtocolLib")
 @SoftDependency("PlaceholderAPI")
 @Author("TheDiVaZo")
