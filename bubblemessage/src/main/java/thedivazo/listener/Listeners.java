@@ -15,12 +15,13 @@ import org.bukkit.scheduler.BukkitTask;
 import thedivazo.BubbleMessage;
 import thedivazo.Main;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public class Listeners implements Listener {
     Main plugin;
-    public Listeners(JavaPlugin plugin) {
-        this.plugin = (Main) plugin;
+    public Listeners(Main plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -46,10 +47,11 @@ public class Listeners implements Listener {
         while (msg.contains("\\")) msg = msg.replace('\\', '/');
 
         String message;
+        String format = getFormatOfPlayer(player);
         if (plugin.isPAPILoaded)
-            message = plugin.makeColors(PlaceholderAPI.setPlaceholders(player, plugin.sormat)).replace("%message%", msg);
+            message = Main.makeColors(PlaceholderAPI.setPlaceholders(player, format)).replace("%message%", msg);
         else
-            message = plugin.makeColors(plugin.sormat).replace("%message%", msg);
+            message = Main.makeColors(format).replace("%message%", msg);
 
         BubbleMessage bubbleMessage = new BubbleMessage(message, loc, plugin);
 
@@ -66,9 +68,11 @@ public class Listeners implements Listener {
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (onlinePlayer.hasPermission(plugin.permSee)) {
-                if (onlinePlayer.getLocation().distance(loc) < plugin.distance) {
-                    if (plugin.isVisibleTextForOwner || !onlinePlayer.equals(player)) {
-                        bubbleMessage.spawn(onlinePlayer);
+                if(onlinePlayer.getWorld().equals(loc.getWorld())) {
+                    if (onlinePlayer.getLocation().distance(loc) < plugin.distance) {
+                        if (plugin.isVisibleTextForOwner || !onlinePlayer.equals(player)) {
+                            bubbleMessage.spawn(onlinePlayer);
+                        }
                     }
                 }
             }
@@ -94,6 +98,25 @@ public class Listeners implements Listener {
             }
         }.runTaskLater(plugin, plugin.delay * 20L);
         bubbleMessage.removeTask(taskDelete, taskMove);
+    }
+
+    public String getFormatOfPlayer(Player player) {
+        int[] priorityFormat = Main.permissionFormat.keySet().stream().mapToInt(x->x.intValue()).toArray();
+        Arrays.sort(priorityFormat);
+        String format = Main.format;
+
+        for(int priority: priorityFormat) {
+            String[] permissionAndFormat = Main.permissionFormat.get(priority);
+            if(permissionAndFormat[0] != null) {
+                if (player.hasPermission(permissionAndFormat[0])) {
+                    format = permissionAndFormat[1];
+                }
+            }
+            else {
+                format = permissionAndFormat[1];
+            }
+        }
+        return format;
     }
 
 

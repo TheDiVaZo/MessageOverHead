@@ -4,13 +4,12 @@ package thedivazo;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class ReloadConfig implements CommandExecutor {
 
-    private final JavaPlugin plugin;
+    private final Main plugin;
 
-    public ReloadConfig(JavaPlugin plugin) {
+    public ReloadConfig(Main plugin) {
         this.plugin = plugin;
     }
 
@@ -20,7 +19,7 @@ public class ReloadConfig implements CommandExecutor {
         }
         this.plugin.reloadConfig();
 
-        ((Main) this.plugin).saveParam();
+        plugin.saveParam();
         commandSender.sendMessage("Config has been reloaded");
         return true;
     }

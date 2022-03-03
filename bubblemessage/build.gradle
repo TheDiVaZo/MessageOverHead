@@ -16,8 +16,6 @@ repositories {
 }
 
 dependencies {
-    //compileOnly 'org.spigotmc:spigot:1.13-R0.2-SNAPSHOT'
-
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 
     compileOnly 'org.projectlombok:lombok:1.18.22'
@@ -29,6 +27,15 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.10.10'
 
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+}
 
-    //compileOnly 'net.md-5:bungeecord-chat:1.16-R0.4'
+task buildAndCopyJar {
+    dependsOn(tasks.jar)
+    doLast {
+        copy {
+            from "$projectDir/build/libs/"+rootProject.name+"-"+version+".jar"
+            // полный путь, куда тебе нужно. У меня вот так:
+            into 'R:/Dima/ServerMinecraft/TestServer/plugins'
+        }
+    }
 }
