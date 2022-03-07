@@ -98,8 +98,6 @@ public class Bubble {
                 ((isMarker ? 0x10 : 0) | (isSmall ? 0x01 : 0) | (noBasePlate ? 0x08 : 0))
         );
         metadata.setObject(0, serByte, (byte) (invisible ? 0x20 : 0));
-
-
     }
 
     private PacketContainer getFakeStandPacket() {

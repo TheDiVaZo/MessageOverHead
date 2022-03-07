@@ -261,7 +261,7 @@ public class Main extends JavaPlugin {
             this.saveConfig();
         }
         catch (IOException e) {
-            Bukkit.getLogger().warning("UPDATE CONFIG ERROR!");
+            Bukkit.getLogger().warning("UPDATE CONFIG ERROR!!");
         }
     }
 }

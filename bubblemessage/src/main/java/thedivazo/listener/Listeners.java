@@ -73,6 +73,7 @@ public class Listeners implements Listener {
                             if (plugin.soundEnable)
                                 bubbleMessage.sound(onlinePlayer);
 
+
                             if (plugin.particleEnable)
                                 bubbleMessage.particle(onlinePlayer);
                         }

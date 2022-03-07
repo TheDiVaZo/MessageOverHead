@@ -23,6 +23,7 @@ public class ReloadConfig implements CommandExecutor {
         plugin.saveParam();
         commandSender.sendMessage("Config has been reloaded");
         return true;
+
     }
 }
 

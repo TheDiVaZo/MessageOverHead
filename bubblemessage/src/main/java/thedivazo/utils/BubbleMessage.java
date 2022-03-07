@@ -59,7 +59,6 @@ public class BubbleMessage {
             bubbleLines.add(colorOld + bubbleLine);
         }
 
-
         for (int i = 0; i < bubbleLines.size(); ++i) {
             Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3D, loc.getZ());
             this.bubbleMessages.add(new Bubble(bubbleLines.get(bubbleLines.size() - 1 - i), locBubble));
