@@ -33,4 +33,3 @@ messages:
     permSee: moh.see
     delay: 4 #in seconds. Bubble life time
     sizeLine: 24 #Maximum size of one bubble
-    enableBubbleOnVanish: false
