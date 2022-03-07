@@ -1,10 +1,10 @@
-package thedivazo;
+package thedivazo.utils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import thedivazo.Main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class BubbleMessage {
             messageLines = new String[]{message};
         }
 
-        StringBuilder bubbleLine = new StringBuilder("");
+        StringBuilder bubbleLine = new StringBuilder();
         int sizeColor = 0;
         String colorOld = "";
 
@@ -94,35 +94,23 @@ public class BubbleMessage {
         bubbleMessages.forEach(Bubble::remove);
     }
 
-    public void particle(int distance) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if(player.getWorld().equals(loc.getWorld())) {
-                if (player.getLocation().distance(loc) <= distance) {
-                    player.spawnParticle(plugin.particleType, loc,
-                            plugin.particleCount,
-                            plugin.particleOffsetX,
-                            plugin.particleOffsetY,
-                            plugin.particleOffsetZ);
-                }
-            }
-        }
+    public void particle(Player player) {
+        player.spawnParticle(plugin.particleType, loc,
+                plugin.particleCount,
+                plugin.particleOffsetX,
+                plugin.particleOffsetY,
+                plugin.particleOffsetZ);
     }
 
     public void removeTask(BukkitTask... tasksRunnable) {
         this.tasksRunnable = tasksRunnable;
     }
 
-    public void sound(int distance) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if(player.getWorld().equals(loc.getWorld())) {
-                if (player.getLocation().distance(loc) <= distance) {
-                    player.playSound(loc,
-                            plugin.soundType,
-                            plugin.soundVolume,
-                            plugin.soundPitch);
-                }
-            }
-        }
+    public void sound(Player player) {
+        player.playSound(loc,
+                plugin.soundType,
+                plugin.soundVolume,
+                plugin.soundPitch);
     }
 }
 

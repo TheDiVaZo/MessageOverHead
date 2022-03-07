@@ -1,7 +1,9 @@
 package thedivazo.listener;
 
+import de.myzelyam.api.vanish.VanishAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,10 +11,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.BubbleMessage;
+import thedivazo.utils.BubbleMessage;
 import thedivazo.Main;
 
 import java.util.Arrays;
@@ -37,6 +39,8 @@ public class Listeners implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
 
+        if (player.getGameMode().equals(GameMode.SPECTATOR)) return;
+
         if (!player.hasPermission(plugin.permSend)) return;
 
         Location loc = player.getLocation();
@@ -55,12 +59,6 @@ public class Listeners implements Listener {
 
         BubbleMessage bubbleMessage = new BubbleMessage(message, loc, plugin);
 
-        if (plugin.soundEnable)
-            bubbleMessage.sound(plugin.distance);
-
-        if (plugin.particleEnable)
-            bubbleMessage.particle(plugin.distance);
-
         if (plugin.bubbleMessageMap.containsKey(player.getUniqueId()))
             plugin.bubbleMessageMap.get(player.getUniqueId()).remove();
 
@@ -68,10 +66,15 @@ public class Listeners implements Listener {
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if (onlinePlayer.hasPermission(plugin.permSee)) {
-                if(onlinePlayer.getWorld().equals(loc.getWorld())) {
+                if(onlinePlayer.getWorld().equals(loc.getWorld()) && onlinePlayer.canSee(player) && canSeeSuperVanish(onlinePlayer, player) && !player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     if (onlinePlayer.getLocation().distance(loc) < plugin.distance) {
                         if (plugin.isVisibleTextForOwner || !onlinePlayer.equals(player)) {
                             bubbleMessage.spawn(onlinePlayer);
+                            if (plugin.soundEnable)
+                                bubbleMessage.sound(onlinePlayer);
+
+                            if (plugin.particleEnable)
+                                bubbleMessage.particle(onlinePlayer);
                         }
                     }
                 }
@@ -100,8 +103,15 @@ public class Listeners implements Listener {
         bubbleMessage.removeTask(taskDelete, taskMove);
     }
 
+    public boolean canSeeSuperVanish(Player viewer, Player viewed) {
+        if(plugin.isSuperVanishLoaded) {
+            return VanishAPI.canSee(viewer, viewed);
+        }
+        else return true;
+    }
+
     public String getFormatOfPlayer(Player player) {
-        int[] priorityFormat = Main.permissionFormat.keySet().stream().mapToInt(x->x.intValue()).toArray();
+        int[] priorityFormat = Main.permissionFormat.keySet().stream().mapToInt(x->x).toArray();
         Arrays.sort(priorityFormat);
         String format = Main.format;
 

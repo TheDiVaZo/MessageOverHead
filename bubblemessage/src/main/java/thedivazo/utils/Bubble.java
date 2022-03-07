@@ -1,4 +1,4 @@
-package thedivazo;
+package thedivazo.utils;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import thedivazo.Main;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -27,9 +28,9 @@ public class Bubble {
 
     private final ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 
-    private static int customNameIndex = 2;
-    private static int customNameVisibleIndex = 3;
-    private static int paramArmorStandIndex = 14;
+    private final static int customNameIndex = 2;
+    private final static int customNameVisibleIndex = 3;
+    private final static int paramArmorStandIndex;
 
     static {
         if (Main.getVersion() >= 1.17f) {
@@ -47,15 +48,15 @@ public class Bubble {
     }
 
     private boolean isRemovedBubble = false;
-    private Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
-    private Serializer serBoolean = WrappedDataWatcher.Registry.get(Boolean.class);
-    private Serializer serByte = WrappedDataWatcher.Registry.get(Byte.class);
+    private final Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+    private final Serializer serBoolean = WrappedDataWatcher.Registry.get(Boolean.class);
+    private final Serializer serByte = WrappedDataWatcher.Registry.get(Byte.class);
 
-    private WrappedDataWatcher metadata = new WrappedDataWatcher();
+    private final WrappedDataWatcher metadata = new WrappedDataWatcher();
 
     private Location loc;
-    private int id = random.nextInt(Integer.MAX_VALUE);
-    private UUID uuid = UUID.randomUUID();
+    private final int id = random.nextInt(Integer.MAX_VALUE);
+    private final UUID uuid = UUID.randomUUID();
 
     public Bubble(String message, Location loc) {
         this.message = message;

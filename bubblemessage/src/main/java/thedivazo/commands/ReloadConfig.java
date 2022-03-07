@@ -1,9 +1,10 @@
 
-package thedivazo;
+package thedivazo.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import thedivazo.Main;
 
 public class ReloadConfig implements CommandExecutor {
 

@@ -3,6 +3,8 @@
 #=========OR==========#
 #===BUBBLE=MESSAGE====#
 #######################
+version: 1.1 #DONT TOUCH!
+
 messages:
   particle:
     enable: true
@@ -19,7 +21,6 @@ messages:
   settings:
     format: '%player_name% %message%' #Default format! Supports PlaceholderAPI and HEX colors (example: &#123456)
     #format: #Group format!
-     #default:
      #'0': #priority
         #format: '%message%' #default format. format haven't permission
      #'1':
