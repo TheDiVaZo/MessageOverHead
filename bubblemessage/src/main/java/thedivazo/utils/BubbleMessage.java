@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.Main;
+import thedivazo.config.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +16,17 @@ public class BubbleMessage {
     private final List<Bubble> bubbleMessages = new ArrayList<>();
     private final Location loc;
     private BukkitTask[] tasksRunnable = null;
-    private final Main plugin;
+    private final Config config;
 
-    public BubbleMessage(String message, Location loc, Main plugin) {
+    public BubbleMessage(String message, Location loc, Config config) {
         this.loc = loc;
-        this.plugin = plugin;
+        this.config = config;
 
         List<String> bubbleLines = new ArrayList<>();
         String[] messageLines;
-        if(message.contains(" ")) {
+        if (message.contains(" ")) {
             messageLines = message.split(" ");
-        }
-        else {
+        } else {
             messageLines = new String[]{message};
         }
 
@@ -47,7 +46,7 @@ public class BubbleMessage {
             bubbleLine.append(line).append(" ");
 
 
-            if ((bubbleLine.length() - sizeColor) > plugin.sizeLine) {
+            if ((bubbleLine.length() - sizeColor) > config.getSizeLine()) {
                 bubbleLines.add(bubbleLine.toString());
                 bubbleLine.setLength(0);
                 sizeColor = 0;
@@ -94,11 +93,11 @@ public class BubbleMessage {
     }
 
     public void particle(Player player) {
-        player.spawnParticle(plugin.particleType, loc,
-                plugin.particleCount,
-                plugin.particleOffsetX,
-                plugin.particleOffsetY,
-                plugin.particleOffsetZ);
+        player.spawnParticle(config.getParticleType(), loc,
+                config.getParticleCount(),
+                config.getParticleOffsetX(),
+                config.getParticleOffsetY(),
+                config.getParticleOffsetZ());
     }
 
     public void removeTask(BukkitTask... tasksRunnable) {
@@ -107,9 +106,9 @@ public class BubbleMessage {
 
     public void sound(Player player) {
         player.playSound(loc,
-                plugin.soundType,
-                plugin.soundVolume,
-                plugin.soundPitch);
+                config.getSoundType(),
+                config.getSoundVolume(),
+                config.getSoundPitch());
     }
 }
 

@@ -41,7 +41,6 @@ task buildAndCopyJar {
     doLast {
         copy {
             from "$projectDir/build/libs/"+rootProject.name+"-"+version+".jar"
-            // полный путь, куда тебе нужно. У меня вот так:
             into 'D:/Minecraft/Test_Server/plugins'
         }
     }

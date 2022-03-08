@@ -14,24 +14,29 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.utils.BubbleMessage;
 import thedivazo.Main;
+import thedivazo.config.Config;
+import thedivazo.utils.BubbleMessage;
 
 import java.util.Arrays;
 import java.util.UUID;
 
 public class Listeners implements Listener {
-    Main plugin;
-    public Listeners(Main plugin) {
+
+    private final Main plugin;
+    private final Config config;
+
+    public Listeners(Main plugin, Config config) {
         this.plugin = plugin;
+        this.config = config;
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         UUID playerUUID = e.getPlayer().getUniqueId();
-        if (plugin.bubbleMessageMap.containsKey(playerUUID)) {
-            plugin.bubbleMessageMap.get(playerUUID).remove();
-            plugin.bubbleMessageMap.remove(playerUUID);
+        if (plugin.getBubbleMessageMap().containsKey(playerUUID)) {
+            plugin.getBubbleMessageMap().get(playerUUID).remove();
+            plugin.getBubbleMessageMap().remove(playerUUID);
         }
     }
 
@@ -41,40 +46,40 @@ public class Listeners implements Listener {
 
         if (player.getGameMode().equals(GameMode.SPECTATOR)) return;
 
-        if (!player.hasPermission(plugin.permSend)) return;
+        if (!player.hasPermission(config.getPermSend())) return;
 
         Location loc = player.getLocation();
 
-        loc.setY(loc.getY() + plugin.biasY);
+        loc.setY(loc.getY() + config.getBiasY());
 
         String msg = e.getMessage();
         while (msg.contains("\\")) msg = msg.replace('\\', '/');
 
         String message;
         String format = getFormatOfPlayer(player);
-        if (plugin.isPAPILoaded)
+        if (config.isPAPILoaded())
             message = Main.makeColors(PlaceholderAPI.setPlaceholders(player, format)).replace("%message%", msg);
         else
             message = Main.makeColors(format).replace("%message%", msg);
 
-        BubbleMessage bubbleMessage = new BubbleMessage(message, loc, plugin);
+        BubbleMessage bubbleMessage = new BubbleMessage(message, loc, config);
 
-        if (plugin.bubbleMessageMap.containsKey(player.getUniqueId()))
-            plugin.bubbleMessageMap.get(player.getUniqueId()).remove();
+        if (plugin.getBubbleMessageMap().containsKey(player.getUniqueId()))
+            plugin.getBubbleMessageMap().get(player.getUniqueId()).remove();
 
-        plugin.bubbleMessageMap.put(player.getUniqueId(), bubbleMessage);
+        plugin.getBubbleMessageMap().put(player.getUniqueId(), bubbleMessage);
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.hasPermission(plugin.permSee)) {
-                if(onlinePlayer.getWorld().equals(loc.getWorld()) && onlinePlayer.canSee(player) && canSeeSuperVanish(onlinePlayer, player) && !player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    if (onlinePlayer.getLocation().distance(loc) < plugin.distance) {
-                        if (plugin.isVisibleTextForOwner || !onlinePlayer.equals(player)) {
+            if (onlinePlayer.hasPermission(config.getPermSee())) {
+                if (onlinePlayer.getWorld().equals(loc.getWorld()) && onlinePlayer.canSee(player) && canSeeSuperVanish(onlinePlayer, player) && !player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                    if (onlinePlayer.getLocation().distance(loc) < config.getDistance()) {
+                        if (config.isVisibleTextForOwner() || !onlinePlayer.equals(player)) {
                             bubbleMessage.spawn(onlinePlayer);
-                            if (plugin.soundEnable)
+                            if (config.isSoundEnable())
                                 bubbleMessage.sound(onlinePlayer);
 
 
-                            if (plugin.particleEnable)
+                            if (config.isParticleEnable())
                                 bubbleMessage.particle(onlinePlayer);
                         }
                     }
@@ -86,7 +91,7 @@ public class Listeners implements Listener {
             @Override
             public void run() {
                 Location loc = player.getLocation().clone();
-                loc.setY(loc.getY() + plugin.biasY);
+                loc.setY(loc.getY() + config.getBiasY());
                 bubbleMessage.setPosition(loc);
             }
         }.runTaskTimer(plugin, 1L, 1L);
@@ -95,41 +100,38 @@ public class Listeners implements Listener {
             @Override
             public void run() {
                 taskMove.cancel();
-                if (plugin.bubbleMessageMap.get(player.getUniqueId()).equals(bubbleMessage)) {
-                    plugin.bubbleMessageMap.remove(player.getUniqueId());
+                if (plugin.getBubbleMessageMap().get(player.getUniqueId()).equals(bubbleMessage)) {
+                    plugin.getBubbleMessageMap().remove(player.getUniqueId());
                     bubbleMessage.remove();
                 }
             }
-        }.runTaskLater(plugin, plugin.delay * 20L);
+        }.runTaskLater(plugin, config.getDelay() * 20L);
         bubbleMessage.removeTask(taskDelete, taskMove);
     }
 
     public boolean canSeeSuperVanish(Player viewer, Player viewed) {
-        if(plugin.isSuperVanishLoaded) {
+        if (config.isSuperVanishLoaded()) {
             return VanishAPI.canSee(viewer, viewed);
-        }
-        else return true;
+        } else return true;
     }
 
     public String getFormatOfPlayer(Player player) {
-        int[] priorityFormat = Main.permissionFormat.keySet().stream().mapToInt(x->x).toArray();
+        int[] priorityFormat = config.getPermissionFormat().keySet().stream().mapToInt(x -> x).toArray();
         Arrays.sort(priorityFormat);
-        String format = Main.format;
+        String format = config.getMessageFormat();
 
-        for(int priority: priorityFormat) {
-            String[] permissionAndFormat = Main.permissionFormat.get(priority);
-            if(permissionAndFormat[0] != null) {
+        for (int priority : priorityFormat) {
+            String[] permissionAndFormat = config.getPermissionFormat().get(priority);
+            if (permissionAndFormat[0] != null) {
                 if (player.hasPermission(permissionAndFormat[0])) {
                     format = permissionAndFormat[1];
                 }
-            }
-            else {
+            } else {
                 format = permissionAndFormat[1];
             }
         }
         return format;
     }
-
 
 
 }
