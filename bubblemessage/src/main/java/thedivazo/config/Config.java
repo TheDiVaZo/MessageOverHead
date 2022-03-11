@@ -29,8 +29,6 @@ public class Config {
 
     private boolean isSuperVanishLoaded = false;
 
-    // всегда True. Ctrl + Shift + F и смотри где у тебя используется particleEnable
-    // ответ - он всегда будет true.
     private boolean isParticleEnable = true;
     private Particle particleType = Particle.CLOUD;
     private int particleCount = 4;
@@ -38,7 +36,6 @@ public class Config {
     private double particleOffsetY = 0.2;
     private double particleOffsetZ = 0.2;
 
-    // Аналогично isParticleEnable
     private boolean isSoundEnable = true;
     private Sound soundType = Sound.BLOCK_ANVIL_STEP;
     private int soundVolume = 4;

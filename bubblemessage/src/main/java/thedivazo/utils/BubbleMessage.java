@@ -44,7 +44,7 @@ public class BubbleMessage {
                                 String newLine1 = new StringBuffer(two_pieces).reverse().toString();
                                 String reverseLine = new StringBuffer(msgLines.get(i)).reverse().toString();
                                 String last_letter = new StringBuffer(line_1[line_1.length-1]).reverse().toString();
-                                msgLines.set(i,  new StringBuffer(reverseLine.replaceFirst(last_letter, newLine1)).reverse().toString().trim());
+                                msgLines.set(i,  (new StringBuffer(reverseLine.replaceFirst(last_letter, newLine1)).reverse().toString()).trim());
                                 msgLines.set(i + 1, msgLines.get(i+1).replaceFirst(line_2[0], ""));
                             }
                         }

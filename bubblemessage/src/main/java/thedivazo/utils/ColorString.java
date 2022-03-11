@@ -19,8 +19,7 @@ public class ColorString {
 
     public static int lengthColor(String string) {
         StringBuilder colorLine = new StringBuilder();
-        string = ofLine(string);
-        Matcher colorMatcher = CHAT_COLOR_PAT.matcher(ofLine(string));
+        Matcher colorMatcher = CHAT_COLOR_PAT.matcher(string);
         while (colorMatcher.find()) {
             colorLine.append(colorMatcher.group());
         }
@@ -28,7 +27,7 @@ public class ColorString {
     }
 
     public static String substring (String string, int begindex, int endindex) { //обрезает строку, не учитывая символы цвета
-        string = ofLine(string + "\0");
+        string += "\0";
         char[] chars = string.toCharArray();
         int letIndex = -1;
         Integer trueBeginIndex = null;
@@ -55,7 +54,7 @@ public class ColorString {
 
 
     public static String toNoColorString(String string) {
-        string = ofLine(string);
+        string = string;
         return string.replaceAll(CHAT_COLOR_PAT.pattern(), "");
     }
 
@@ -77,7 +76,6 @@ public class ColorString {
         StringBuilder colorLineOld = new StringBuilder();
         for(int i = 0; i < messages.length; i++) {
             StringBuilder colorLine = new StringBuilder();
-            messages[i] = ofLine(messages[i]);
             Matcher colorMatcher = CHAT_COLOR_PAT.matcher(messages[i]);
             while (colorMatcher.find()) {
                 colorLine.append(colorMatcher.group());
