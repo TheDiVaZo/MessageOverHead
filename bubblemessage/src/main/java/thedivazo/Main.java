@@ -2,7 +2,6 @@ package thedivazo;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -23,8 +22,6 @@ import thedivazo.utils.BubbleMessage;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Plugin(name = "MessageOverHead", version = PluginSettings.version)
 @Dependency(value = "ProtocolLib")
@@ -46,11 +43,8 @@ public class Main extends JavaPlugin {
     @Getter
     private final HashMap<UUID, BubbleMessage> bubbleMessageMap = new HashMap<>();
 
-    private static final Pattern HEXPAT = Pattern.compile("&#[a-fA-F0-9]{6}");
-
     private Config configuration;
 
-    // Переопределения всегда нужно так указывать, чтобы понимать что это не с бухты борахты метод взял
     @Override
     public void onEnable() {
         this.checkPluginVersion();
@@ -60,8 +54,6 @@ public class Main extends JavaPlugin {
         this.configuration = new Config(this);
 
         this.getServer().getPluginManager().registerEvents(new Listeners(this, configuration), this);
-        // это же лишнее, нет? У тебя же есть алиас для /messageoverhead => /moh отдельно не нужно регистрировать.
-//        this.getCommand("moh").setExecutor(new ReloadConfig(this, configuration));
         this.getCommand("messageoverhead").setExecutor(new ReloadConfig(this, configuration));
     }
 
@@ -69,21 +61,6 @@ public class Main extends JavaPlugin {
     public void onDisable() {
         this.bubbleMessageMap.values().forEach(BubbleMessage::remove);
     }
-
-    public static String makeColors(String message) {
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        if (Main.getVersion() < 1.16f) {
-            return message;
-        }
-        Matcher match = HEXPAT.matcher(message);
-        while (match.find()) {
-            String color = message.substring(match.start(), match.end());
-            // проверь, корректно ли отрабатывает это:
-            message = message.replace(color, "" + ChatColor.translateAlternateColorCodes('&', color));
-        }
-        return message;
-    }
-
 
     private void checkPluginVersion() {
         if (!PluginSettings.version.equals(Config.getLastVersionOfPlugin())) {

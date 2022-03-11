@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group 'io.messageoverhead.thedivazo'
@@ -35,16 +36,23 @@ dependencies {
 
 
 }
+shadowJar {
+    relocate 'org.bstats', 'thedivazo.bstats'
+    minimize()
+}
 
 task buildAndCopyJar {
     dependsOn(tasks.jar)
+    dependsOn(shadowJar)
     doLast {
         copy {
-            from "$projectDir/build/libs/"+rootProject.name+"-"+version+".jar"
+            from "$projectDir/build/libs/"+rootProject.name+"-"+version+"-all.jar"
             into 'D:/Minecraft/Test_Server/plugins'
         }
     }
 }
+
+
 
 
 

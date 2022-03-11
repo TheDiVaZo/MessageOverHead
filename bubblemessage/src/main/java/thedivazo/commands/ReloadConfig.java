@@ -22,7 +22,6 @@ public class ReloadConfig implements CommandExecutor {
             return false;
         }
         this.plugin.reloadConfig();
-
         config.saveParam();
         commandSender.sendMessage("Config has been reloaded");
         return true;

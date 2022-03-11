@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 @Data
 public class Config {
     private final Main plugin;
-    private final FileConfiguration config;
+    private FileConfiguration config;
 
 
     private boolean isPAPILoaded = false;
@@ -39,7 +39,7 @@ public class Config {
     private double particleOffsetZ = 0.2;
 
     // Аналогично isParticleEnable
-    private final boolean isSoundEnable = true;
+    private boolean isSoundEnable = true;
     private Sound soundType = Sound.BLOCK_ANVIL_STEP;
     private int soundVolume = 4;
     private int soundPitch = 4;
@@ -69,6 +69,7 @@ public class Config {
     }
 
     public void saveParam() {
+        this.config = plugin.getConfig();
         if (Bukkit.getPluginManager().getPlugin("ProtocolLib") == null) {
             Bukkit.getLogger().warning("ProtocolLib not found! Please install ProtocolLib");
             Bukkit.getPluginManager().disablePlugin(plugin);
@@ -114,6 +115,9 @@ public class Config {
             }
             this.setMessageFormat("%player_name% %message%");
         }
+
+        this.setParticleEnable(config.getBoolean("messages.particle.enable"));
+        this.setSoundEnable(config.getBoolean("messages.sound.enable"));
         this.setDistance(config.getInt("messages.settings.distance"));
         this.setBiasY(config.getDouble("messages.settings.biasY"));
         this.setVisibleTextForOwner(config.getBoolean("messages.settings.visibleTextForOwner"));
@@ -124,9 +128,9 @@ public class Config {
     }
 
     public static String getLastVersionOfPlugin() {
+        String inputLine;
+        Bukkit.getLogger().info("Check updates...");
         try {
-            String inputLine;
-            Bukkit.getLogger().info("Check updates...");
             URL obj = new URL("https://api.spigotmc.org/legacy/update.php?resource=100051");
             HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
             connection.setRequestMethod("GET");
@@ -160,8 +164,8 @@ public class Config {
                     }
                 }
                 thisConfig.set("version", defaultConfig.get("version"));
+                plugin.saveConfig();
             }
-            plugin.saveConfig();
         } catch (IOException e) {
             Bukkit.getLogger().warning("UPDATE CONFIG ERROR!!");
         }

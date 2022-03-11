@@ -1,66 +1,65 @@
 package thedivazo.utils;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import thedivazo.config.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class BubbleMessage {
 
     private final List<Bubble> bubbleMessages = new ArrayList<>();
-    private final Location loc;
+    private Location loc;
     private BukkitTask[] tasksRunnable = null;
-    private final Config config;
+    private Config config;
 
     public BubbleMessage(String message, Location loc, Config config) {
+        String noColorMessage = ColorString.toNoColorString(message);
         this.loc = loc;
         this.config = config;
 
         List<String> bubbleLines = new ArrayList<>();
-        String[] messageLines;
-        if (message.contains(" ")) {
-            messageLines = message.split(" ");
-        } else {
-            messageLines = new String[]{message};
+        List<String> msgLines = new ArrayList<>();
+        for(int i = 0; i < Math.ceil((double)noColorMessage.length() / config.getSizeLine()); i++) {
+            int begin = i*config.getSizeLine();
+            int end = (i+1)*config.getSizeLine();
+            if(end>noColorMessage.length()) end=noColorMessage.length();
+            msgLines.add(ColorString.substring(message,begin, end));
         }
 
-        StringBuilder bubbleLine = new StringBuilder();
-        int sizeColor = 0;
-        String colorOld = "";
-
-        for (String messageLine : messageLines) {
-            String line = colorOld + messageLine;
-            List<String> colors = new ArrayList<>();
-            Matcher colorMatcher = Pattern.compile("" + ChatColor.COLOR_CHAR + "[0-9a-zA-Z]").matcher(line);
-            while (colorMatcher.find()) {
-                colors.add(colorMatcher.group());
+        //FIXED:
+        for(int i = 0; i < msgLines.size(); i++) {
+            if(msgLines.get(i).length() != 0) {
+                if (msgLines.get(i).charAt(msgLines.get(i).length() - 1) != ' ') {
+                    if (i + 1 < msgLines.size()) {
+                        if (msgLines.get(i + 1).charAt(0) != ' ') {
+                            String[] line_1 = msgLines.get(i).split(" ");
+                            String[] line_2 = msgLines.get(i + 1).split(" ");
+                            String two_pieces = line_1[line_1.length - 1] + line_2[0];
+                            if (ColorString.lengthString(line_2[0]) < 6) {
+                                String newLine1 = new StringBuffer(two_pieces).reverse().toString();
+                                String reverseLine = new StringBuffer(msgLines.get(i)).reverse().toString();
+                                String last_letter = new StringBuffer(line_1[line_1.length-1]).reverse().toString();
+                                msgLines.set(i,  new StringBuffer(reverseLine.replaceFirst(last_letter, newLine1)).reverse().toString().trim());
+                                msgLines.set(i + 1, msgLines.get(i+1).replaceFirst(line_2[0], ""));
+                            }
+                        }
+                    }
+                }
             }
-
-            sizeColor += colors.size() * 2;
-            bubbleLine.append(line).append(" ");
-
-
-            if ((bubbleLine.length() - sizeColor) > config.getSizeLine()) {
-                bubbleLines.add(bubbleLine.toString());
-                bubbleLine.setLength(0);
-                sizeColor = 0;
+        }
+        msgLines = Arrays.asList(ColorString.ofText(msgLines.toArray(new String[]{})));
+        for (int i = 0; i < msgLines.size(); i++) {
+            if(msgLines.get(msgLines.size() - 1 - i).length() > 0) {
+                if(!msgLines.get(msgLines.size() - 1 - i).equals(" ")) {
+                    Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3D, loc.getZ());
+                    this.bubbleMessages.add(new Bubble(msgLines.get(msgLines.size() - 1 - i), locBubble));
+                }
             }
-
-            colorOld = String.join("", colors.toArray(new String[0]));
-        }
-        if (bubbleLine.length()!=0) {
-            bubbleLines.add(colorOld + bubbleLine);
-        }
-
-        for (int i = 0; i < bubbleLines.size(); ++i) {
-            Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3D, loc.getZ());
-            this.bubbleMessages.add(new Bubble(bubbleLines.get(bubbleLines.size() - 1 - i), locBubble));
         }
 
     }

@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 import thedivazo.Main;
 import thedivazo.config.Config;
 import thedivazo.utils.BubbleMessage;
+import thedivazo.utils.ColorString;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -58,9 +59,9 @@ public class Listeners implements Listener {
         String message;
         String format = getFormatOfPlayer(player);
         if (config.isPAPILoaded())
-            message = Main.makeColors(PlaceholderAPI.setPlaceholders(player, format)).replace("%message%", msg);
+            message = ColorString.ofLine(PlaceholderAPI.setPlaceholders(player, format)).replace("%message%", msg);
         else
-            message = Main.makeColors(format).replace("%message%", msg);
+            message = ColorString.ofLine(format).replace("%message%", msg);
 
         BubbleMessage bubbleMessage = new BubbleMessage(message, loc, config);
 
