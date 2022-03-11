@@ -59,9 +59,9 @@ public class Listeners implements Listener {
         String message;
         String format = getFormatOfPlayer(player);
         if (config.isPAPILoaded())
-            message = (PlaceholderAPI.setPlaceholders(player, format)).replace("%message%", msg);
+            message = ColorString.ofLine(PlaceholderAPI.setPlaceholders(player, format)).replace("%message%", msg);
         else
-            message = (format).replace("%message%", msg);
+            message = ColorString.ofLine(format).replace("%message%", msg);
 
         BubbleMessage bubbleMessage = new BubbleMessage(message, loc, config);
 
