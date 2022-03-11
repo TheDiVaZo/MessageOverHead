@@ -1,4 +1,4 @@
-package thedivazo;
+package thedivazo.utils;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -7,14 +7,16 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
+import lombok.Data;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import thedivazo.Main;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+@Data
 public class Bubble {
     private final Random random = new Random();
 
@@ -27,35 +29,32 @@ public class Bubble {
 
     private final ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 
-    private static int customNameIndex = 2;
-    private static int customNameVisibleIndex = 3;
-    private static int paramArmorStandIndex = 14;
+    private static final int CUSTOM_NAME_INDEX = 2;
+    private static final int CUSTOM_NAME_VISIBLE_INDEX = 3;
+    private static final int PARAM_ARMOR_STAND_INDEX;
 
     static {
         if (Main.getVersion() >= 1.17f) {
-            paramArmorStandIndex = 15;
-        }
-        else if (Main.getVersion() > 1.14f) {
-            paramArmorStandIndex = 14;
-        }
-        else if (Main.getVersion() == 1.14f) {
-            paramArmorStandIndex = 13;
-        }
-        else {
-            paramArmorStandIndex = 11;
+            PARAM_ARMOR_STAND_INDEX = 15;
+        } else if (Main.getVersion() > 1.14f) {
+            PARAM_ARMOR_STAND_INDEX = 14;
+        } else if (Main.getVersion() == 1.14f) {
+            PARAM_ARMOR_STAND_INDEX = 13;
+        } else {
+            PARAM_ARMOR_STAND_INDEX = 11;
         }
     }
 
     private boolean isRemovedBubble = false;
-    private Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
-    private Serializer serBoolean = WrappedDataWatcher.Registry.get(Boolean.class);
-    private Serializer serByte = WrappedDataWatcher.Registry.get(Byte.class);
+    private final Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+    private final Serializer serBoolean = WrappedDataWatcher.Registry.get(Boolean.class);
+    private final Serializer serByte = WrappedDataWatcher.Registry.get(Byte.class);
 
-    private WrappedDataWatcher metadata = new WrappedDataWatcher();
+    private final WrappedDataWatcher metadata = new WrappedDataWatcher();
 
     private Location loc;
-    private int id = random.nextInt(Integer.MAX_VALUE);
-    private UUID uuid = UUID.randomUUID();
+    private final int id = random.nextInt(Integer.MAX_VALUE);
+    private final UUID uuid = UUID.randomUUID();
 
     public Bubble(String message, Location loc) {
         this.message = message;
@@ -91,14 +90,12 @@ public class Bubble {
         } else {
             opt = Optional.of(WrappedChatComponent.fromChatMessage(message)[0].getHandle());
         }
-        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(customNameIndex, serChatComponent), opt);
-        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(customNameVisibleIndex, serBoolean), true);
-        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(paramArmorStandIndex, serByte), (byte)
+        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
+        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_VISIBLE_INDEX, serBoolean), true);
+        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(PARAM_ARMOR_STAND_INDEX, serByte), (byte)
                 ((isMarker ? 0x10 : 0) | (isSmall ? 0x01 : 0) | (noBasePlate ? 0x08 : 0))
         );
         metadata.setObject(0, serByte, (byte) (invisible ? 0x20 : 0));
-
-
     }
 
     private PacketContainer getFakeStandPacket() {
@@ -108,8 +105,7 @@ public class Bubble {
 
             if(Main.getVersion() <= 1.13f) {
                 getIntegers().write(6, 78);
-            }
-            else {
+            } else {
                 getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
             }
             // Set location
@@ -158,48 +154,12 @@ public class Bubble {
             List<Integer> Entity = new ArrayList<>();
             Entity.add(id);
             removeStandPacket.getIntLists().write(0, Entity);
-        }
-        else if(Main.getVersion() == 1.17f) {
-            removeStandPacket.getModifier().writeSafely(0, new IntArrayList(new int[]{id}));
-        }
-
-        else {
+        } else if(Main.getVersion() == 1.17f) {
+            removeStandPacket.getModifier().writeSafely(0, List.of(new int[]{id}));
+        } else {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }
 
         pm.broadcastServerPacket(removeStandPacket);
-    }
-
-    //Getters and setters
-    public boolean isSmall() {
-        return isSmall;
-    }
-
-    public void setSmall(boolean small) {
-        isSmall = small;
-    }
-
-    public boolean isNoBasePlate() {
-        return noBasePlate;
-    }
-
-    public void setNoBasePlate(boolean noBasePlate) {
-        this.noBasePlate = noBasePlate;
-    }
-
-    public boolean isMarker() {
-        return isMarker;
-    }
-
-    public void setMarker(boolean marker) {
-        isMarker = marker;
-    }
-
-    public boolean isInvisible() {
-        return invisible;
-    }
-
-    public void setInvisible(boolean invisible) {
-        this.invisible = invisible;
     }
 }

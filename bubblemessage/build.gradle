@@ -1,17 +1,19 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group 'io.messageoverhead.thedivazo'
-version '2.2'
+version "2.4"
 
 repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url 'https://oss.sonatype.org/content/repositories/central' }
     maven { url "https://repo.dmulloy2.net/repository/public/" }
+    maven { url "https://jitpack.io"}
 
 }
 
@@ -27,15 +29,32 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.10.10'
 
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
+
+    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.6-4'
+
+
+}
+shadowJar {
+    relocate 'org.bstats', 'thedivazo.bstats'
+    minimize()
 }
 
 task buildAndCopyJar {
     dependsOn(tasks.jar)
+    dependsOn(shadowJar)
     doLast {
         copy {
-            from "$projectDir/build/libs/"+rootProject.name+"-"+version+".jar"
-            // полный путь, куда тебе нужно. У меня вот так:
-            into 'R:/Dima/ServerMinecraft/TestServer/plugins'
+            from "$projectDir/build/libs/"+rootProject.name+"-"+version+"-all.jar"
+            into 'D:/Minecraft/Test_Server/plugins'
         }
     }
 }
+
+
+
+
+
+
+
