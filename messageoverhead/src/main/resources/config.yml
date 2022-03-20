@@ -1,0 +1,35 @@
+#######################
+#=MESSAGE=OVER=HEADER=#
+#=========OR==========#
+#===BUBBLE=MESSAGE====#
+#######################
+version: 1.1 #DONT TOUCH!
+
+messages:
+  particle:
+    enable: true
+    particleType: CLOUD # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+    count: 4 #count of particle
+    offsetX: 0.2 #the maximum random offset on the X axis
+    offsetY: 0.2 #the maximum random offset on the X axis
+    offsetZ: 0.2 #the maximum random offset on the Z axis
+  sound:
+    enable: true
+    soundType: BLOCK_ANVIL_STEP # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+    volume: 3 #The volume of the sound
+    pitch: 3 #The pitch of the sound
+  settings:
+    format: '%player_name% %message%' #Default format! Supports PlaceholderAPI and HEX colors (example: &#123456)
+    #format: #Group format!
+     #'0': #priority
+        #format: '%message%' #default format. format haven't permission
+     #'1':
+        #perm: 'perm.vip' #perm.vip
+        #format: '&cVIP &e%message%' #format of perm.vip
+    distance: 10
+    biasY: 2.15 #height spawn of Bubble Message. The value is calculated experimentally.
+    visibleTextForOwner: true
+    permSend: moh.send
+    permSee: moh.see
+    delay: 4 #in seconds. Bubble life time
+    sizeLine: 24 #Maximum size of one bubble
