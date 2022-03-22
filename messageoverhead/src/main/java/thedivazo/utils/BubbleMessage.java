@@ -1,13 +1,11 @@
 package thedivazo.utils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import thedivazo.config.Config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -102,7 +100,7 @@ public class BubbleMessage {
         bubbleMessages.forEach(Bubble::remove);
     }
 
-    public void particle(Player player) {
+    public void playParticle(Player player) {
         player.spawnParticle(config.getParticleType(), loc,
                 config.getParticleCount(),
                 config.getParticleOffsetX(),
@@ -114,7 +112,7 @@ public class BubbleMessage {
         this.tasksRunnable = tasksRunnable;
     }
 
-    public void sound(Player player) {
+    public void playSound(Player player) {
         player.playSound(loc,
                 config.getSoundType(),
                 config.getSoundVolume(),

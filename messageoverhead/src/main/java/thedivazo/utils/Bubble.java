@@ -15,11 +15,10 @@ import thedivazo.Main;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 public class Bubble {
-    private final Random random = new Random();
-
     private boolean isSmall = true;
     private boolean noBasePlate = true;
     private boolean isMarker = true;
@@ -53,7 +52,7 @@ public class Bubble {
     private final WrappedDataWatcher metadata = new WrappedDataWatcher();
 
     private Location loc;
-    private final int id = random.nextInt(Integer.MAX_VALUE);
+    private final int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private final UUID uuid = UUID.randomUUID();
 
     public Bubble(String message, Location loc) {

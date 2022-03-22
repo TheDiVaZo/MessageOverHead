@@ -1,6 +1,7 @@
 package thedivazo.listener;
 
 import de.myzelyam.api.vanish.VanishAPI;
+import lombok.AllArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -24,15 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@AllArgsConstructor
 public class Listeners implements Listener {
 
     private final Main plugin;
     private final Config config;
-
-    public Listeners(Main plugin, Config config) {
-        this.plugin = plugin;
-        this.config = config;
-    }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
@@ -81,17 +78,17 @@ public class Listeners implements Listener {
                         if (onlinePlayer.equals(player)) {
                             if (config.isVisibleTextForOwner()) {
                                 if (config.isSoundEnable())
-                                    bubbleMessage.sound(onlinePlayer);
+                                    bubbleMessage.playSound(onlinePlayer);
                                 if (config.isParticleEnable())
-                                    bubbleMessage.particle(onlinePlayer);
+                                    bubbleMessage.playParticle(onlinePlayer);
                                 bubbleMessage.spawn(onlinePlayer);
                             }
                         }
                         else {
                             if (config.isSoundEnable())
-                                bubbleMessage.sound(onlinePlayer);
+                                bubbleMessage.playSound(onlinePlayer);
                             if (config.isParticleEnable())
-                                bubbleMessage.particle(onlinePlayer);
+                                bubbleMessage.playParticle(onlinePlayer);
                             bubbleMessage.spawn(onlinePlayer);
                         }
                     }
