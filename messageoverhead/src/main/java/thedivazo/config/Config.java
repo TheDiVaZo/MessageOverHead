@@ -56,7 +56,6 @@ public class Config {
 
     private int delay = 4;
     private int sizeLine = 24;
-    private static final Pattern HEXPAT = Pattern.compile("&#[a-fA-F0-9]{6}");
 
     public Config(Main plugin) {
         this.plugin = plugin;

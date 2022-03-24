@@ -9,6 +9,7 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import lombok.Data;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import thedivazo.Main;
@@ -154,7 +155,7 @@ public class Bubble {
             Entity.add(id);
             removeStandPacket.getIntLists().write(0, Entity);
         } else if(Main.getVersion() == 1.17f) {
-            removeStandPacket.getModifier().writeSafely(0, List.of(new int[]{id}));
+            removeStandPacket.getModifier().write(0, new IntArrayList(new int[]{id}));
         } else {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }
