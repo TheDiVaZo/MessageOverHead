@@ -28,7 +28,6 @@ public class ColorString {
     }
 
     public static String substring (String string, int begindex, int endindex) { //обрезает строку, не учитывая символы цвета
-        string += "\0";
         char[] chars = string.toCharArray();
         int letIndex = -1;
         Integer trueBeginIndex = null;
@@ -40,13 +39,16 @@ public class ColorString {
             if(i+1 < chars.length) {
                 nextChar = chars[i+1];
                 String doubleChars = new String(new char[]{thisChar, nextChar});
-                if(CHAT_COLOR_PAT.matcher(doubleChars).find()) {letIndex-=2;}
+                if(CHAT_COLOR_PAT.matcher(doubleChars).find()) {
+                    letIndex-=2;
+                }
             }
-            if(letIndex == begindex && trueBeginIndex == null) {
+            if(begindex == 0) {trueBeginIndex = 0;}
+            if(letIndex == begindex && trueBeginIndex == null ) {
                 trueBeginIndex = i;
             }
-            if(letIndex == endindex && trueEndIndex == null) {
-                trueEndIndex = i;
+            if(letIndex == endindex-1 && trueEndIndex == null) {
+                trueEndIndex = i+1;
                 break;
             }
         }
