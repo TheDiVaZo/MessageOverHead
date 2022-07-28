@@ -37,6 +37,8 @@ public class MetricsManager {
                 map.put("Java 1.17", entry);
             } else if (javaVersion.startsWith("1.18")) {
                 map.put("Java 1.18", entry);
+            } else if (javaVersion.startsWith("1.19")) {
+                map.put("Java 1.19", entry);
             } else {
                 map.put("Other", entry);
             }

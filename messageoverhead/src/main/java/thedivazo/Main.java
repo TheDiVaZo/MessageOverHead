@@ -22,6 +22,8 @@ import thedivazo.utils.BubbleMessage;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Plugin(name = "MessageOverHead", version = PluginSettings.version)
 @Dependency(value = "ProtocolLib")
@@ -74,9 +76,13 @@ public class Main extends JavaPlugin {
 
     public static Float getVersion() {
         String version = Bukkit.getVersion();
-        String pattern = "[^0-9\\.\\:]";
-        String versionMinecraft = version.replaceAll(pattern, "");
-        return Float.parseFloat(versionMinecraft.substring(versionMinecraft.indexOf(":") + 1, versionMinecraft.lastIndexOf(".")));
+        Pattern pattern = Pattern.compile("\\(MC: ([0-9]+\\.[0-9]+)");
+        Matcher matcher = pattern.matcher(version);
+        if (matcher.find())
+        {
+            return Float.parseFloat(matcher.group(1));
+        }
+        else return null;
     }
 
 }

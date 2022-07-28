@@ -103,7 +103,7 @@ public class Listeners implements Listener {
                 loc.setY(loc.getY() + config.getBiasY());
                 bubbleMessage.setPosition(loc);
             }
-        }.runTaskTimer(plugin, 1L, 1L);
+        }.runTaskTimerAsynchronously(plugin, 1L, 1L);
 
         BukkitTask taskDelete = new BukkitRunnable() {
             @Override
@@ -114,7 +114,7 @@ public class Listeners implements Listener {
                     bubbleMessage.remove();
                 }
             }
-        }.runTaskLater(plugin, config.getDelay() * 20L);
+        }.runTaskLaterAsynchronously(plugin, config.getDelay() * 20L);
         bubbleMessage.removeTask(taskDelete, taskMove);
     }
 

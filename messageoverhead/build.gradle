@@ -4,11 +4,12 @@ plugins {
 }
 
 group 'io.messageoverhead.thedivazo'
-version "2.52"
+version "2.54"
 
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url 'https://maven.pkg.github.com/LoneDev6/API-ItemsAdder' }
     maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
@@ -28,8 +29,6 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.10.10'
 
-    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
-
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     compileOnly 'com.github.LeonMangler:SuperVanish:6.2.6-4'
@@ -47,7 +46,7 @@ task buildAndCopyJar {
     doLast {
         copy {
             from "$projectDir/build/libs/"+rootProject.name+"-"+version+"-all.jar"
-            into 'D:/Minecraft/Test_Server/plugins'
+            into 'D:/testServer/plugins'
         }
     }
 }

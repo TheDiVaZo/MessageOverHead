@@ -77,7 +77,7 @@ public class Bubble {
         try {
             pm.sendServerPacket(player, fakeStandPacket);
             pm.sendServerPacket(player, metaPacket);
-        } catch (InvocationTargetException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
 

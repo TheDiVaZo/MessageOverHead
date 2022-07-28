@@ -27,7 +27,8 @@ public class ColorString {
         return colorLine.length();
     }
 
-    public static String substring (String string, int begindex, int endindex) { //обрезает строку, не учитывая символы цвета
+    //обрезает строку, не учитывая символы цвета
+    public static String substring (String string, int begindex, int endindex) {
         char[] chars = string.toCharArray();
         int letIndex = -1;
         Integer trueBeginIndex = null;
@@ -57,7 +58,6 @@ public class ColorString {
 
 
     public static String toNoColorString(String string) {
-        string = string;
         return string.replaceAll(CHAT_COLOR_PAT.pattern(), "");
     }
 
