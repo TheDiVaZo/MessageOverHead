@@ -3,10 +3,11 @@ package thedivazo.utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.config.Config;
+import thedivazo.Main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BubbleMessage {
@@ -14,24 +15,26 @@ public class BubbleMessage {
     private final List<Bubble> bubbleMessages = new ArrayList<>();
     private Location loc;
     private BukkitTask[] tasksRunnable = null;
-    private Config config;
+    private boolean isBubbleInit = false;
 
-    public BubbleMessage(List<String> messageLines, Location loc, Config config) {
+    public BubbleMessage(Location loc) {
         this.loc = loc;
-        this.config = config;
+    }
 
-        List<String> allMessages = null;
+    public void init(List<String> message) {
+        if(isBubbleInit) return;
+        List<String> resultMessages = null;
 
-        for (String message : messageLines) {
+        for (String msg : message) {
 
-            String noColorMessage = ColorString.toNoColorString(message);
+            String noColorMessage = ColorString.toNoColorString(msg);
 
             List<String> msgLines = new ArrayList<>();
-            for (int i = 0; i < Math.ceil((double) noColorMessage.length() / config.getSizeLine()); i++) {
-                int begin = i * config.getSizeLine();
-                int end = (i + 1) * config.getSizeLine();
+            for (int i = 0; i < Math.ceil((double) noColorMessage.length() / Main.getConfigPlugin().getSizeLine()); i++) {
+                int begin = i * Main.getConfigPlugin().getSizeLine();
+                int end = (i + 1) * Main.getConfigPlugin().getSizeLine();
                 if (end > noColorMessage.length()) end = noColorMessage.length();
-                msgLines.add(ColorString.substring(message, begin, end));
+                msgLines.add(ColorString.substring(msg, begin, end));
             }
 
             for (int i = 0; i < msgLines.size(); i++) {
@@ -46,33 +49,34 @@ public class BubbleMessage {
                                     String newLine1 = new StringBuffer(two_pieces).reverse().toString();
                                     String reverseLine = new StringBuffer(msgLines.get(i)).reverse().toString();
                                     String last_letter = new StringBuffer(line_1[line_1.length - 1]).reverse().toString();
-                                    msgLines.set(i, (new StringBuffer(reverseLine.replaceFirst(Pattern.quote(last_letter), newLine1)).reverse().toString()).trim());
-                                    msgLines.set(i + 1, msgLines.get(i + 1).replaceFirst(Pattern.quote(line_2[0]), ""));
+                                    msgLines.set(i, ((new StringBuffer(reverseLine.replaceFirst(Pattern.quote(last_letter), Matcher.quoteReplacement(newLine1))).reverse().toString()).trim()));
+                                    msgLines.set(i + 1, (msgLines.get(i + 1).replaceFirst(Pattern.quote(line_2[0]), "")));
                                 }
                             }
                         }
                     }
                 }
             }
-            if(allMessages == null) allMessages = msgLines;
+            if(resultMessages == null) resultMessages = msgLines;
             else {
-                allMessages.addAll(msgLines);
+                resultMessages.addAll(msgLines);
             }
         }
-        ColorString.ofText(allMessages);
-        for (int i = 0; i < allMessages.size(); i++) {
-            if (allMessages.get(allMessages.size() - 1 - i).length() > 0) {
-                if (!allMessages.get(allMessages.size() - 1 - i).equals(" ")) {
+        ColorString.ofText(resultMessages);
+        for (int i = 0; i < resultMessages.size(); i++) {
+            if (resultMessages.get(resultMessages.size() - 1 - i).length() > 0) {
+                if (!resultMessages.get(resultMessages.size() - 1 - i).equals(" ")) {
                     Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3D, loc.getZ());
-                    this.bubbleMessages.add(new Bubble(allMessages.get(allMessages.size() - 1 - i), locBubble));
+                    this.bubbleMessages.add(new Bubble(resultMessages.get(resultMessages.size() - 1 - i), locBubble));
                 }
             }
         }
+
     }
 
 
 
-    public void spawn(Player player) {
+    public void show(Player player) {
         for (Bubble msg : bubbleMessages) {
             msg.spawn(player);
         }
@@ -100,11 +104,11 @@ public class BubbleMessage {
     }
 
     public void playParticle(Player player) {
-        player.spawnParticle(config.getParticleType(), loc,
-                config.getParticleCount(),
-                config.getParticleOffsetX(),
-                config.getParticleOffsetY(),
-                config.getParticleOffsetZ());
+        player.spawnParticle(Main.getConfigPlugin().getParticleType(), loc,
+                Main.getConfigPlugin().getParticleCount(),
+                Main.getConfigPlugin().getParticleOffsetX(),
+                Main.getConfigPlugin().getParticleOffsetY(),
+                Main.getConfigPlugin().getParticleOffsetZ());
     }
 
     public void removeTask(BukkitTask... tasksRunnable) {
@@ -113,9 +117,9 @@ public class BubbleMessage {
 
     public void playSound(Player player) {
         player.playSound(loc,
-                config.getSoundType(),
-                config.getSoundVolume(),
-                config.getSoundPitch());
+                Main.getConfigPlugin().getSoundType(),
+                Main.getConfigPlugin().getSoundVolume(),
+                Main.getConfigPlugin().getSoundPitch());
     }
 }
 

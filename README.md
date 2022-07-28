@@ -7,6 +7,6 @@ Here you can write about your __mistakes__, as well as take my plugin code and f
 
 write your bugs in [**issues**](https://github.com/TheDiVaZo/MessageOverHead/issues/new)
 
-Last update: __2.52__
+Last update: __2.55__
 Changes: __on spigotmc.org__
 

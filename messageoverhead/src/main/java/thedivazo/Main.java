@@ -19,6 +19,7 @@ import thedivazo.config.Config;
 import thedivazo.listener.Listeners;
 import thedivazo.metrics.MetricsManager;
 import thedivazo.utils.BubbleMessage;
+import thedivazo.utils.BubbleMessageManager;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -42,10 +43,11 @@ import java.util.regex.Pattern;
 @ApiVersion(value = ApiVersion.Target.v1_13)
 public class Main extends JavaPlugin {
 
-    @Getter
-    private final HashMap<UUID, BubbleMessage> bubbleMessageMap = new HashMap<>();
+    private static Config configuration;
 
-    private Config configuration;
+    public static Config getConfigPlugin() {
+        return Main.configuration;
+    }
 
     @Override
     public void onEnable() {
@@ -55,13 +57,13 @@ public class Main extends JavaPlugin {
 
         this.configuration = new Config(this);
 
-        this.getServer().getPluginManager().registerEvents(new Listeners(this, configuration), this);
-        this.getCommand("messageoverhead").setExecutor(new ReloadConfig(this, configuration));
+        this.getServer().getPluginManager().registerEvents(new Listeners(this), this);
+        this.getCommand("messageoverhead").setExecutor(new ReloadConfig(this));
     }
 
     @Override
     public void onDisable() {
-        this.bubbleMessageMap.values().forEach(BubbleMessage::remove);
+        BubbleMessageManager.getBubbleMessageMap().values().forEach(BubbleMessage::remove);
     }
 
     private void checkPluginVersion() {
