@@ -16,6 +16,7 @@ public class ReloadConfig implements CommandExecutor {
         if (!commandSender.hasPermission("moh.reload")) {
             return false;
         }
+
         this.plugin.reloadConfig();
         Main.getConfigPlugin().saveParam();
         commandSender.sendMessage("Config has been reloaded");

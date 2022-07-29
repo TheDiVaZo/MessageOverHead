@@ -37,6 +37,7 @@ public class BubbleMessage {
                 msgLines.add(ColorString.substring(msg, begin, end));
             }
 
+
             for (int i = 0; i < msgLines.size(); i++) {
                 if (msgLines.get(i).length() != 0) {
                     if (msgLines.get(i).charAt(msgLines.get(i).length() - 1) != ' ') {

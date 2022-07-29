@@ -44,6 +44,7 @@ public class Listeners implements Listener {
 
         BubbleMessageManager bubbleMessageManager = new BubbleMessageManager(e.getMessage(), player, plugin);
 
+
         bubbleMessageManager.generateBubbleMessage();
     }
 

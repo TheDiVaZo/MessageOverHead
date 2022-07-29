@@ -58,6 +58,7 @@ public class ColorString {
 
 
     public static String toNoColorString(String string) {
+
         return string.replaceAll(CHAT_COLOR_PAT.pattern(), "");
     }
 

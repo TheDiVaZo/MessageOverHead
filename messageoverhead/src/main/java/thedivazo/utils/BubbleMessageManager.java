@@ -38,6 +38,7 @@ public class BubbleMessageManager {
         removeOtherBubble(player.getUniqueId());
     }
 
+
     public static void removeOtherBubble(UUID player) {
         if (BubbleMessageManager.getBubbleMessageMap().containsKey(player)) {
             bubbleMessageMap.get(player).remove();
