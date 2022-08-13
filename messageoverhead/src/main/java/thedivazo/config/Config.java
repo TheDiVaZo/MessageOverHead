@@ -7,7 +7,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import thedivazo.Main;
+import thedivazo.MessageOverHear;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,11 +19,13 @@ import java.util.*;
 
 @Data
 public class Config {
-    private final Main plugin;
+    private final MessageOverHear plugin;
     private FileConfiguration config;
 
 
     private boolean isPAPILoaded = false;
+    private boolean isIALoaded = false; //IA - ItemsAdder
+    private boolean isOraxenLoaded = false;
 
     private boolean isSuperVanishLoaded = false;
 
@@ -55,7 +57,7 @@ public class Config {
     private int delay = 4;
     private int sizeLine = 24;
 
-    public Config(Main plugin) {
+    public Config(MessageOverHear plugin) {
         this.plugin = plugin;
         this.config = plugin.getConfig();
         plugin.saveDefaultConfig();
@@ -63,16 +65,23 @@ public class Config {
         saveParam();
     }
 
+    private boolean isPlugin(String pluginName) {
+        return Bukkit.getPluginManager().getPlugin(pluginName) != null;
+    }
+
     public void saveParam() {
         this.config = plugin.getConfig();
-        if (Bukkit.getPluginManager().getPlugin("ProtocolLib") == null) {
+        if (!isPlugin("ProtocolLib")) {
             Bukkit.getLogger().warning("ProtocolLib not found! Please install ProtocolLib");
             Bukkit.getPluginManager().disablePlugin(plugin);
         }
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            this.setPAPILoaded(true);
+        if (isPlugin("ItemsAdder")) {
+            this.setIALoaded(true);
         }
-        if (Bukkit.getPluginManager().isPluginEnabled("SuperVanish") || Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
+        if (isPlugin("Oraxen")) {
+            this.setOraxenLoaded(true);
+        }
+        if (isPlugin("SuperVanish") || isPlugin("PremiumVanish")) {
             this.setSuperVanishLoaded(true);
         }
         if (config.getBoolean("messages.particle.enable")) {
@@ -99,14 +108,19 @@ public class Config {
         MoreMessageFormat.clear();
         MorePermissionFormat.clear();
         if (!config.isConfigurationSection("messages.settings.format")) {
-            List<String> format = config.isList("messages.settings.format") ? config.getStringList("messages.settings.format"):new ArrayList<>(){{add(config.getString("messages.settings.format"));}};
+            List<String> list = new ArrayList<>();
+            list.add(config.getString("messages.settings.format"));
+            List<String> format = config.isList("messages.settings.format") ?
+                    config.getStringList("messages.settings.format"):list;
             MoreMessageFormat.put(null, format);
             MorePermissionFormat.put(0, null);
         } else {
             ConfigurationSection permissionsFormat = config.getConfigurationSection("messages.settings.format");
             for (String priority : permissionsFormat.getKeys(false)) {
                 ConfigurationSection sectionFormat = permissionsFormat.getConfigurationSection(priority);
-                List<String> format =  sectionFormat.isList("format") ? sectionFormat.getStringList("format"): new ArrayList<>() {{add(sectionFormat.getString("format"));}};
+                List<String> list = new ArrayList<>();
+                list.add(sectionFormat.getString("format"));
+                List<String> format =  sectionFormat.isList("format") ? sectionFormat.getStringList("format"): list;
 
                 String permission = null;
                if (sectionFormat.isString("perm")) {

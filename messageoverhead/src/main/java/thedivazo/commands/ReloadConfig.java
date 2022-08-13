@@ -1,26 +1,23 @@
 
 package thedivazo.commands;
 
-import lombok.AllArgsConstructor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Dependency;
+import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.command.CommandSender;
-import thedivazo.Main;
+import thedivazo.MessageOverHear;
 
-@AllArgsConstructor
-public class ReloadConfig implements CommandExecutor {
+@CommandAlias("messageoverhear|moh")
+public class ReloadConfig extends BaseCommand {
 
-    private final Main plugin;
-
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (!commandSender.hasPermission("moh.reload")) {
-            return false;
-        }
-
-        this.plugin.reloadConfig();
-        Main.getConfigPlugin().saveParam();
+    @Subcommand("reload")
+    @CommandPermission("moh.reload")
+    public void onCommand(CommandSender commandSender) {
+        MessageOverHear.getInstance().reloadConfig();
+        MessageOverHear.getConfigPlugin().saveParam();
         commandSender.sendMessage("Config has been reloaded");
-        return true;
 
     }
 }

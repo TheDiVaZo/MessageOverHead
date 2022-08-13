@@ -12,9 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import thedivazo.Main;
+import thedivazo.MessageOverHear;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,11 +33,11 @@ public class Bubble {
     private static final int PARAM_ARMOR_STAND_INDEX;
 
     static {
-        if (Main.getVersion() >= 1.17f) {
+        if (MessageOverHear.getVersion() >= 1.17f) {
             PARAM_ARMOR_STAND_INDEX = 15;
-        } else if (Main.getVersion() > 1.14f) {
+        } else if (MessageOverHear.getVersion() > 1.14f) {
             PARAM_ARMOR_STAND_INDEX = 14;
-        } else if (Main.getVersion() == 1.14f) {
+        } else if (MessageOverHear.getVersion() == 1.14f) {
             PARAM_ARMOR_STAND_INDEX = 13;
         } else {
             PARAM_ARMOR_STAND_INDEX = 11;
@@ -74,18 +73,14 @@ public class Bubble {
         PacketContainer metaPacket = getMetaPacket();
         PacketContainer fakeStandPacket = getFakeStandPacket();
 
-        try {
-            pm.sendServerPacket(player, fakeStandPacket);
-            pm.sendServerPacket(player, metaPacket);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+        pm.sendServerPacket(player, fakeStandPacket);
+        pm.sendServerPacket(player, metaPacket);
 
     }
 
     private void setMetadata() {
         Optional<?> opt;
-        if (Main.getVersion() <= 1.13f) {
+        if (MessageOverHear.getVersion() <= 1.13f) {
             opt = Optional.of(WrappedChatComponent.fromText(message).getHandle());
         } else {
             opt = Optional.of(WrappedChatComponent.fromChatMessage(message)[0].getHandle());
@@ -103,7 +98,7 @@ public class Bubble {
             getModifier().writeDefaults();
             getIntegers().write(0, id);
 
-            if(Main.getVersion() <= 1.13f) {
+            if(MessageOverHear.getVersion() <= 1.13f) {
                 getIntegers().write(6, 78);
             } else {
                 getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
@@ -150,11 +145,11 @@ public class Bubble {
     public void remove() {
         if (isRemovedBubble) return;
         PacketContainer removeStandPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-        if(Main.getVersion() >= 1.18f) {
-            List<Integer> Entity = new ArrayList<>();
-            Entity.add(id);
-            removeStandPacket.getIntLists().write(0, Entity);
-        } else if(Main.getVersion() == 1.17f) {
+        if(MessageOverHear.getVersion() >= 1.18f) {
+            List<Integer> entity = new ArrayList<>();
+            entity.add(id);
+            removeStandPacket.getIntLists().write(0, entity);
+        } else if(MessageOverHear.getVersion() == 1.17f) {
             removeStandPacket.getModifier().write(0, new IntArrayList(new int[]{id}));
         } else {
             removeStandPacket.getModifier().write(0, new int[]{id});
