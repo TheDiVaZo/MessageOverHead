@@ -3,16 +3,16 @@ package thedivazo.metrics;
 
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.DrilldownPie;
-import thedivazo.Main;
+import thedivazo.MessageOverHear;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MetricsManager {
 
-    private final Main plugin;
+    private final MessageOverHear plugin;
 
-    public MetricsManager(Main plugin) {
+    public MetricsManager(MessageOverHear plugin) {
         this.plugin = plugin;
         enableMetrics();
     }
@@ -21,7 +21,7 @@ public class MetricsManager {
     private void enableMetrics() {
         Metrics metrics = new Metrics(plugin, 14530);
         metrics.addCustomChart(new DrilldownPie("java_version", () -> {
-            HashMap<String, Map<String, Integer>> map = new HashMap();
+            HashMap<String, Map<String, Integer>> map = new HashMap<>();
             String javaVersion = System.getProperty("java.version");
             HashMap<String, Integer> entry = new HashMap<>();
             entry.put(javaVersion, 1);

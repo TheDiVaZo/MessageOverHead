@@ -15,15 +15,29 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
     maven { url "https://repo.dmulloy2.net/repository/public/" }
     maven { url "https://jitpack.io"}
+    maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+    maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
+    maven { url = "https://jitpack.io" }
+}
 
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+compileJava {
+    options.compilerArgs += ["-parameters"]
+    options.fork = true
+    options.forkOptions.executable = "C:\\Program Files\\Java\\jdk-17.0.3.1\\bin\\javac.exe"
+    options.setDebug(false);
 }
 
 dependencies {
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 
+    compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
+    compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
 
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
     annotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
@@ -34,22 +48,16 @@ dependencies {
 
     compileOnly 'com.github.LeonMangler:SuperVanish:6.2.6-4'
 
+    implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
+
+    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 
 }
 shadowJar {
     relocate 'org.bstats', 'thedivazo.bstats'
     minimize()
-}
-
-task buildAndCopyJar {
-    dependsOn(tasks.jar)
-    dependsOn(shadowJar)
-    doLast {
-        copy {
-            from "$projectDir/build/libs/"+rootProject.name+"-"+version+"-all.jar"
-            into 'D:/testServer/plugins'
-        }
-    }
+    relocate 'co.aikar.commands', 'thedivazo.acf'
+    relocate 'co.aikar.locales', 'thedivazo.locales'
 }
 
 
