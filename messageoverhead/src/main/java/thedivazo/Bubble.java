@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -72,8 +73,12 @@ public class Bubble {
         PacketContainer metaPacket = getMetaPacket();
         PacketContainer fakeStandPacket = getFakeStandPacket();
 
-        pm.sendServerPacket(player, fakeStandPacket);
-        pm.sendServerPacket(player, metaPacket);
+        try {
+            pm.sendServerPacket(player, fakeStandPacket);
+            pm.sendServerPacket(player, metaPacket);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
 
     }
 

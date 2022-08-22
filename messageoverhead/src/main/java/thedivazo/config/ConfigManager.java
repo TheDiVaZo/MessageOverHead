@@ -56,7 +56,7 @@ public class ConfigManager {
 
     private Permission permissionVault = null;
 
-    private ChatListener chatEventListener;
+    private ChatListener<?, ?> chatEventListener;
 
     public static final String DEFAULT_MESSAGE_FORMAT = "%player_name% %message%";
 
