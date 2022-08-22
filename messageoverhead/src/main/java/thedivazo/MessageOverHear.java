@@ -154,7 +154,10 @@ public class MessageOverHear extends JavaPlugin {
 
         boolean canSeePlayer = player2.canSee(player1) && player2.getWorld().equals(player1.getWorld());
         boolean isNotInvisiblePlayer = canSeeSuperVanish(player2, player1) && !player1.hasPotionEffect(PotionEffectType.INVISIBILITY);
-        boolean isBeside = player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();
+        boolean isBeside = canSeePlayer;
+        if(isBeside) {
+            isBeside = player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();
+        }
         boolean isSpectator = player1.getGameMode().equals(GameMode.SPECTATOR);
         return MessageOverHear.getConfigManager().haveSeePermission(player2) && canSeePlayer && isBeside && isNotInvisiblePlayer && !isSpectator;
     }
