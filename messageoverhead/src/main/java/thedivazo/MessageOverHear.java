@@ -144,15 +144,10 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     public static void createBubbleMessage(Player player, String message, Set<Player> showPlayers) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if(getConfigManager().haveSendPermission(player)) {
-                    Set<Player> showPlayersFilter = showPlayers.stream().filter(player1 -> getInstance().isPossibleBubbleMessage(player, player1)).collect(Collectors.toSet());
-                    getBubbleMessageManager().spawnBubble(getBubbleMessageManager().generateBubbleMessage(player, message), showPlayersFilter);
-                }
-            }
-        }.runTaskAsynchronously(MessageOverHear.getInstance());
+        if(getConfigManager().haveSendPermission(player)) {
+            Set<Player> showPlayersFilter = showPlayers.stream().filter(player1 -> getInstance().isPossibleBubbleMessage(player, player1)).collect(Collectors.toSet());
+            getBubbleMessageManager().spawnBubble(getBubbleMessageManager().generateBubbleMessage(player, message), showPlayersFilter);
+        }
     }
 
     public boolean isPossibleBubbleMessage(Player player1, Player player2) {

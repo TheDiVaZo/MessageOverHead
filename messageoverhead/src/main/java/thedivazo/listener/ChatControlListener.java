@@ -13,7 +13,6 @@ public class ChatControlListener implements ChatListener<ChatChannelEvent, PrePr
     @Override
     @EventHandler
     public void onPlayerChat(ChatChannelEvent e) {
-        Logger.warn("PlayerMessageEvent");
         if(!(e.getSender() instanceof Player sender)) return;
         MessageOverHear.createBubbleMessage(sender, e.getMessage(), e.getRecipients());
     }

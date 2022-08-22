@@ -94,8 +94,8 @@ public abstract class BubbleMessageManager {
         isShowSpectatorMessage = showSpectatorMessage;
     }
 
-    public HashMap<UUID, BubbleMessage> getBubbleMessageMap() {
-        return (HashMap<UUID, BubbleMessage>) Collections.unmodifiableMap(bubbleMessageMap);
+    public Map<UUID, BubbleMessage> getBubbleMessageMap() {
+        return Collections.unmodifiableMap(bubbleMessageMap);
     }
 
     public void removeBubble(UUID player) {
