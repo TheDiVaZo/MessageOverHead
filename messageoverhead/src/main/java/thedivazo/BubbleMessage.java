@@ -1,9 +1,8 @@
-package thedivazo.utils;
+package thedivazo;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.MessageOverHear;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,21 +10,23 @@ import java.util.List;
 public class BubbleMessage {
 
     private final List<Bubble> bubbleMessages = new ArrayList<>();
-    private Location loc;
+    private final Location loc;
     private BukkitTask[] tasksRunnable = null;
+    private final Player ownerPlayer;
 
-    public BubbleMessage(Player player, List<String> message) {
-        this(player.getLocation(), message);
-    }
-
-    public BubbleMessage(Location loc, List<String> message) {
+    public BubbleMessage(Player player, Location loc, List<String> message) {
+        ownerPlayer = player;
         this.loc = loc;
         for (int i = 0; i < message.size(); i++) {
             if (message.get(message.size() - 1 - i).length() > 0 && !message.get(message.size() - 1 - i).equals(" ")) {
-                Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3D, loc.getZ());
+                Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.1D, loc.getZ());
                 this.bubbleMessages.add(new Bubble(message.get(message.size() - 1 - i), locBubble));
             }
         }
+    }
+
+    public Player getOwnerPlayer() {
+        return ownerPlayer;
     }
 
     public void show(Player player) {
@@ -56,22 +57,22 @@ public class BubbleMessage {
     }
 
     public void playParticle(Player player) {
-        player.spawnParticle(MessageOverHear.getConfigPlugin().getParticleType(), loc,
-                MessageOverHear.getConfigPlugin().getParticleCount(),
-                MessageOverHear.getConfigPlugin().getParticleOffsetX(),
-                MessageOverHear.getConfigPlugin().getParticleOffsetY(),
-                MessageOverHear.getConfigPlugin().getParticleOffsetZ());
+        player.spawnParticle(MessageOverHear.getConfigManager().getParticleType(), loc,
+                MessageOverHear.getConfigManager().getParticleCount(),
+                MessageOverHear.getConfigManager().getParticleOffsetX(),
+                MessageOverHear.getConfigManager().getParticleOffsetY(),
+                MessageOverHear.getConfigManager().getParticleOffsetZ());
     }
 
-    public void removeTask(BukkitTask... tasksRunnable) {
+    public void setTask(BukkitTask... tasksRunnable) {
         this.tasksRunnable = tasksRunnable;
     }
 
     public void playSound(Player player) {
         player.playSound(loc,
-                MessageOverHear.getConfigPlugin().getSoundType(),
-                MessageOverHear.getConfigPlugin().getSoundVolume(),
-                MessageOverHear.getConfigPlugin().getSoundPitch());
+                MessageOverHear.getConfigManager().getSoundType(),
+                MessageOverHear.getConfigManager().getSoundVolume(),
+                MessageOverHear.getConfigManager().getSoundPitch());
     }
 }
 

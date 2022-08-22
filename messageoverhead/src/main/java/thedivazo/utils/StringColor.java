@@ -2,6 +2,7 @@ package thedivazo.utils;
 
 import net.md_5.bungee.api.ChatColor;
 import java.awt.*;
+
 import thedivazo.MessageOverHear;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringColor {
+    private StringColor(){}
+
     public static final Pattern HEX_PAT = Pattern.compile("&#[a-fA-F0-9]{6}");
     public static final Pattern HEX_PATv2 = Pattern.compile("\\{#([a-fA-F0-9]{6})}");
     private static final Pattern HEX_GRADIENT = Pattern.compile("\\{#([a-fA-F0-9]{6})(:#([a-fA-F0-9]{6}))+( )([^{}])*(})");
@@ -48,7 +51,7 @@ public class StringColor {
 
         Matcher matcher = HEX_GRADIENT.matcher(text);
 
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
 
         while (matcher.find()) {
             String gradient = matcher.group();
@@ -86,20 +89,18 @@ public class StringColor {
                     ChatColor chatColor = ChatColor.of(color);
 
                     int charIndex = colorLength * i + j;
-                    if (charIndex + 1 < chars.length) {
-                        if (chars[charIndex] == '&' || chars[charIndex] == '\u00A7') {
-                            if (chars[charIndex + 1] == 'r') {
-                                currentStyles.clear();
-                                j++;
-                                continue;
-                            }
+                    if (charIndex + 1 < chars.length && (chars[charIndex] == '&' || chars[charIndex] == '\u00A7')) {
+                        if (chars[charIndex + 1] == 'r') {
+                            currentStyles.clear();
+                            j++;
+                            continue;
+                        }
 
-                            ChatColor style = ChatColor.getByChar(chars[charIndex + 1]);
-                            if (style != null) {
-                                currentStyles.add(style);
-                                j++;
-                                continue;
-                            }
+                        ChatColor style = ChatColor.getByChar(chars[charIndex + 1]);
+                        if (style != null) {
+                            currentStyles.add(style);
+                            j++;
+                            continue;
                         }
                     }
 
@@ -113,24 +114,24 @@ public class StringColor {
                 }
             }
 
-            matcher.appendReplacement(stringBuffer, gradientBuilder.toString());
+            matcher.appendReplacement(stringBuilder, gradientBuilder.toString());
         }
 
-        matcher.appendTail(stringBuffer);
-        text = stringBuffer.toString();
+        matcher.appendTail(stringBuilder);
+        text = stringBuilder.toString();
 
         matcher = HEX_PATv2.matcher(text);
-        stringBuffer = new StringBuffer();
+        stringBuilder = new StringBuilder();
 
         while (matcher.find()) {
             String hexColorString = matcher.group();
-            matcher.appendReplacement(stringBuffer, ChatColor.of(hexColorString.substring(1, hexColorString.length() - 1)).toString());
+            matcher.appendReplacement(stringBuilder, ChatColor.of(hexColorString.substring(1, hexColorString.length() - 1)).toString());
         }
 
-        matcher.appendTail(stringBuffer);
+        matcher.appendTail(stringBuilder);
 
 
-        return ChatColor.translateAlternateColorCodes('&', stringBuffer.toString());
+        return ChatColor.translateAlternateColorCodes('&', stringBuilder.toString());
     }
 
     public static String ofText(String message) {

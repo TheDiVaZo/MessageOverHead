@@ -1,10 +1,18 @@
 package thedivazo.utils;
 
+import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
+import thedivazo.MessageOverHear;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
+
+    private StringUtil() {
+    }
 
     public static LinkedHashMap<Integer, String> stripsSymbol(String str, Pattern pattern) {
         Matcher colorMatcher = pattern.matcher(str);
@@ -30,7 +38,7 @@ public class StringUtil {
 
     public static String insertsSymbol(LinkedHashMap<Integer, String> colorCodesAndInexs, String str) {
         Iterator<Integer> iterator = colorCodesAndInexs.keySet().iterator();
-        String result = "";
+        StringBuilder result = new StringBuilder();
         int shiftIndex = 0;
         int lengthColorSum = 0;
         while (iterator.hasNext()) {
@@ -40,11 +48,11 @@ public class StringUtil {
             String intermediateResult = str.substring(shiftIndex, colorIndex-lengthColorSum) + colorCode;
             shiftIndex = colorIndex - lengthColorSum;
             lengthColorSum+= colorCode.length();
-            result += intermediateResult;
+            result.append(intermediateResult);
         }
         String intermediateResult = str.substring(shiftIndex);
-        result += intermediateResult;
-        return result;
+        result.append(intermediateResult);
+        return result.toString();
     }
 
     public static LinkedHashMap<Integer, String> stripsSymbol(Pattern pattern, List<String> strArray) {
@@ -84,7 +92,7 @@ public class StringUtil {
                     break;
                 }
                 int realIndex = index - shiftIndex;
-                if(realIndex > 0) {
+                if(realIndex >= 0) {
                     colorCodesAndIndexsForStr.put(realIndex, code);
                 }
             }
@@ -103,7 +111,7 @@ public class StringUtil {
         Matcher matcher = pattern.matcher(text);
         StringBuilder testString = new StringBuilder();
         while (matcher.find()) {
-            if (testString.length() <= maxSizeLine) {
+            if (testString.length() < maxSizeLine) {
                 testString.append(matcher.group());
             }
             else {
@@ -114,5 +122,16 @@ public class StringUtil {
         result.add(testString.toString());
 
         return result;
+    }
+
+    public static String setEmoji(Player player, String text) {
+        if(text==null) return text;
+        if(MessageOverHear.getConfigManager().isIALoaded()) text = FontImageWrapper.replaceFontImages(player, text);
+        return text;
+    }
+
+    public static String setPlaceholders(Player player, String text) {
+        if(MessageOverHear.getConfigManager().isPAPILoaded() && text!=null) text = PlaceholderAPI.setPlaceholders(player, text);
+        return text;
     }
 }

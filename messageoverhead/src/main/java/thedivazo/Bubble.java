@@ -1,4 +1,4 @@
-package thedivazo.utils;
+package thedivazo;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import thedivazo.MessageOverHear;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
