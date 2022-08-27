@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringColor {
-    private StringColor(){}
+public class StringColorUtils {
+    private StringColorUtils(){}
 
     public static final Pattern HEX_PAT = Pattern.compile("&#[a-fA-F0-9]{6}");
     public static final Pattern HEX_PATv2 = Pattern.compile("\\{#([a-fA-F0-9]{6})}");
@@ -153,7 +153,7 @@ public class StringColor {
         ArrayList<String> colorLines = new ArrayList<>();
         for (String message : messages) {
             colorLines.add(shiftColor + message);
-            StringUtil.stripsSymbol(StringColor.ofText(message), StringColor.CHAT_COLOR_PAT)
+            StringUtil.stripsSymbol(StringColorUtils.ofText(message), StringColorUtils.CHAT_COLOR_PAT)
                     .forEach((index, color)->shiftColor.append(color));
         }
         return colorLines;

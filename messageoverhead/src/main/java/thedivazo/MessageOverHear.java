@@ -28,8 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static thedivazo.config.ConfigManager.canSeeSuperVanish;
-
 @Plugin(name = "MessageOverHead", version = PluginSettings.version)
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
@@ -69,7 +67,7 @@ public class MessageOverHear extends JavaPlugin {
         Logger.init(new JULHandler(getLogger()));
         Logger.info("Starting...");
         setConfigManager(new ConfigManager(MessageOverHear.getInstance()));
-        setBubbleMessageManager(new DefaultBubbleMessageManager(this));
+        setBubbleMessageManager(new DefaultBubbleMessageManager());
         this.checkPluginVersion();
         new MetricsManager(this);
         registerEvent();
@@ -120,19 +118,8 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     public void reloadConfigManager() {
-        super.reloadConfig();
+        reloadConfig();
         getConfigManager().saveParam();
-        updateBubbleMessageManager();
-    }
-
-    public void updateBubbleMessageManager() {
-        getBubbleMessageManager().setSoundEnable(getConfigManager().isSoundEnable());
-        getBubbleMessageManager().setVisibleTextForOwner(getConfigManager().isVisibleTextForOwner());
-        getBubbleMessageManager().setDistance(getConfigManager().getDistance());
-        getBubbleMessageManager().setSizeLine(getConfigManager().getSizeLine());
-        getBubbleMessageManager().setDelay(getConfigManager().getDelay());
-        getBubbleMessageManager().setParticleEnable(getConfigManager().isParticleEnable());
-        getBubbleMessageManager().setBiasY(getConfigManager().getBiasY());
     }
 
     public static void createBubbleMessage(Player player, String message, Player showPlayer) {
@@ -152,10 +139,9 @@ public class MessageOverHear extends JavaPlugin {
 
     public boolean isPossibleBubbleMessage(Player player1, Player player2) {
 
-        boolean canSeePlayer = player2.canSee(player1) && player2.getWorld().equals(player1.getWorld()) && player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();;
-        boolean isNotInvisiblePlayer = canSeeSuperVanish(player2, player1) && !player1.hasPotionEffect(PotionEffectType.INVISIBILITY);
-        boolean isSpectator = player1.getGameMode().equals(GameMode.SPECTATOR);
-        return MessageOverHear.getConfigManager().haveSeePermission(player2) && canSeePlayer && isNotInvisiblePlayer && !isSpectator;
+        boolean isNormalDistance = player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();;
+        boolean canSee = getConfigManager().getVanishManager().canSee(player2, player1);
+        return MessageOverHear.getConfigManager().haveSeePermission(player2) && isNormalDistance && canSee;
     }
 
 }

@@ -11,13 +11,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import thedivazo.MessageOverHear;
-import thedivazo.listener.ChatControlListener;
-import thedivazo.listener.ChatListener;
-import thedivazo.listener.DefaultChatListener;
+import thedivazo.supports.chatlistener.ChatControlListener;
+import thedivazo.supports.chatlistener.ChatListener;
+import thedivazo.supports.chatlistener.DefaultChatListener;
+import thedivazo.supports.vanish.SuperVansihManager;
+import thedivazo.supports.vanish.VanishManager;
 import thedivazo.utils.ConfigUtils;
 
 import java.io.BufferedReader;
@@ -39,7 +39,6 @@ public class ConfigManager {
     private boolean isPAPILoaded = false;
     private boolean isIALoaded = false; //IA - ItemsAdder
     private boolean isOraxenLoaded = false;
-    private boolean isSuperVanishLoaded = false;
     private boolean isVault = false;
 
     private boolean isParticleEnable = true;
@@ -57,6 +56,7 @@ public class ConfigManager {
     private Permission permissionVault = null;
 
     private ChatListener<?, ?> chatEventListener;
+    private VanishManager vanishManager;
 
     public static final String DEFAULT_MESSAGE_FORMAT = "%player_name% %message%";
 
@@ -154,6 +154,12 @@ public class ConfigManager {
         else this.setChatEventListener(new DefaultChatListener());
     }
 
+    private void saveVanishManager() {
+        if (isPlugin("SuperVanish") || isPlugin("PremiumVanish")) {
+            this.setVanishManager(new SuperVansihManager());
+        }
+    }
+
     private void saveSoftDependCondition() {
         if (!isPlugin("ProtocolLib")) {
             Logger.warn("ProtocolLib not found! Please install ProtocolLib");
@@ -164,9 +170,6 @@ public class ConfigManager {
         }
         if (isPlugin("Oraxen")) {
             this.setOraxenLoaded(true);
-        }
-        if (isPlugin("SuperVanish") || isPlugin("PremiumVanish")) {
-            this.setSuperVanishLoaded(true);
         }
         if(isPlugin("Vault")) {
             this.setVault(true);
@@ -259,12 +262,6 @@ public class ConfigManager {
         } catch (IOException e) {
             Logger.warn("UPDATE CONFIG ERROR!!");
         }
-    }
-
-    public static boolean canSeeSuperVanish(Player viewer, Player viewed) {
-        if (MessageOverHear.getConfigManager().isSuperVanishLoaded()) {
-            return VanishAPI.canSee(viewer, viewed);
-        } else return true;
     }
 
     public static List<String> getFormatOfPlayer(Player player) {

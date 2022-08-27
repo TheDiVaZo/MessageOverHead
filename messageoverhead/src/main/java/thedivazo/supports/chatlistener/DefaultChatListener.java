@@ -1,4 +1,4 @@
-package thedivazo.listener;
+package thedivazo.supports.chatlistener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import thedivazo.MessageOverHear;
 
-public class DefaultChatListener implements Listener, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
+public final class DefaultChatListener implements Listener, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {

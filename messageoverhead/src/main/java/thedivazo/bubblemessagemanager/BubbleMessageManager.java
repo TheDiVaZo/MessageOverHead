@@ -8,14 +8,6 @@ import java.util.*;
 
 public abstract class BubbleMessageManager {
     private final HashMap<UUID, BubbleMessage> bubbleMessageMap = new HashMap<>();
-    private int sizeLine = 24;
-    private double biasY = 2.15;
-    private long delay = 4;
-    private boolean isVisibleTextForOwner = true;
-    private boolean isSoundEnable = true;
-    private boolean isParticleEnable = true;
-    private int distance = 10;
-    private boolean isShowSpectatorMessage = false;
     private JavaPlugin plugin;
 
     protected BubbleMessageManager(JavaPlugin plugin) {
@@ -28,70 +20,6 @@ public abstract class BubbleMessageManager {
 
     public JavaPlugin getPlugin() {
         return plugin;
-    }
-
-    public int getSizeLine() {
-        return sizeLine;
-    }
-
-    public void setSizeLine(int sizeLine) {
-        this.sizeLine = sizeLine;
-    }
-
-    public double getBiasY() {
-        return biasY;
-    }
-
-    public void setBiasY(double biasY) {
-        this.biasY = biasY;
-    }
-
-    public long getDelay() {
-        return delay;
-    }
-
-    public void setDelay(long delay) {
-        this.delay = delay;
-    }
-
-    public boolean isVisibleTextForOwner() {
-        return isVisibleTextForOwner;
-    }
-
-    public void setVisibleTextForOwner(boolean visibleTextForOwner) {
-        isVisibleTextForOwner = visibleTextForOwner;
-    }
-
-    public boolean isSoundEnable() {
-        return isSoundEnable;
-    }
-
-    public void setSoundEnable(boolean soundEnable) {
-        isSoundEnable = soundEnable;
-    }
-
-    public boolean isParticleEnable() {
-        return isParticleEnable;
-    }
-
-    public void setParticleEnable(boolean particleEnable) {
-        isParticleEnable = particleEnable;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    public boolean isShowSpectatorMessage() {
-        return isShowSpectatorMessage;
-    }
-
-    public void setShowSpectatorMessage(boolean showSpectatorMessage) {
-        isShowSpectatorMessage = showSpectatorMessage;
     }
 
     public Map<UUID, BubbleMessage> getBubbleMessageMap() {
