@@ -34,7 +34,9 @@ import java.util.stream.Collectors;
         @SoftDependency(value = "PlaceholderAPI"),
         @SoftDependency(value = "SuperVanish"),
         @SoftDependency(value = "PremiumVanish"),
-        @SoftDependency(value = "ChatControllerRed")
+        @SoftDependency(value = "ChatControllerRed"),
+        @SoftDependency(value = "Essentials"),
+        @SoftDependency(value = "CMI")
 })
 @Author(value = "TheDiVaZo")
 @ApiVersion(value = ApiVersion.Target.v1_13)
