@@ -248,6 +248,9 @@ public class ConfigManager {
                 setPermissionVault(rsp1.getProvider());
             }
         }
+        if(isPlugin("PlaceholderAPI")) {
+            this.setPAPILoaded(true);
+        }
         saveChatEventListener();
     }
 
