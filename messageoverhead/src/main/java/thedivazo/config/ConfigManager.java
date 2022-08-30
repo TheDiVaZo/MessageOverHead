@@ -3,6 +3,8 @@ package thedivazo.config;
 import api.logging.Logger;
 import de.myzelyam.api.vanish.VanishAPI;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -11,13 +13,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import thedivazo.MessageOverHear;
-import thedivazo.listener.ChatControlListener;
-import thedivazo.listener.ChatListener;
-import thedivazo.listener.DefaultChatListener;
+import thedivazo.supports.chatlistener.ChatControlListener;
+import thedivazo.supports.chatlistener.ChatListener;
+import thedivazo.supports.chatlistener.DefaultChatListener;
+import thedivazo.supports.vanish.*;
 import thedivazo.utils.ConfigUtils;
 
 import java.io.BufferedReader;
@@ -30,36 +31,80 @@ import java.util.*;
 
 import static org.bukkit.Bukkit.getServer;
 
-@Data
 public class ConfigManager {
+
+    @Getter
     private final MessageOverHear plugin;
+    @Getter
+    @Setter
     private FileConfiguration fileConfig;
+    @Getter
+    @Setter
     private ConfigUtils configUtils;
 
+    @Getter
+    @Setter
     private boolean isPAPILoaded = false;
+    @Getter
+    @Setter
     private boolean isIALoaded = false; //IA - ItemsAdder
+    @Getter
+    @Setter
     private boolean isOraxenLoaded = false;
-    private boolean isSuperVanishLoaded = false;
+    @Getter
+    @Setter
     private boolean isVault = false;
 
+    @Getter
+    @Setter
     private boolean isParticleEnable = true;
+    @Getter
+    @Setter
     private Particle particleType = Particle.CLOUD;
+    @Getter
+    @Setter
     private int particleCount = 4;
+    @Getter
+    @Setter
     private double particleOffsetX = 0.2;
+    @Getter
+    @Setter
     private double particleOffsetY = 0.2;
+    @Getter
+    @Setter
     private double particleOffsetZ = 0.2;
 
+    @Getter
+    @Setter
     private boolean isSoundEnable = true;
+    @Getter
+    @Setter
     private Sound soundType = Sound.BLOCK_ANVIL_STEP;
+    @Getter
+    @Setter
     private int soundVolume = 4;
+    @Getter
+    @Setter
     private int soundPitch = 4;
 
+    @Getter
+    @Setter
     private Permission permissionVault = null;
 
+    @Getter
+    @Setter
     private ChatListener<?, ?> chatEventListener;
+    @Getter
+    @Setter
+    private VanishManager vanishManager;
+    @Getter
+    private boolean isInitVanishManager;
+    @Getter
+    private boolean isInitChatEventListener;
 
     public static final String DEFAULT_MESSAGE_FORMAT = "%player_name% %message%";
 
+    @Getter
     private final LinkedHashMap<Integer, Format> messageFormat = new LinkedHashMap<>();
 
     public String toString() {
@@ -102,15 +147,29 @@ public class ConfigManager {
         }
     }
 
+    @Getter
+    @Setter
     private int distance = 10;
+    @Getter
+    @Setter
     private double biasY = 2.15;
 
+    @Getter
+    @Setter
     private boolean isVisibleTextForOwner = false;
 
+    @Getter
+    @Setter
     private String permSend = "moh.send";
+    @Getter
+    @Setter
     private String permSee = "moh.see";
 
+    @Getter
+    @Setter
     private int delay = 4;
+    @Getter
+    @Setter
     private int sizeLine = 24;
 
     public ConfigManager(MessageOverHear plugin) {
@@ -148,10 +207,27 @@ public class ConfigManager {
     }
 
     private void saveChatEventListener() {
+        if(isInitChatEventListener) return;
         if (isPlugin("ChatControlRed")) {
             this.setChatEventListener(new ChatControlListener());
         }
         else this.setChatEventListener(new DefaultChatListener());
+        isInitChatEventListener = true;
+    }
+
+    private void saveVanishManager() {
+        if(isInitVanishManager) return;
+        if (isPlugin("SuperVanish") || isPlugin("PremiumVanish")) {
+            this.setVanishManager(new SuperVansihManager());
+        }
+        else if (isPlugin("Essentials")) {
+            this.setVanishManager(new EssentialsVanishManager());
+        }
+        else if (isPlugin("CMI")) {
+            this.setVanishManager(new CMIVanishManager());
+        }
+        else this.setVanishManager(new DefaultVanishManager());
+        isInitVanishManager = true;
     }
 
     private void saveSoftDependCondition() {
@@ -165,15 +241,15 @@ public class ConfigManager {
         if (isPlugin("Oraxen")) {
             this.setOraxenLoaded(true);
         }
-        if (isPlugin("SuperVanish") || isPlugin("PremiumVanish")) {
-            this.setSuperVanishLoaded(true);
-        }
         if(isPlugin("Vault")) {
             this.setVault(true);
             RegisteredServiceProvider<Permission> rsp1 = getServer().getServicesManager().getRegistration(Permission.class);
             if(rsp1!= null) {
                 setPermissionVault(rsp1.getProvider());
             }
+        }
+        if(isPlugin("PlaceholderAPI")) {
+            this.setPAPILoaded(true);
         }
         saveChatEventListener();
     }
@@ -183,6 +259,7 @@ public class ConfigManager {
         this.configUtils.setConfig(fileConfig);
         saveFormatFromConfig();
         saveSoftDependCondition();
+        saveVanishManager();
         if (fileConfig.getBoolean("messages.particle.enable")) {
             this.setParticleEnable(true);
             try {
@@ -215,6 +292,8 @@ public class ConfigManager {
         this.setDelay(fileConfig.getInt("messages.settings.delay"));
         this.setSizeLine(fileConfig.getInt("messages.settings.sizeLine"));
     }
+
+
 
     public static String getLastVersionOfPlugin() {
         String inputLine;
@@ -259,12 +338,6 @@ public class ConfigManager {
         } catch (IOException e) {
             Logger.warn("UPDATE CONFIG ERROR!!");
         }
-    }
-
-    public static boolean canSeeSuperVanish(Player viewer, Player viewed) {
-        if (MessageOverHear.getConfigManager().isSuperVanishLoaded()) {
-            return VanishAPI.canSee(viewer, viewed);
-        } else return true;
     }
 
     public static List<String> getFormatOfPlayer(Player player) {

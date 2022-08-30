@@ -1,4 +1,4 @@
-package thedivazo.listener;
+package thedivazo.supports.chatlistener;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
