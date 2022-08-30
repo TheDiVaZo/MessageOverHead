@@ -8,6 +8,8 @@ Here you can write about your __mistakes__, as well as take my plugin code and f
 write your bugs in [**issues**](https://github.com/TheDiVaZo/MessageOverHead/issues/new)
 
 
+API for plugin: https://github.com/TheDiVaZo/MessageOverHead/tree/develop
+
 
 Last update: __3.02__
 
