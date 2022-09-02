@@ -140,11 +140,12 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     public boolean isPossibleBubbleMessage(Player player1, Player player2) {
-
-        boolean isNormalDistance = player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();;
+        boolean isNormalDistance = false;
+        if(player1.getWorld().equals(player2.getWorld())) {
+            isNormalDistance = player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();
+        }
         boolean canSee = getConfigManager().getVanishManager().canSee(player2, player1);
         return MessageOverHear.getConfigManager().haveSeePermission(player2) && isNormalDistance && canSee;
     }
-
 }
 
