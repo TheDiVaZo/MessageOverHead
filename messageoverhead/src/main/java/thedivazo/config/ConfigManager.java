@@ -1,8 +1,6 @@
 package thedivazo.config;
 
 import api.logging.Logger;
-import de.myzelyam.api.vanish.VanishAPI;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.permission.Permission;
@@ -14,9 +12,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.scoreboard.NameTagVisibility;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import thedivazo.MessageOverHear;
 import thedivazo.supports.chatlistener.ChatControlListener;
 import thedivazo.supports.chatlistener.ChatListener;
@@ -175,10 +170,6 @@ public class ConfigManager {
     @Setter
     private int sizeLine = 24;
 
-    @Getter
-    @Setter
-    private boolean hidenick = false;
-
     public ConfigManager(MessageOverHear plugin) {
         this.plugin = plugin;
         this.fileConfig = plugin.getConfig();
@@ -298,7 +289,6 @@ public class ConfigManager {
         this.setPermSee(fileConfig.getString("messages.settings.permSee"));
         this.setDelay(fileConfig.getInt("messages.settings.delay"));
         this.setSizeLine(fileConfig.getInt("messages.settings.sizeLine"));
-        this.setHidenick(fileConfig.getBoolean("hidenick"));
     }
 
 

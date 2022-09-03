@@ -4,7 +4,6 @@ import api.logging.Logger;
 import api.logging.handlers.JULHandler;
 import co.aikar.commands.PaperCommandManager;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
@@ -13,8 +12,6 @@ import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.bubblemessagemanager.BubbleMessageManager;
 import thedivazo.bubblemessagemanager.DefaultBubbleMessageManager;
 import thedivazo.commands.DebugCommands;
@@ -28,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Plugin(name = "MessageOverHead", version = PluginSettings.version)
+@Plugin(name = "MessageOverHead", version = PluginSettings.VERSION)
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
         @SoftDependency(value = "PlaceholderAPI"),
@@ -87,7 +84,7 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     private void checkPluginVersion() {
-        if (!PluginSettings.version.equals(ConfigManager.getLastVersionOfPlugin())) {
+        if (!PluginSettings.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
             for (int i = 0; i < 5; i++) {
                 Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
             }

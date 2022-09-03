@@ -1,7 +1,6 @@
 package thedivazo.supports.vanish;
 
 import com.Zrips.CMI.CMI;
-import com.Zrips.CMI.Containers.CMIVanish;
 import org.bukkit.entity.Player;
 
 public class CMIVanishManager extends DefaultVanishManager{
