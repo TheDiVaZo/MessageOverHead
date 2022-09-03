@@ -3,7 +3,6 @@ package thedivazo.supports.vanish;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
-import thedivazo.MessageOverHear;
 
 public class DefaultVanishManager implements VanishManager{
     @Override
@@ -12,7 +11,6 @@ public class DefaultVanishManager implements VanishManager{
                 !viewed.hasPotionEffect(PotionEffectType.INVISIBILITY) &&
                 viewer.canSee(viewed) &&
                 viewer.getWorld().equals(viewed.getWorld());
-
     }
 
     @Override

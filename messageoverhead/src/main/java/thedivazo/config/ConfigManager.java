@@ -1,8 +1,6 @@
 package thedivazo.config;
 
 import api.logging.Logger;
-import de.myzelyam.api.vanish.VanishAPI;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.permission.Permission;
