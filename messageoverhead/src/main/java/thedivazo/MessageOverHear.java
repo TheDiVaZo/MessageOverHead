@@ -16,6 +16,7 @@ import thedivazo.bubblemessagemanager.BubbleMessageManager;
 import thedivazo.bubblemessagemanager.DefaultBubbleMessageManager;
 import thedivazo.commands.DebugCommands;
 import thedivazo.commands.DefaultCommands;
+import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
 import thedivazo.metrics.MetricsManager;
 
@@ -70,12 +71,13 @@ public class MessageOverHear extends JavaPlugin {
         this.checkPluginVersion();
         new MetricsManager(this);
         registerEvent();
-        registerEvent();
         registerCommands();
     }
 
     private void registerEvent() {
-        Bukkit.getPluginManager().registerEvents(getConfigManager().getChatEventListener(), this);
+        if(getConfigManager().isEnableChatListener()) {
+            Bukkit.getPluginManager().registerEvents(getConfigManager().getChatEventListener(), this);
+        }
     }
 
     @Override
@@ -118,31 +120,31 @@ public class MessageOverHear extends JavaPlugin {
 
     public void reloadConfigManager() {
         reloadConfig();
-        getConfigManager().saveParam();
+        getConfigManager().reloadConfigFile();
     }
 
-    public static void createBubbleMessage(Player player, String message, Player showPlayer) {
-        createBubbleMessage(player, message, new HashSet<>(){{add(showPlayer);}});
+    public static void createBubbleMessage(ConfigBubble configBubble, Player player, String message, Player showPlayer) {
+        createBubbleMessage(configBubble, player, message, new HashSet<>(){{add(showPlayer);}});
     }
 
-    public static void createBubbleMessage(Player player, String message) {
-        createBubbleMessage(player, message, new HashSet<>(Bukkit.getOnlinePlayers()));
+    public static void createBubbleMessage(ConfigBubble configBubble,Player player, String message) {
+        createBubbleMessage(configBubble,player, message, new HashSet<>(Bukkit.getOnlinePlayers()));
     }
 
-    public static void createBubbleMessage(Player player, String message, Set<Player> showPlayers) {
-        if(getConfigManager().haveSendPermission(player)) {
-            Set<Player> showPlayersFilter = showPlayers.stream().filter(player1 -> getInstance().isPossibleBubbleMessage(player, player1)).collect(Collectors.toSet());
-            getBubbleMessageManager().spawnBubble(getBubbleMessageManager().generateBubbleMessage(player, message), showPlayersFilter);
+    public static void createBubbleMessage(ConfigBubble configBubble, Player player, String message, Set<Player> showPlayers) {
+        if(configBubble.haveSendPermission(player)) {
+            Set<Player> showPlayersFilter = showPlayers.stream().filter(player1 -> getInstance().isPossibleBubbleMessage(configBubble,player, player1)).collect(Collectors.toSet());
+            getBubbleMessageManager().spawnBubble(getBubbleMessageManager().generateBubbleMessage(configBubble,player, message), showPlayersFilter);
         }
     }
 
-    public boolean isPossibleBubbleMessage(Player player1, Player player2) {
+    public boolean isPossibleBubbleMessage(ConfigBubble configBubble, Player player1, Player player2) {
         boolean isNormalDistance = false;
         if(player1.getWorld().equals(player2.getWorld())) {
-            isNormalDistance = player2.getLocation().distance(player1.getLocation()) < getConfigManager().getDistance();
+            isNormalDistance = player2.getLocation().distance(player1.getLocation()) < configBubble.getDistance();
         }
         boolean canSee = getConfigManager().getVanishManager().canSee(player2, player1);
-        return MessageOverHear.getConfigManager().haveSeePermission(player2) && isNormalDistance && canSee;
+        return configBubble.haveSeePermission(player2) && isNormalDistance && canSee;
     }
 }
 

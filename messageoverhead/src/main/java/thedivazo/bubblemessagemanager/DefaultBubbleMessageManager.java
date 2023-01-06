@@ -6,13 +6,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import thedivazo.BubbleMessage;
 import thedivazo.MessageOverHear;
+import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
 import thedivazo.utils.StringColorUtils;
 import thedivazo.utils.StringUtil;
 
 import java.util.*;
-
-import static thedivazo.config.ConfigManager.getFormatOfPlayer;
 
 
 public final class DefaultBubbleMessageManager extends BubbleMessageManager {
@@ -23,26 +22,26 @@ public final class DefaultBubbleMessageManager extends BubbleMessageManager {
         super(MessageOverHear.getInstance());
     }
 
-    public List<String> convertMsgToLinesBubble(String msg) {
+    public List<String> convertMsgToLinesBubble(ConfigBubble configBubble, String msg) {
         msg = StringColorUtils.ofText(msg);
-        return StringUtil.insertsSymbol(StringUtil.stripsSymbol(msg, StringColorUtils.CHAT_COLOR_PAT), StringUtil.splitText(ChatColor.stripColor(msg), configManager.getSizeLine()));
+        return StringUtil.insertsSymbol(StringUtil.stripsSymbol(msg, StringColorUtils.CHAT_COLOR_PAT), StringUtil.splitText(ChatColor.stripColor(msg), configBubble.getSizeLine()));
     }
 
-    public BubbleMessage generateBubbleMessage(Player player, String message) {
+    public BubbleMessage generateBubbleMessage(ConfigBubble configBubble, Player player, String message) {
         List<String> messageLines = new ArrayList<>();
-        List<String> formatLines = getFormatOfPlayer(player);
+        List<String> formatLines = configBubble.getFormatOfPlayer(player);
         for(String format: formatLines) {
             if(format != null) {
-                messageLines.addAll(StringColorUtils.ofText(convertMsgToLinesBubble(StringUtil.setEmoji(player, StringUtil.setPlaceholders(player, format).replace("%message%", StringColorUtils.toNoColorString(message))))));
+                messageLines.addAll(StringColorUtils.ofText(convertMsgToLinesBubble(configBubble,StringUtil.setEmoji(player, StringUtil.setPlaceholders(player, format).replace("%message%", StringColorUtils.toNoColorString(message))))));
             }
         }
 
         removeBubble(player.getUniqueId());
 
         Location loc = player.getLocation();
-        loc.setY(loc.getY() + configManager.getBiasY());
+        loc.setY(loc.getY() + configBubble.getBiasY());
 
-        BubbleMessage bubbleMessage = new BubbleMessage(player, loc, messageLines);
+        BubbleMessage bubbleMessage = new BubbleMessage(player, loc, messageLines, configBubble);
 
         addBubble(player.getUniqueId(), bubbleMessage);
 
@@ -50,7 +49,7 @@ public final class DefaultBubbleMessageManager extends BubbleMessageManager {
             @Override
             public void run() {
                 Location loc = player.getLocation().clone();
-                loc.setY(loc.getY() + configManager.getBiasY());
+                loc.setY(loc.getY() + configBubble.getBiasY());
                 bubbleMessage.setPosition(loc);
             }
         }.runTaskTimerAsynchronously(getPlugin(), 1L, 1L);
@@ -61,7 +60,7 @@ public final class DefaultBubbleMessageManager extends BubbleMessageManager {
                 taskMove.cancel();
                 removeBubble(bubbleMessage);
             }
-        }.runTaskLaterAsynchronously(getPlugin(), configManager.getDelay() * 20L);
+        }.runTaskLaterAsynchronously(getPlugin(), configBubble.getDelay() * 20L);
         bubbleMessage.setTask(taskDelete, taskMove);
         return bubbleMessage;
     }
@@ -74,10 +73,10 @@ public final class DefaultBubbleMessageManager extends BubbleMessageManager {
 
     public void spawnBubble(BubbleMessage bubbleMessage, Player showPlayer) {
         Player ownerPlayer = bubbleMessage.getOwnerPlayer();
-        if (showPlayer.equals(ownerPlayer) && !configManager.isVisibleTextForOwner()) return;
-        if (configManager.isSoundEnable())
+        if (showPlayer.equals(ownerPlayer) && !bubbleMessage.getConfigBubble().isVisibleTextForOwner()) return;
+        if (bubbleMessage.getConfigBubble().isSoundEnable())
             bubbleMessage.playSound(showPlayer);
-        if (configManager.isParticleEnable())
+        if (bubbleMessage.getConfigBubble().isParticleEnable())
             bubbleMessage.playParticle(showPlayer);
         bubbleMessage.show(showPlayer);
     }

@@ -3,11 +3,13 @@ package thedivazo.supports.chatlistener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import thedivazo.MessageOverHear;
+import thedivazo.config.ConfigManager;
 
 public final class DefaultChatListener implements Listener, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
 
@@ -17,13 +19,13 @@ public final class DefaultChatListener implements Listener, ChatListener<AsyncPl
     }
 
     @Override
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(AsyncPlayerChatEvent e) {
-        MessageOverHear.createBubbleMessage(e.getPlayer(), e.getMessage());
+        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), e.getPlayer(), e.getMessage());
     }
 
     @Override
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerPrivateChat(PlayerCommandPreprocessEvent e) {
         String cmd = e.getMessage().trim();
         String[] args = cmd.split(" ");
@@ -34,7 +36,7 @@ public final class DefaultChatListener implements Listener, ChatListener<AsyncPl
         Player player = e.getPlayer();
         String message = args[2];
 
-        MessageOverHear.createBubbleMessage(player, message, targetPlayer);
+        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), player, message, targetPlayer);
 
     }
 }

@@ -15,7 +15,7 @@ public class DefaultCommands extends BaseCommand {
     @Subcommand("send")
     @Syntax("<сообщение>")
     public void onCommand(Player player, String message) {
-        MessageOverHear.createBubbleMessage(player, message);
+        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), player.getPlayer(), message);
     }
 
     @Subcommand("reload")
