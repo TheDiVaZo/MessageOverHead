@@ -1,9 +1,7 @@
-package thedivazo.supports.chatlistener;
+package thedivazo.listener.chatlistener;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
-
-import java.util.Set;
 
 public interface ChatListener<E1 extends Event, E2 extends Event> extends Listener {
 

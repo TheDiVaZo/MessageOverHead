@@ -1,17 +1,11 @@
-package thedivazo.supports.chatlistener;
+package thedivazo.listener.chatlistener;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.mineacademy.chatcontrol.api.ChatChannelEvent;
 import org.mineacademy.chatcontrol.api.PrePrivateMessageEvent;
 import thedivazo.MessageOverHear;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 public final class ChatControlListener implements ChatListener<ChatChannelEvent, PrePrivateMessageEvent> {

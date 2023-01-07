@@ -1,17 +1,11 @@
-package thedivazo.supports.chatlistener;
+package thedivazo.listener.chatlistener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import thedivazo.MessageOverHear;
-import thedivazo.config.ConfigManager;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public final class DefaultChatListener implements Listener, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
 

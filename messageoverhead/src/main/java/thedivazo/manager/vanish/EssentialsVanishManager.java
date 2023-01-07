@@ -1,4 +1,4 @@
-package thedivazo.supports.vanish;
+package thedivazo.manager.vanish;
 
 import com.earth2me.essentials.Essentials;
 import org.bukkit.entity.Player;

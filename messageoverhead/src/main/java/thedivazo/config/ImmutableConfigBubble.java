@@ -94,16 +94,6 @@ public class ImmutableConfigBubble extends ConfigBubble {
     }
 
     @Override
-    public void setPermSend(String permSend) {
-        throw new UnsupportedOperationException("You cannot access the parameter.");
-    }
-
-    @Override
-    public void setPermSee(String permSee) {
-        throw new UnsupportedOperationException("You cannot access the parameter.");
-    }
-
-    @Override
     public void setDelay(int delay) {
         throw new UnsupportedOperationException("You cannot access the parameter.");
     }

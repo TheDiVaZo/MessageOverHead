@@ -1,4 +1,4 @@
-package thedivazo.supports.vanish;
+package thedivazo.manager.vanish;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;

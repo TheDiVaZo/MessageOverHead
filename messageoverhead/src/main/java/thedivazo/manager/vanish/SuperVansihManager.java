@@ -1,4 +1,4 @@
-package thedivazo.supports.vanish;
+package thedivazo.manager.vanish;
 
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.entity.Player;

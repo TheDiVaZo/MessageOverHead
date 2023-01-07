@@ -9,10 +9,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import thedivazo.MessageOverHear;
-import thedivazo.supports.chatlistener.ChatControlListener;
-import thedivazo.supports.chatlistener.ChatListener;
-import thedivazo.supports.chatlistener.DefaultChatListener;
-import thedivazo.supports.vanish.*;
+import thedivazo.listener.chatlistener.ChatControlListener;
+import thedivazo.listener.chatlistener.ChatListener;
+import thedivazo.listener.chatlistener.DefaultChatListener;
+import thedivazo.manager.vanish.*;
 import thedivazo.utils.ConfigUtils;
 
 import java.io.BufferedReader;
@@ -146,7 +146,9 @@ public class ConfigManager {
         }
     }
 
-
+    public boolean isConfigBubble(String path) {
+        return configBubbles.containsKey(path);
+    }
 
     public ImmutableConfigBubble getConfigBubble(String path) {
         ImmutableConfigBubble configBubble = configBubbles.get(path);

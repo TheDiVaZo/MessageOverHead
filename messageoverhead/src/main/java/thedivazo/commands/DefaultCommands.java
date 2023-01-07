@@ -28,10 +28,14 @@ public class DefaultCommands extends BaseCommand {
     @Subcommand("create")
     @CommandPermission("moh.admin")
     @Syntax("<sender> <recipient recipients> <bubbleConfig> <message>")
-    public void onCommand(CommandSender commandSender, Player sender, String recipients, String bubbleConfig, String messages) {
+    @CommandCompletion("@players @players @configBubbles сообщение")
+    public void onCommand(CommandSender commandSender, OfflinePlayer sender, String recipients, String bubbleConfig, String messages) {
         Set<Player> recipientPlayers = Arrays.stream(recipients.split(",")).filter(p->!Objects.isNull(Bukkit.getPlayer(p))).map(Bukkit::getPlayer).collect(Collectors.toSet());
         ConfigBubble configBubble = MessageOverHear.getConfigManager().getConfigBubble(bubbleConfig);
-        MessageOverHear.createBubbleMessage(configBubble, sender, messages, recipientPlayers);
+        if(!sender.isOnline()) {
+            commandSender.sendMessage("Игрок "+sender.getName()+" не в сети.");
+        }
+        else MessageOverHear.createBubbleMessage(configBubble, sender.getPlayer(), messages, recipientPlayers);
     }
 
     @Subcommand("reload")
