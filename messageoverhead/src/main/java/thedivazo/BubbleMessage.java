@@ -3,6 +3,7 @@ package thedivazo;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import thedivazo.config.ConfigBubble;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +12,17 @@ public class BubbleMessage {
 
     private final List<Bubble> bubbleMessages = new ArrayList<>();
     private final Location loc;
+
+    public ConfigBubble getConfigBubble() {
+        return configBubble;
+    }
+
+    private ConfigBubble configBubble;
     private BukkitTask[] tasksRunnable = null;
     private final Player ownerPlayer;
 
-    public BubbleMessage(Player player, Location loc, List<String> message) {
+    public BubbleMessage(Player player, Location loc, List<String> message, ConfigBubble configBubble) {
+        this.configBubble = configBubble;
         ownerPlayer = player;
         this.loc = loc;
         for (int i = 0; i < message.size(); i++) {
@@ -57,11 +65,11 @@ public class BubbleMessage {
     }
 
     public void playParticle(Player player) {
-        player.spawnParticle(MessageOverHear.getConfigManager().getParticleType(), loc,
-                MessageOverHear.getConfigManager().getParticleCount(),
-                MessageOverHear.getConfigManager().getParticleOffsetX(),
-                MessageOverHear.getConfigManager().getParticleOffsetY(),
-                MessageOverHear.getConfigManager().getParticleOffsetZ());
+        player.spawnParticle(configBubble.getParticleType(), loc,
+                configBubble.getParticleCount(),
+                configBubble.getParticleOffsetX(),
+                configBubble.getParticleOffsetY(),
+                configBubble.getParticleOffsetZ());
     }
 
     public void setTask(BukkitTask... tasksRunnable) {
@@ -70,9 +78,9 @@ public class BubbleMessage {
 
     public void playSound(Player player) {
         player.playSound(loc,
-                MessageOverHear.getConfigManager().getSoundType(),
-                MessageOverHear.getConfigManager().getSoundVolume(),
-                MessageOverHear.getConfigManager().getSoundPitch());
+                configBubble.getSoundType(),
+                configBubble.getSoundVolume(),
+                configBubble.getSoundPitch());
     }
 }
 

@@ -3,6 +3,7 @@ package thedivazo.bubblemessagemanager;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import thedivazo.BubbleMessage;
+import thedivazo.config.ConfigBubble;
 
 import java.util.*;
 
@@ -41,7 +42,7 @@ public abstract class BubbleMessageManager {
         removeBubble(bubbleMessage.getOwnerPlayer());
     }
 
-    public abstract BubbleMessage generateBubbleMessage(Player player, String message);
+    public abstract BubbleMessage generateBubbleMessage(ConfigBubble configBubble, Player player, String message);
 
     public abstract void spawnBubble(BubbleMessage bubbleMessage, Player showPlayer);
 

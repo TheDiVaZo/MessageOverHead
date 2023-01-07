@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigUtils {
-    private Configuration fileConfig;
+    private ConfigurationSection fileConfig;
 
-    public ConfigUtils(Configuration fileConfig) {
+    public ConfigUtils(ConfigurationSection fileConfig) {
         this.fileConfig = fileConfig;
     }
 
@@ -25,7 +25,7 @@ public class ConfigUtils {
         return result;
     }
 
-    public void setConfig(FileConfiguration fileConfig) {
+    public void setConfig(ConfigurationSection fileConfig) {
         this.fileConfig = fileConfig;
     }
 }

@@ -3,8 +3,16 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
+compileJava.options.encoding = 'UTF-8' // устанавливает кодировку для компилируемого кода
+javadoc.options.encoding = 'UTF-8' // устанавливает кодировку для генерируемой документации
+compileTestJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 group 'io.messageoverhead.thedivazo'
-version "3.03"
+version "3.1"
 
 repositories {
     mavenCentral()
@@ -61,6 +69,17 @@ shadowJar {
     minimize()
     relocate 'co.aikar.commands', 'thedivazo.acf'
     relocate 'co.aikar.locales', 'thedivazo.locales'
+}
+
+task buildAndCopyJar {
+    dependsOn(tasks.jar)
+    dependsOn(shadowJar)
+    doLast {
+        copy {
+            from "$projectDir/build/libs/" + rootProject.name + "-" + version + "-all.jar"
+            into 'D:/testServer/plugins'
+        }
+    }
 }
 
 
