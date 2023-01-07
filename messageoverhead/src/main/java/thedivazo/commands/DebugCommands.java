@@ -11,8 +11,8 @@ import thedivazo.MessageOverHear;
 public class DebugCommands extends BaseCommand {
 
     @Subcommand("config")
-    @CommandPermission("moh.develop.config")
+    @CommandPermission("moh.admin")
     public void checkConfig(CommandSender sender) {
-        sender.sendMessage(MessageOverHear.getConfigManager().toString());
+        sender.sendMessage(MessageOverHear.getConfigManager().getConfigString());
     }
 }

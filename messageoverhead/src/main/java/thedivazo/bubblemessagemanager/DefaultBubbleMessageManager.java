@@ -32,7 +32,7 @@ public final class DefaultBubbleMessageManager extends BubbleMessageManager {
         List<String> formatLines = configBubble.getFormatOfPlayer(player);
         for(String format: formatLines) {
             if(format != null) {
-                messageLines.addAll(StringColorUtils.ofText(convertMsgToLinesBubble(configBubble,StringUtil.setEmoji(player, StringUtil.setPlaceholders(player, format).replace("%message%", StringColorUtils.toNoColorString(message))))));
+                messageLines.addAll(StringColorUtils.ofText(convertMsgToLinesBubble(configBubble,StringUtil.setEmoji(player, StringUtil.setPlaceholders(player, format).replace("%message%", configManager.isClearColorFromMessage() ? StringColorUtils.toNoColorString(message):message)))));
             }
         }
 

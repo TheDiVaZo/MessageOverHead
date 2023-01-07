@@ -1,11 +1,17 @@
 package thedivazo.supports.chatlistener;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.mineacademy.chatcontrol.api.ChatChannelEvent;
 import org.mineacademy.chatcontrol.api.PrePrivateMessageEvent;
 import thedivazo.MessageOverHear;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 public final class ChatControlListener implements ChatListener<ChatChannelEvent, PrePrivateMessageEvent> {
@@ -23,5 +29,11 @@ public final class ChatControlListener implements ChatListener<ChatChannelEvent,
         if (!(e.getSender() instanceof Player sender)) return;
 
         MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), sender, e.getMessage(), e.getReceiver());
+    }
+
+    @Override
+    public void disableListener() {
+        PrePrivateMessageEvent.getHandlerList().unregister(MessageOverHear.getInstance());
+        ChatChannelEvent.getHandlerList().unregister(MessageOverHear.getInstance());
     }
 }

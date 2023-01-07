@@ -46,9 +46,6 @@ public class ConfigManager {
     @Getter
     private boolean isVault = false;
 
-    public String toString() {
-        return fileConfig.saveToString();
-    }
 
     @Getter
     private boolean isInitVanishManager;
@@ -67,6 +64,8 @@ public class ConfigManager {
 
     @Getter
     private boolean isEnableChatListener = true;
+    @Getter
+    private boolean isClearColorFromMessage = false;
 
     public ConfigManager(MessageOverHear plugin) {
         this.plugin = plugin;
@@ -75,6 +74,10 @@ public class ConfigManager {
         plugin.saveDefaultConfig();
         updateConfig();
         reloadConfigFile();
+    }
+
+    public List<String> getConfigBubblesName() {
+        return new ArrayList<>(configBubbles.keySet());
     }
 
     private boolean isPlugin(String pluginName) {
@@ -134,6 +137,9 @@ public class ConfigManager {
             ConfigurationSection settings = fileConfig.getConfigurationSection("settings");
             ConfigurationSection listener = settings.getConfigurationSection("listener");
             isEnableChatListener = listener.getBoolean("chat");
+
+            ConfigurationSection message = settings.getConfigurationSection("message");
+            isClearColorFromMessage = message.getBoolean("clearColorFromPlayerMessage");
         } catch (Exception e) {
             Logger.warn("Ошибка обновления настроек плагина! Пожалуйста, проверьте конфиг на наличие опечаток!");
             throw e;
@@ -195,4 +201,7 @@ public class ConfigManager {
         //todo: write method
     }
 
+    public String getConfigString() {
+        return fileConfig.saveToString();
+    }
 }

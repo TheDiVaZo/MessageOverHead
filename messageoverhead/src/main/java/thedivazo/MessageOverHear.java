@@ -3,8 +3,13 @@ package thedivazo;
 import api.logging.Logger;
 import api.logging.handlers.JULHandler;
 import co.aikar.commands.PaperCommandManager;
+import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
@@ -75,6 +80,7 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     private void registerEvent() {
+        getConfigManager().getChatEventListener().disableListener();
         if(getConfigManager().isEnableChatListener()) {
             Bukkit.getPluginManager().registerEvents(getConfigManager().getChatEventListener(), this);
         }
@@ -116,11 +122,14 @@ public class MessageOverHear extends JavaPlugin {
             getLogger().warning("Error occurred while executing command "+command.getName());
             return true;
         });
+        manager.getCommandCompletions().registerCompletion("configBubbles", c -> getConfigManager().getConfigBubblesName());
     }
 
     public void reloadConfigManager() {
+        saveDefaultConfig();
         reloadConfig();
         getConfigManager().reloadConfigFile();
+        registerEvent();
     }
 
     public static void createBubbleMessage(ConfigBubble configBubble, Player player, String message, Player showPlayer) {
@@ -146,5 +155,6 @@ public class MessageOverHear extends JavaPlugin {
         boolean canSee = getConfigManager().getVanishManager().canSee(player2, player1);
         return configBubble.haveSeePermission(player2) && isNormalDistance && canSee;
     }
+
 }
 
