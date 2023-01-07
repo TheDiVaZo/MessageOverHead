@@ -9,5 +9,3 @@ write your bugs in [**issues**](https://github.com/TheDiVaZo/MessageOverHead/iss
 
 
 
-Last update: __3.01__
-
