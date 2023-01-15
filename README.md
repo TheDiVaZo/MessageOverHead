@@ -11,5 +11,5 @@ write your bugs in [**issues**](https://github.com/TheDiVaZo/MessageOverHead/iss
 API for plugin: https://github.com/TheDiVaZo/MessageOverHead/wiki
 
 
-Last update: __3.03__
+Last update: __3.1__
 
