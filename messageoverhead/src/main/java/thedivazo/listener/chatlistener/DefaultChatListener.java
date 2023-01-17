@@ -25,7 +25,9 @@ public final class DefaultChatListener implements Listener, ChatListener<AsyncPl
         Player targetPlayer = Bukkit.getPlayer(args[1]);
         if(targetPlayer==null) return;
         Player player = e.getPlayer();
-        String message = args[2];
+        args[0] = "";
+        args[1] = "";
+        String message = String.join(" ", args);
 
         MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), player, message, targetPlayer);
     }
