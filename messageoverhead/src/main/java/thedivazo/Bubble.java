@@ -1,13 +1,18 @@
 package thedivazo;
 
+import api.logging.Logger;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import lombok.Data;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
@@ -45,7 +50,6 @@ public class Bubble {
     }
 
     private boolean isRemovedBubble = false;
-    private final Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
     private final Serializer serBoolean = WrappedDataWatcher.Registry.get(Boolean.class);
     private final Serializer serByte = WrappedDataWatcher.Registry.get(Byte.class);
 
@@ -76,7 +80,7 @@ public class Bubble {
         try {
             pm.sendServerPacket(player, fakeStandPacket);
             pm.sendServerPacket(player, metaPacket);
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -89,7 +93,13 @@ public class Bubble {
         } else {
             opt = Optional.of(WrappedChatComponent.fromChatMessage(message)[0].getHandle());
         }
-        metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
+        if(MessageOverHear.getVersion()>1.12f) {
+            Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+            metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
+        } else {
+            Serializer serString = WrappedDataWatcher.Registry.get(String.class);
+            metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serString), message);
+        }
         metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_VISIBLE_INDEX, serBoolean), true);
         metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(PARAM_ARMOR_STAND_INDEX, serByte), (byte)
                 ((isMarker ? 0x10 : 0) | (isSmall ? 0x01 : 0) | (noBasePlate ? 0x08 : 0))
@@ -115,11 +125,38 @@ public class Bubble {
         }};
     }
 
+    protected boolean checkClass(String string) {
+        try {
+            Class.forName(string, false, getClass().getClassLoader());
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
     private PacketContainer getMetaPacket() {
         PacketContainer metaPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-
         metaPacket.getIntegers().write(0, id);
-        metaPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
+        if(checkClass("com.comphenix.protocol.wrappers.WrappedDataValue"))
+        {
+            final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
+
+            for(final WrappedWatchableObject entry : metadata.getWatchableObjects()) {
+                if(entry == null) continue;
+
+                final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
+                wrappedDataValueList.add(
+                        new WrappedDataValue(
+                                watcherObject.getIndex(),
+                                watcherObject.getSerializer(),
+                                entry.getRawValue()
+                        )
+                );
+            }
+
+            metaPacket.getDataValueCollectionModifier().write(0, wrappedDataValueList);
+        }
+        else metaPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
         return metaPacket;
     }
 
@@ -154,7 +191,11 @@ public class Bubble {
             entity.add(id);
             removeStandPacket.getIntLists().write(0, entity);
         } else if(MessageOverHear.getVersion() == 1.17f) {
-            removeStandPacket.getModifier().write(0, new IntArrayList(new int[]{id}));
+            try {
+                removeStandPacket.getModifier().write(0, new IntArrayList(new int[]{id}));
+            } catch (Throwable e) {
+                removeStandPacket.getModifier().write(0, id);
+            }
         } else {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }

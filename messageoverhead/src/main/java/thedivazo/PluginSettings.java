@@ -2,7 +2,8 @@ package thedivazo;
 
 @interface PluginSettings {
     String NAME_PLUGIN = "MessageOverHead";
-    String VERSION = "3.1";
+    String VERSION = "3.2";
+
 
 }
 

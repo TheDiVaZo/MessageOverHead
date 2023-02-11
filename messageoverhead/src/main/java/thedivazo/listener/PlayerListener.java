@@ -24,7 +24,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onInvisible(EntityPotionEffectEvent e) {
         if(!e.getModifiedType().equals(PotionEffectType.INVISIBILITY)) return;
-        if(!(e.getEntity() instanceof Player player)) return;
-        MessageOverHear.getBubbleMessageManager().removeBubble(player);
+        if(!(e.getEntity() instanceof Player)) return;
+        MessageOverHear.getBubbleMessageManager().removeBubble((Player) e.getEntity());
     }
 }
