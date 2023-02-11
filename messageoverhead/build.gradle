@@ -12,7 +12,7 @@ tasks.withType(JavaCompile) {
 }
 
 group 'io.messageoverhead.thedivazo'
-version "3.1.1"
+version "3.2"
 
 repositories {
     mavenCentral()
@@ -29,8 +29,8 @@ repositories {
     maven { url "https://repo.dmulloy2.net/repository/public/" }
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 compileJava {
     options.compilerArgs += ["-parameters"]
@@ -40,6 +40,8 @@ compileJava {
 }
 
 dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0";
@@ -80,6 +82,10 @@ task buildAndCopyJar {
             into 'D:/testServer/plugins'
         }
     }
+}
+
+test {
+    useJUnitPlatform()
 }
 
 
