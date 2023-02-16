@@ -1,13 +1,11 @@
-# MessageOverHead
----
-> These are the sources of the MessageOverHead plugin!
-> Ready, compiled version of the plugin [**page on spigot**](https://www.spigotmc.org/resources/messageoverhead.100051/)
+MessageOverHead is a plugin that allows other people to see your messages over your head
 
-Here you can write about your __mistakes__, as well as take my plugin code and fork it in a [__pull request__](https://github.com/TheDiVaZo/MessageOverHead/pulls)!
+***
 
-write your bugs in [**issues**](https://github.com/TheDiVaZo/MessageOverHead/issues/new)
+## Useful Links
 
+🔘 [Wiki](https://github.com/TheDiVaZo/MessageOverHead/wiki)
 
-API for plugin: https://github.com/TheDiVaZo/MessageOverHead/wiki
+📁 [Spigot Releases](https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-12-1-19.100051/)
 
-Last update: __3.2__
+🛠️ [Github Releases](https://github.com/TheDiVaZo/MessageOverHead/releases)
