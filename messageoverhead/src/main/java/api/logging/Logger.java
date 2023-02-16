@@ -1,7 +1,5 @@
 package api.logging;
 
-import thedivazo.MessageOverHear;
-
 public final class Logger {
 
     private static LoggerHandler handler;

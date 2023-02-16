@@ -4,7 +4,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.BubbleMessage;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 import thedivazo.config.ConfigBubble;
 
 
@@ -12,7 +12,7 @@ import thedivazo.config.ConfigBubble;
 public final class DefaultBubbleMessageManager extends BubbleMessageManager<Player> {
 
     public DefaultBubbleMessageManager() {
-        super(MessageOverHear.getInstance());
+        super(MessageOverHead.getInstance());
     }
 
     @Override

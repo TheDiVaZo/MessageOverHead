@@ -7,24 +7,24 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
 public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        MessageOverHear.getBubbleMessageManager().removeBubble(player);
+        MessageOverHead.getBubbleMessageManager().removeBubble(player);
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        MessageOverHear.getBubbleMessageManager().removeBubble(e.getEntity());
+        MessageOverHead.getBubbleMessageManager().removeBubble(e.getEntity());
     }
 
     @EventHandler
     public void onInvisible(EntityPotionEffectEvent e) {
         if(!e.getModifiedType().equals(PotionEffectType.INVISIBILITY)) return;
         if(!(e.getEntity() instanceof Player)) return;
-        MessageOverHear.getBubbleMessageManager().removeBubble((Player) e.getEntity());
+        MessageOverHead.getBubbleMessageManager().removeBubble((Player) e.getEntity());
     }
 }

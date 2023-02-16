@@ -7,9 +7,8 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 import thedivazo.listener.chatlistener.*;
 import thedivazo.manager.vanish.*;
 import thedivazo.utils.ConfigUtils;
@@ -31,7 +30,7 @@ public class ConfigManager {
     HashMap<String, ImmutableConfigBubble> configBubbles = new HashMap<>();
 
     @Getter
-    private final MessageOverHear plugin;
+    private final MessageOverHead plugin;
     private FileConfiguration fileConfig;
     @Getter
     private ConfigUtils configUtils;
@@ -69,7 +68,7 @@ public class ConfigManager {
     @Getter
     private boolean isClearColorFromMessage = false;
 
-    public ConfigManager(MessageOverHear plugin) {
+    public ConfigManager(MessageOverHead plugin) {
         this.plugin = plugin;
         this.fileConfig = plugin.getConfig();
         this.configUtils = new ConfigUtils(fileConfig);

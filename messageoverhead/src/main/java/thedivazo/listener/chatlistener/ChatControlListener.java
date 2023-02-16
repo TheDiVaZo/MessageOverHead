@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.mineacademy.chatcontrol.api.ChatChannelEvent;
 import org.mineacademy.chatcontrol.api.PrePrivateMessageEvent;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
 
 public final class ChatControlListener implements ChatListener<ChatChannelEvent, PrePrivateMessageEvent> {
@@ -14,7 +14,7 @@ public final class ChatControlListener implements ChatListener<ChatChannelEvent,
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(ChatChannelEvent e) {
         if(!(e.getSender() instanceof Player)) return;
-        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getRecipients());
+        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getRecipients());
     }
 
     @Override
@@ -22,12 +22,12 @@ public final class ChatControlListener implements ChatListener<ChatChannelEvent,
     public void onPlayerPrivateChat(PrePrivateMessageEvent e) {
         if (!(e.getSender() instanceof Player)) return;
 
-        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getReceiver());
+        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getReceiver());
     }
 
     @Override
     public void disableListener() {
-        PrePrivateMessageEvent.getHandlerList().unregister(MessageOverHear.getInstance());
-        ChatChannelEvent.getHandlerList().unregister(MessageOverHear.getInstance());
+        PrePrivateMessageEvent.getHandlerList().unregister(MessageOverHead.getInstance());
+        ChatChannelEvent.getHandlerList().unregister(MessageOverHead.getInstance());
     }
 }

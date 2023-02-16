@@ -3,7 +3,7 @@ package thedivazo.utils;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -126,12 +126,12 @@ public class StringUtil {
 
     public static String setEmoji(Player player, String text) {
         if(text==null) return text;
-        if(MessageOverHear.getConfigManager().isIALoaded()) text = FontImageWrapper.replaceFontImages(player, text);
+        if(MessageOverHead.getConfigManager().isIALoaded()) text = FontImageWrapper.replaceFontImages(player, text);
         return text;
     }
 
     public static String setPlaceholders(Player player, String text) {
-        if(MessageOverHear.getConfigManager().isPAPILoaded() && text!=null) text = PlaceholderAPI.setPlaceholders(player, text);
+        if(MessageOverHead.getConfigManager().isPAPILoaded() && text!=null) text = PlaceholderAPI.setPlaceholders(player, text);
         return text;
     }
 }

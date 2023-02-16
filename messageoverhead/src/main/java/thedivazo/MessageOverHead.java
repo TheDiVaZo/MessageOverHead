@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Plugin(name = "MessageOverHead", version = PluginSettings.VERSION)
+@Plugin(name = MessageOverHead.NAME, version = MessageOverHead.VERSION)
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
         @SoftDependency(value = "PlaceholderAPI"),
@@ -39,7 +39,9 @@ import java.util.stream.Collectors;
 })
 @Author(value = "TheDiVaZo")
 @ApiVersion(value = ApiVersion.Target.v1_13)
-public class MessageOverHear extends JavaPlugin {
+public class MessageOverHead extends JavaPlugin {
+    public static final String VERSION = "3.2";
+    public static final String NAME = "MessageOverHead";
 
     private static ConfigManager configManager;
     private static BubbleMessageManager<Player> bubbleMessageManager;
@@ -49,25 +51,25 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     public static void setBubbleMessageManager(BubbleMessageManager<Player> bubbleMessageManager) {
-        MessageOverHear.bubbleMessageManager = bubbleMessageManager;
+        MessageOverHead.bubbleMessageManager = bubbleMessageManager;
     }
 
     public static ConfigManager getConfigManager() {
-        return MessageOverHear.configManager;
+        return MessageOverHead.configManager;
     }
 
-    public static MessageOverHear getInstance() {
-        return JavaPlugin.getPlugin(MessageOverHear.class);
+    public static MessageOverHead getInstance() {
+        return JavaPlugin.getPlugin(MessageOverHead.class);
     }
 
     private static void setConfigManager(ConfigManager configManager) {
-        MessageOverHear.configManager = configManager;
+        MessageOverHead.configManager = configManager;
     }
     @Override
     public void onEnable() {
         Logger.init(new JULHandler(getLogger()));
         Logger.info("Starting...");
-        setConfigManager(new ConfigManager(MessageOverHear.getInstance()));
+        setConfigManager(new ConfigManager(MessageOverHead.getInstance()));
         setBubbleMessageManager(new DefaultBubbleMessageManager());
         this.checkPluginVersion();
         new MetricsManager(this);
@@ -94,7 +96,7 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     private void checkPluginVersion() {
-        if (!PluginSettings.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
+        if (!MessageOverHead.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
             for (int i = 0; i < 5; i++) {
                 Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
             }

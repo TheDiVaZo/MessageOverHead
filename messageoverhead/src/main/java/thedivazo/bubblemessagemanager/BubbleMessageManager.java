@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.BubbleMessage;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
 import thedivazo.utils.StringColorUtils;
@@ -17,7 +17,7 @@ import java.util.*;
 
 public abstract class BubbleMessageManager<T> {
 
-    protected ConfigManager configManager = MessageOverHear.getConfigManager();
+    protected ConfigManager configManager = MessageOverHead.getConfigManager();
     private final HashMap<T, BubbleMessage<T>> bubbleMessageMap = new HashMap<>();
     private JavaPlugin plugin;
 
@@ -83,7 +83,7 @@ public abstract class BubbleMessageManager<T> {
     public abstract Location getLocation(T object);
 
     public BubbleMessage<T> generateBubbleMessage(@Nullable Player formatter, ConfigBubble configBubble, T object, String message) {
-        if(Objects.isNull(configManager)) configManager = MessageOverHear.getConfigManager();
+        if(Objects.isNull(configManager)) configManager = MessageOverHead.getConfigManager();
         List<String> messageLines = generateTextFromFormat(configBubble, formatter, message);
         removeBubble(object);
 

@@ -1,6 +1,5 @@
 package thedivazo;
 
-import api.logging.Logger;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -11,15 +10,12 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import lombok.Data;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import thedivazo.utils.StringUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -39,11 +35,11 @@ public class Bubble {
     private static final int PARAM_ARMOR_STAND_INDEX;
 
     static {
-        if (MessageOverHear.getVersion() >= 1.17f) {
+        if (MessageOverHead.getVersion() >= 1.17f) {
             PARAM_ARMOR_STAND_INDEX = 15;
-        } else if (MessageOverHear.getVersion() > 1.14f) {
+        } else if (MessageOverHead.getVersion() > 1.14f) {
             PARAM_ARMOR_STAND_INDEX = 14;
-        } else if (MessageOverHear.getVersion() == 1.14f) {
+        } else if (MessageOverHead.getVersion() == 1.14f) {
             PARAM_ARMOR_STAND_INDEX = 13;
         } else {
             PARAM_ARMOR_STAND_INDEX = 11;
@@ -90,12 +86,12 @@ public class Bubble {
     private void setMetadata(Player player) {
         String modifyMessages = StringUtil.setEmoji(player,StringUtil.setPlaceholders(player, message));
         Optional<?> opt;
-        if (MessageOverHear.getVersion() <= 1.13f) {
+        if (MessageOverHead.getVersion() <= 1.13f) {
             opt = Optional.of(WrappedChatComponent.fromText(modifyMessages).getHandle());
         } else {
             opt = Optional.of(WrappedChatComponent.fromChatMessage(modifyMessages)[0].getHandle());
         }
-        if(MessageOverHear.getVersion()>1.12f) {
+        if(MessageOverHead.getVersion()>1.12f) {
             Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
             metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
         } else {
@@ -114,7 +110,7 @@ public class Bubble {
             getModifier().writeDefaults();
             getIntegers().write(0, id);
 
-            if(MessageOverHear.getVersion() <= 1.13f) {
+            if(MessageOverHead.getVersion() <= 1.13f) {
                 getIntegers().write(6, 78);
             } else {
                 getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
@@ -188,11 +184,11 @@ public class Bubble {
     public void remove() {
         if (isRemovedBubble) return;
         PacketContainer removeStandPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-        if(MessageOverHear.getVersion() >= 1.18f) {
+        if(MessageOverHead.getVersion() >= 1.18f) {
             List<Integer> entity = new ArrayList<>();
             entity.add(id);
             removeStandPacket.getIntLists().write(0, entity);
-        } else if(MessageOverHear.getVersion() == 1.17f) {
+        } else if(MessageOverHead.getVersion() == 1.17f) {
             try {
                 removeStandPacket.getModifier().write(0, new IntArrayList(new int[]{id}));
             } catch (Throwable e) {
