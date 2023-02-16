@@ -1,7 +1,8 @@
 # MessageOverHead
 <p align="center">
-<a href="https://www.spigotmc.org/resources/2124/"><img src="https://img.shields.io/spiget/downloads/100051?label=Spigot%20downloads" alt="Spigot downloads"></a>
-<a href="https://www.spigotmc.org/resources/2124/"><img src="https://img.shields.io/spiget/rating/100051?label=Spigot%20rating" alt="Spigot rating"></a>
+<a href="https://www.spigotmc.org/resources/100051/"><img src="https://img.shields.io/spiget/downloads/100051?label=Spigot%20downloads" alt="Spigot downloads"></a>
+<a href="https://www.spigotmc.org/resources/100051/"><img src="https://img.shields.io/spiget/rating/100051?label=Spigot%20rating" alt="Spigot rating"></a>
+ <a href="https://github.com/TheDiVaZo/MessageOverHead/graphs/contributors"><img src="https://img.shields.io/github/contributors/TheDiVaZo/MessageOverHead.svg" alt="Contributors"></a>
 </p>
 
 MessageOverHead is a plugin that allows other people to see your messages over your head
