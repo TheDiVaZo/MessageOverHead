@@ -7,8 +7,9 @@ import thedivazo.config.ConfigBubble;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class BubbleMessage {
+public class BubbleMessage<T> {
 
     private final List<Bubble> bubbleMessages = new ArrayList<>();
     private final Location loc;
@@ -19,11 +20,11 @@ public class BubbleMessage {
 
     private ConfigBubble configBubble;
     private BukkitTask[] tasksRunnable = null;
-    private final Player ownerPlayer;
+    private final T id;
 
-    public BubbleMessage(Player player, Location loc, List<String> message, ConfigBubble configBubble) {
+    public BubbleMessage(T id, Location loc, List<String> message, ConfigBubble configBubble) {
         this.configBubble = configBubble;
-        ownerPlayer = player;
+        this.id = id;
         this.loc = loc;
         for (int i = 0; i < message.size(); i++) {
             if (message.get(message.size() - 1 - i).length() > 0 && !message.get(message.size() - 1 - i).equals(" ")) {
@@ -33,13 +34,13 @@ public class BubbleMessage {
         }
     }
 
-    public Player getOwnerPlayer() {
-        return ownerPlayer;
+    public T getBubbleID() {
+        return this.id;
     }
 
-    public void show(Player player) {
+    public void show(Player player, Player placeholderPlayer) {
         for (Bubble msg : bubbleMessages) {
-            msg.spawn(player);
+            msg.spawn(player, placeholderPlayer);
         }
     }
 

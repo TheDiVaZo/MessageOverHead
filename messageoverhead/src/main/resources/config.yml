@@ -3,12 +3,37 @@
 #=========OR==========#
 #===BUBBLE=MESSAGE====#
 #######################
-version: 1.2 #DONT TOUCH!
+version: 1.2.1 #DONT TOUCH!
 settings:
   listener:
     chat: true
   message:
     clearColorFromPlayerMessage: false
+  citizens:
+    enable: false
+    chatSettings: "npcMessages"
+
+npcMessages:
+  isBubble: true
+  particle:
+    enable: true
+    particleType: CLOUD # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+    count: 4
+    offsetX: 0.2
+    offsetY: 0.2
+    offsetZ: 0.2
+  sound:
+    enable: true
+    soundType: BLOCK_ANVIL_STEP # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+    volume: 3
+    pitch: 3
+  settings:
+    format: '%player_name% %message%'
+    distance: 10
+    biasY: 2.15
+    visibleTextForOwner: true
+    delay: 4
+    sizeLine: 24
 
 messages: #default
   isBubble: true #don't touch. It magic

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import thedivazo.MessageOverHear;
 import thedivazo.utils.ConfigUtils;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -169,11 +170,16 @@ public class ConfigBubble {
         }
     }
 
-
-    public List<String> getFormatOfPlayer(Player player) {
+    public List<String> getDefaultFormat() {
         List<String> defaultFormat = new ArrayList<>();
         defaultFormat.add(DEFAULT_MESSAGE_FORMAT);
+        return defaultFormat;
+    }
 
+    public List<String> getFormatOfPlayer(@Nullable Player player) {
+        List<String> defaultFormat = new ArrayList<>();
+        defaultFormat.add(DEFAULT_MESSAGE_FORMAT);
+        if(Objects.isNull(player)) return defaultFormat;
         for (Map.Entry<Integer, Format> priorityAndFormat : getMessageFormat().entrySet()) {
             String perm = priorityAndFormat.getValue().getPermission();
             List<String> format = priorityAndFormat.getValue().getFormatsMessage();

@@ -3,13 +3,8 @@ package thedivazo;
 import api.logging.Logger;
 import api.logging.handlers.JULHandler;
 import co.aikar.commands.PaperCommandManager;
-import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
@@ -23,6 +18,7 @@ import thedivazo.commands.DebugCommands;
 import thedivazo.commands.DefaultCommands;
 import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
+import thedivazo.listener.chatlistener.ListenerWrapper;
 import thedivazo.metrics.MetricsManager;
 
 import java.util.HashSet;
@@ -46,13 +42,13 @@ import java.util.stream.Collectors;
 public class MessageOverHear extends JavaPlugin {
 
     private static ConfigManager configManager;
-    private static BubbleMessageManager bubbleMessageManager;
+    private static BubbleMessageManager<Player> bubbleMessageManager;
 
-    public static BubbleMessageManager getBubbleMessageManager() {
+    public static BubbleMessageManager<Player> getBubbleMessageManager() {
         return bubbleMessageManager;
     }
 
-    public static void setBubbleMessageManager(BubbleMessageManager bubbleMessageManager) {
+    public static void setBubbleMessageManager(BubbleMessageManager<Player> bubbleMessageManager) {
         MessageOverHear.bubbleMessageManager = bubbleMessageManager;
     }
 
@@ -81,8 +77,14 @@ public class MessageOverHear extends JavaPlugin {
 
     private void registerEvent() {
         getConfigManager().getChatEventListener().disableListener();
+        for (ListenerWrapper additionalListener : getConfigManager().getAdditionalListeners()) {
+            additionalListener.disableListener();
+        }
         if(getConfigManager().isEnableChatListener()) {
             Bukkit.getPluginManager().registerEvents(getConfigManager().getChatEventListener(), this);
+        }
+        for (ListenerWrapper additionalListener : getConfigManager().getAdditionalListeners()) {
+            Bukkit.getPluginManager().registerEvents(additionalListener, this);
         }
     }
 
@@ -143,7 +145,7 @@ public class MessageOverHear extends JavaPlugin {
     public static void createBubbleMessage(ConfigBubble configBubble, Player player, String message, Set<Player> showPlayers) {
         if(configBubble.haveSendPermission(player)) {
             Set<Player> showPlayersFilter = showPlayers.stream().filter(player1 -> getInstance().isPossibleBubbleMessage(configBubble,player, player1)).collect(Collectors.toSet());
-            getBubbleMessageManager().spawnBubble(getBubbleMessageManager().generateBubbleMessage(configBubble,player, message), showPlayersFilter);
+            getBubbleMessageManager().showBubble(getBubbleMessageManager().generateBubbleMessage(player,configBubble,player, message), showPlayersFilter);
         }
     }
 

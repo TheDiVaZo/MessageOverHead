@@ -7,11 +7,10 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import thedivazo.MessageOverHear;
-import thedivazo.listener.chatlistener.ChatControlListener;
-import thedivazo.listener.chatlistener.ChatListener;
-import thedivazo.listener.chatlistener.DefaultChatListener;
+import thedivazo.listener.chatlistener.*;
 import thedivazo.manager.vanish.*;
 import thedivazo.utils.ConfigUtils;
 
@@ -54,6 +53,9 @@ public class ConfigManager {
 
     @Getter
     private Permission permissionVault = null;
+
+    @Getter
+    private Set<ListenerWrapper> additionalListeners = new HashSet<>();
 
     @Getter
     @Setter
@@ -129,7 +131,6 @@ public class ConfigManager {
         if(isPlugin("PlaceholderAPI")) {
             this.isPAPILoaded = true;
         }
-        saveChatEventListener();
     }
 
     public void saveSettingsPlugin() {
@@ -140,7 +141,7 @@ public class ConfigManager {
 
             ConfigurationSection message = settings.getConfigurationSection("message");
             isClearColorFromMessage = message.getBoolean("clearColorFromPlayerMessage");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Logger.warn("Ошибка обновления настроек плагина! Пожалуйста, проверьте конфиг на наличие опечаток!");
             throw e;
         }
@@ -171,10 +172,12 @@ public class ConfigManager {
     public void reloadConfigFile() {
         this.fileConfig = plugin.getConfig();
         this.configUtils.setConfig(fileConfig);
+        getAdditionalListeners().clear();
         saveSoftDependCondition();
         saveVanishManager();
         saveSettingsPlugin();
         generateConfigBubbles();
+        saveChatEventListener();
     }
 
 

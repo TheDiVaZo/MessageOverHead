@@ -1,6 +1,5 @@
 package thedivazo.listener.chatlistener;
 
-import api.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -8,7 +7,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import thedivazo.MessageOverHear;
 
-public final class DefaultChatListener implements Listener, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
+public final class DefaultChatListener implements ListenerWrapper, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
 
     @Override
     @EventHandler(priority = EventPriority.LOWEST)

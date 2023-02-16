@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import thedivazo.utils.StringUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -62,18 +63,18 @@ public class Bubble {
     public Bubble(String message, Location loc) {
         this.message = message;
         setPosition(loc);
-        setMetadata();
     }
 
-    public void spawn(int distance) {
+    public void spawn(int distance, Player placeholderPlayer) {
         for (Player p : Objects.requireNonNull(loc.getWorld()).getPlayers()) {
             if (p.getLocation().distance(loc) <= distance) {
-                spawn(p);
+                spawn(p, placeholderPlayer);
             }
         }
     }
 
-    public void spawn(Player player) {
+    public void spawn(Player player, Player placeholderPlayer) {
+        setMetadata(placeholderPlayer);
         PacketContainer metaPacket = getMetaPacket();
         PacketContainer fakeStandPacket = getFakeStandPacket();
 
@@ -86,19 +87,20 @@ public class Bubble {
 
     }
 
-    private void setMetadata() {
+    private void setMetadata(Player player) {
+        String modifyMessages = StringUtil.setEmoji(player,StringUtil.setPlaceholders(player, message));
         Optional<?> opt;
         if (MessageOverHear.getVersion() <= 1.13f) {
-            opt = Optional.of(WrappedChatComponent.fromText(message).getHandle());
+            opt = Optional.of(WrappedChatComponent.fromText(modifyMessages).getHandle());
         } else {
-            opt = Optional.of(WrappedChatComponent.fromChatMessage(message)[0].getHandle());
+            opt = Optional.of(WrappedChatComponent.fromChatMessage(modifyMessages)[0].getHandle());
         }
         if(MessageOverHear.getVersion()>1.12f) {
             Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
             metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
         } else {
             Serializer serString = WrappedDataWatcher.Registry.get(String.class);
-            metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serString), message);
+            metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serString), modifyMessages);
         }
         metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_VISIBLE_INDEX, serBoolean), true);
         metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(PARAM_ARMOR_STAND_INDEX, serByte), (byte)

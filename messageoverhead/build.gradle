@@ -11,12 +11,16 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-group 'io.messageoverhead.thedivazo'
+group 'com.github.TheDiVaZo.MessageOverHead'
 version "3.2"
 
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        name = 'citizens-repo'
+        url = 'https://maven.citizensnpcs.co/repo'
+    }
     maven { url 'https://maven.pkg.github.com/LoneDev6/API-ItemsAdder' }
     maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
@@ -42,7 +46,12 @@ compileJava {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+
     compileOnly fileTree(dir: 'libs', include: '*.jar')
+
+    compileOnly('net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT') {
+        exclude group: '*', module: '*'
+    }
 
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0";
 
