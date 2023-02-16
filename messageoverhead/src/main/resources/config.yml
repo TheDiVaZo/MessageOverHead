@@ -3,15 +3,12 @@
 #=========OR==========#
 #===BUBBLE=MESSAGE====#
 #######################
-version: 1.2.1 #DONT TOUCH!
+version: 1.2 #DONT TOUCH!
 settings:
   listener:
     chat: true
   message:
     clearColorFromPlayerMessage: false
-  citizens:
-    enable: false
-    chatSettings: "npcMessages"
 
 npcMessages:
   isBubble: true
