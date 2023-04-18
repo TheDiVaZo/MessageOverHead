@@ -3,16 +3,16 @@ package thedivazo.metrics;
 
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.DrilldownPie;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MetricsManager {
 
-    private final MessageOverHear plugin;
+    private final MessageOverHead plugin;
 
-    public MetricsManager(MessageOverHear plugin) {
+    public MetricsManager(MessageOverHead plugin) {
         this.plugin = plugin;
         enableMetrics();
     }

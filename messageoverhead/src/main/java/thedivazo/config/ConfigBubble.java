@@ -7,9 +7,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 import thedivazo.utils.ConfigUtils;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,28 +76,25 @@ public class ConfigBubble {
     private int sizeLine = 24;
 
     public void setParams(ConfigurationSection configBubbleSettings) {
-        isSoundEnable = (configBubbleSettings.getBoolean("messages.sound.enable", isSoundEnable()));
+        isSoundEnable = (configBubbleSettings.getBoolean("sound.enable", isSoundEnable()));
         isParticleEnable = (configBubbleSettings.getBoolean("particle.enable", isParticleEnable()));
-        if (isParticleEnable()) {
-            try {
-                particleType = (Particle.valueOf(configBubbleSettings.getString("particle.particleType",getParticleType().name())));
-            } catch (IllegalArgumentException e) {
-                Logger.warn("Wrong particle type. Please check your config. Default particle type set: CLOUD");
-            }
-            particleCount = (configBubbleSettings.getInt("particle.count", particleCount));
-            particleOffsetX = (configBubbleSettings.getDouble("particle.offsetX", particleOffsetX));
-            particleOffsetY = (configBubbleSettings.getDouble("particle.offsetY", particleOffsetY));
-            particleOffsetZ = (configBubbleSettings.getDouble("particle.offsetZ", particleOffsetZ));
+        try {
+            particleType = (Particle.valueOf(configBubbleSettings.getString("particle.particleType",getParticleType().name())));
+        } catch (IllegalArgumentException e) {
+            Logger.warn("Wrong particle type. Please check your config. Default particle type set: CLOUD");
         }
-        if (isSoundEnable()) {
-            try {
-                soundType = (Sound.valueOf(configBubbleSettings.getString("sound.soundType", getSoundType().name())));
-            } catch (IllegalArgumentException e) {
-                Logger.warn("Wrong sound type. Please check your config "+configBubbleSettings.getName()+". Default sound type set: BLOCK_ANVIL_STEP");
-            }
-            soundVolume = (configBubbleSettings.getInt("sound.volume", soundVolume));
-            soundPitch = (configBubbleSettings.getInt("sound.pitch", soundPitch));
+        particleCount = (configBubbleSettings.getInt("particle.count", particleCount));
+        particleOffsetX = (configBubbleSettings.getDouble("particle.offsetX", particleOffsetX));
+        particleOffsetY = (configBubbleSettings.getDouble("particle.offsetY", particleOffsetY));
+        particleOffsetZ = (configBubbleSettings.getDouble("particle.offsetZ", particleOffsetZ));
+        try {
+            soundType = (Sound.valueOf(configBubbleSettings.getString("sound.soundType", getSoundType().name())));
+        } catch (IllegalArgumentException e) {
+            Logger.warn("Wrong sound type. Please check your config "+configBubbleSettings.getName()+". Default sound type set: BLOCK_ANVIL_STEP");
         }
+        soundVolume = (configBubbleSettings.getInt("sound.volume", soundVolume));
+        soundPitch = (configBubbleSettings.getInt("sound.pitch", soundPitch));
+
         distance = (configBubbleSettings.getInt("settings.distance", distance));
         biasY = (configBubbleSettings.getDouble("settings.biasY", biasY));
         isVisibleTextForOwner = (configBubbleSettings.getBoolean("settings.visibleTextForOwner", isVisibleTextForOwner));
@@ -169,15 +167,19 @@ public class ConfigBubble {
         }
     }
 
-
-    public List<String> getFormatOfPlayer(Player player) {
+    public List<String> getDefaultFormat() {
         List<String> defaultFormat = new ArrayList<>();
         defaultFormat.add(DEFAULT_MESSAGE_FORMAT);
+        return defaultFormat;
+    }
 
+    public List<String> getFormatOfPlayer(@Nullable Player player) {
+        List<String> defaultFormat = new ArrayList<>();
+        defaultFormat.add(DEFAULT_MESSAGE_FORMAT);
         for (Map.Entry<Integer, Format> priorityAndFormat : getMessageFormat().entrySet()) {
             String perm = priorityAndFormat.getValue().getPermission();
             List<String> format = priorityAndFormat.getValue().getFormatsMessage();
-            if (perm == null || player.hasPermission(perm)) {
+            if (perm == null || Objects.isNull(player) || player.hasPermission(perm)) {
                 defaultFormat = format;
             }
         }
@@ -185,14 +187,14 @@ public class ConfigBubble {
     }
 
     public boolean haveSendPermission(Player player) {
-        if(MessageOverHear.getConfigManager().isVault()) {
-            return MessageOverHear.getConfigManager().getPermissionVault().has(player, getPermSend());
+        if(MessageOverHead.getConfigManager().isVault()) {
+            return MessageOverHead.getConfigManager().getPermissionVault().has(player, getPermSend());
         }
         else return player.hasPermission(getPermSend());
     }
     public boolean haveSeePermission(Player player) {
-        if(MessageOverHear.getConfigManager().isVault()) {
-            return MessageOverHear.getConfigManager().getPermissionVault().has(player, getPermSee());
+        if(MessageOverHead.getConfigManager().isVault()) {
+            return MessageOverHead.getConfigManager().getPermissionVault().has(player, getPermSee());
         }
         else return player.hasPermission(getPermSee());
     }

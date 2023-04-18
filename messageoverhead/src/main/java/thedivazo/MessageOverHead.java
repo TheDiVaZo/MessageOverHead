@@ -3,13 +3,8 @@ package thedivazo;
 import api.logging.Logger;
 import api.logging.handlers.JULHandler;
 import co.aikar.commands.PaperCommandManager;
-import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
@@ -17,12 +12,14 @@ import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
+import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.bubblemessagemanager.BubbleMessageManager;
 import thedivazo.bubblemessagemanager.DefaultBubbleMessageManager;
 import thedivazo.commands.DebugCommands;
 import thedivazo.commands.DefaultCommands;
 import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
+import thedivazo.listener.chatlistener.ListenerWrapper;
 import thedivazo.metrics.MetricsManager;
 
 import java.util.HashSet;
@@ -31,7 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Plugin(name = "MessageOverHead", version = PluginSettings.VERSION)
+@Plugin(name = MessageOverHead.NAME, version = MessageOverHead.VERSION)
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
         @SoftDependency(value = "PlaceholderAPI"),
@@ -43,35 +40,37 @@ import java.util.stream.Collectors;
 })
 @Author(value = "TheDiVaZo")
 @ApiVersion(value = ApiVersion.Target.v1_13)
-public class MessageOverHear extends JavaPlugin {
+public class MessageOverHead extends JavaPlugin {
+    public static final String VERSION = "3.4";
+    public static final String NAME = "MessageOverHead";
 
     private static ConfigManager configManager;
-    private static BubbleMessageManager bubbleMessageManager;
+    private static BubbleMessageManager<Player> bubbleMessageManager;
 
-    public static BubbleMessageManager getBubbleMessageManager() {
+    public static BubbleMessageManager<Player> getBubbleMessageManager() {
         return bubbleMessageManager;
     }
 
-    public static void setBubbleMessageManager(BubbleMessageManager bubbleMessageManager) {
-        MessageOverHear.bubbleMessageManager = bubbleMessageManager;
+    public static void setBubbleMessageManager(BubbleMessageManager<Player> bubbleMessageManager) {
+        MessageOverHead.bubbleMessageManager = bubbleMessageManager;
     }
 
     public static ConfigManager getConfigManager() {
-        return MessageOverHear.configManager;
+        return MessageOverHead.configManager;
     }
 
-    public static MessageOverHear getInstance() {
-        return JavaPlugin.getPlugin(MessageOverHear.class);
+    public static MessageOverHead getInstance() {
+        return JavaPlugin.getPlugin(MessageOverHead.class);
     }
 
     private static void setConfigManager(ConfigManager configManager) {
-        MessageOverHear.configManager = configManager;
+        MessageOverHead.configManager = configManager;
     }
     @Override
     public void onEnable() {
         Logger.init(new JULHandler(getLogger()));
         Logger.info("Starting...");
-        setConfigManager(new ConfigManager(MessageOverHear.getInstance()));
+        setConfigManager(new ConfigManager(MessageOverHead.getInstance()));
         setBubbleMessageManager(new DefaultBubbleMessageManager());
         this.checkPluginVersion();
         new MetricsManager(this);
@@ -81,8 +80,14 @@ public class MessageOverHear extends JavaPlugin {
 
     private void registerEvent() {
         getConfigManager().getChatEventListener().disableListener();
+        for (ListenerWrapper additionalListener : getConfigManager().getAdditionalListeners()) {
+            additionalListener.disableListener();
+        }
         if(getConfigManager().isEnableChatListener()) {
             Bukkit.getPluginManager().registerEvents(getConfigManager().getChatEventListener(), this);
+        }
+        for (ListenerWrapper additionalListener : getConfigManager().getAdditionalListeners()) {
+            Bukkit.getPluginManager().registerEvents(additionalListener, this);
         }
     }
 
@@ -92,13 +97,18 @@ public class MessageOverHear extends JavaPlugin {
     }
 
     private void checkPluginVersion() {
-        if (!PluginSettings.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
-            for (int i = 0; i < 5; i++) {
-                Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!MessageOverHead.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
+                    for (int i = 0; i < 5; i++) {
+                        Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
+                    }
+                } else {
+                    Logger.info("Plugin have last version");
+                }
             }
-        } else {
-            Logger.info("Plugin have last version");
-        }
+        }.runTaskAsynchronously(this);
     }
 
     public static Float getVersion() {
@@ -143,7 +153,7 @@ public class MessageOverHear extends JavaPlugin {
     public static void createBubbleMessage(ConfigBubble configBubble, Player player, String message, Set<Player> showPlayers) {
         if(configBubble.haveSendPermission(player)) {
             Set<Player> showPlayersFilter = showPlayers.stream().filter(player1 -> getInstance().isPossibleBubbleMessage(configBubble,player, player1)).collect(Collectors.toSet());
-            getBubbleMessageManager().spawnBubble(getBubbleMessageManager().generateBubbleMessage(configBubble,player, message), showPlayersFilter);
+            getBubbleMessageManager().showBubble(getBubbleMessageManager().generateBubbleMessage(player,configBubble,player, message), showPlayersFilter);
         }
     }
 

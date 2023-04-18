@@ -8,10 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import thedivazo.MessageOverHear;
-import thedivazo.listener.chatlistener.ChatControlListener;
-import thedivazo.listener.chatlistener.ChatListener;
-import thedivazo.listener.chatlistener.DefaultChatListener;
+import thedivazo.MessageOverHead;
+import thedivazo.listener.chatlistener.*;
 import thedivazo.manager.vanish.*;
 import thedivazo.utils.ConfigUtils;
 
@@ -32,7 +30,7 @@ public class ConfigManager {
     HashMap<String, ImmutableConfigBubble> configBubbles = new HashMap<>();
 
     @Getter
-    private final MessageOverHear plugin;
+    private final MessageOverHead plugin;
     private FileConfiguration fileConfig;
     @Getter
     private ConfigUtils configUtils;
@@ -56,6 +54,9 @@ public class ConfigManager {
     private Permission permissionVault = null;
 
     @Getter
+    private Set<ListenerWrapper> additionalListeners = new HashSet<>();
+
+    @Getter
     @Setter
     private ChatListener<?, ?> chatEventListener;
     @Getter
@@ -67,7 +68,7 @@ public class ConfigManager {
     @Getter
     private boolean isClearColorFromMessage = false;
 
-    public ConfigManager(MessageOverHear plugin) {
+    public ConfigManager(MessageOverHead plugin) {
         this.plugin = plugin;
         this.fileConfig = plugin.getConfig();
         this.configUtils = new ConfigUtils(fileConfig);
@@ -129,7 +130,6 @@ public class ConfigManager {
         if(isPlugin("PlaceholderAPI")) {
             this.isPAPILoaded = true;
         }
-        saveChatEventListener();
     }
 
     public void saveSettingsPlugin() {
@@ -140,7 +140,7 @@ public class ConfigManager {
 
             ConfigurationSection message = settings.getConfigurationSection("message");
             isClearColorFromMessage = message.getBoolean("clearColorFromPlayerMessage");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Logger.warn("Ошибка обновления настроек плагина! Пожалуйста, проверьте конфиг на наличие опечаток!");
             throw e;
         }
@@ -171,10 +171,12 @@ public class ConfigManager {
     public void reloadConfigFile() {
         this.fileConfig = plugin.getConfig();
         this.configUtils.setConfig(fileConfig);
+        getAdditionalListeners().clear();
         saveSoftDependCondition();
         saveVanishManager();
         saveSettingsPlugin();
         generateConfigBubbles();
+        saveChatEventListener();
     }
 
 

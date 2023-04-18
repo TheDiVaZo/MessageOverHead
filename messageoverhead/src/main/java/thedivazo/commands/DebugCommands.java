@@ -5,7 +5,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.command.CommandSender;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
 @CommandAlias("messageoverhear|moh")
 public class DebugCommands extends BaseCommand {
@@ -13,6 +13,6 @@ public class DebugCommands extends BaseCommand {
     @Subcommand("config")
     @CommandPermission("moh.admin")
     public void checkConfig(CommandSender sender) {
-        sender.sendMessage(MessageOverHear.getConfigManager().getConfigString());
+        sender.sendMessage(MessageOverHead.getConfigManager().getConfigString());
     }
 }

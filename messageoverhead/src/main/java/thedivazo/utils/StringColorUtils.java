@@ -3,7 +3,7 @@ package thedivazo.utils;
 import net.md_5.bungee.api.ChatColor;
 import java.awt.*;
 
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,7 +136,7 @@ public class StringColorUtils {
 
     public static String ofText(String message) {
         message = ChatColor.translateAlternateColorCodes('&', message);
-        if (MessageOverHear.getVersion() < 1.16f) {
+        if (MessageOverHead.getVersion() < 1.16f) {
             return message;
         }
         Matcher match = HEX_PAT.matcher(message);

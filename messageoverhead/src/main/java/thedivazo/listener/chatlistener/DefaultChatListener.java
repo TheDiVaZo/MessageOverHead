@@ -1,19 +1,18 @@
 package thedivazo.listener.chatlistener;
 
-import api.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import thedivazo.MessageOverHear;
+import thedivazo.MessageOverHead;
 
-public final class DefaultChatListener implements Listener, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
+public final class DefaultChatListener implements ListenerWrapper, ChatListener<AsyncPlayerChatEvent, PlayerCommandPreprocessEvent> {
 
     @Override
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(AsyncPlayerChatEvent e) {
-        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), e.getPlayer(), e.getMessage());
+        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), e.getPlayer(), e.getMessage());
     }
 
     @Override
@@ -30,12 +29,12 @@ public final class DefaultChatListener implements Listener, ChatListener<AsyncPl
         args[1] = "";
         String message = String.join(" ", args);
 
-        MessageOverHear.createBubbleMessage(MessageOverHear.getConfigManager().getConfigBubble("messages"), player, message, targetPlayer);
+        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), player, message, targetPlayer);
     }
 
     @Override
     public void disableListener() {
-        PlayerCommandPreprocessEvent.getHandlerList().unregister(MessageOverHear.getInstance());
-        AsyncPlayerChatEvent.getHandlerList().unregister(MessageOverHear.getInstance());
+        PlayerCommandPreprocessEvent.getHandlerList().unregister(MessageOverHead.getInstance());
+        AsyncPlayerChatEvent.getHandlerList().unregister(MessageOverHead.getInstance());
     }
 }
