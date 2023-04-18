@@ -12,7 +12,7 @@ tasks.withType(JavaCompile) {
 }
 
 group 'com.github.TheDiVaZo.MessageOverHead'
-version "3.3"
+version "3.4"
 
 repositories {
     mavenCentral()
