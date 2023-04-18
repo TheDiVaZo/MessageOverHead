@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
+import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.bubblemessagemanager.BubbleMessageManager;
 import thedivazo.bubblemessagemanager.DefaultBubbleMessageManager;
 import thedivazo.commands.DebugCommands;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 @Author(value = "TheDiVaZo")
 @ApiVersion(value = ApiVersion.Target.v1_13)
 public class MessageOverHead extends JavaPlugin {
-    public static final String VERSION = "3.2";
+    public static final String VERSION = "3.3";
     public static final String NAME = "MessageOverHead";
 
     private static ConfigManager configManager;
@@ -96,13 +97,18 @@ public class MessageOverHead extends JavaPlugin {
     }
 
     private void checkPluginVersion() {
-        if (!MessageOverHead.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
-            for (int i = 0; i < 5; i++) {
-                Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!MessageOverHead.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
+                    for (int i = 0; i < 5; i++) {
+                        Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
+                    }
+                } else {
+                    Logger.info("Plugin have last version");
+                }
             }
-        } else {
-            Logger.info("Plugin have last version");
-        }
+        }.runTaskAsynchronously(this);
     }
 
     public static Float getVersion() {

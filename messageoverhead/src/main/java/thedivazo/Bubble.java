@@ -123,24 +123,14 @@ public class Bubble {
         }};
     }
 
-    protected boolean checkClass(String string) {
-        try {
-            Class.forName(string, false, getClass().getClassLoader());
-            return true;
-        } catch (Throwable e) {
-            return false;
-        }
-    }
-
     private PacketContainer getMetaPacket() {
         PacketContainer metaPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
         metaPacket.getIntegers().write(0, id);
-        if(checkClass("com.comphenix.protocol.wrappers.WrappedDataValue"))
-        {
+        try {
             final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
 
-            for(final WrappedWatchableObject entry : metadata.getWatchableObjects()) {
-                if(entry == null) continue;
+            for (final WrappedWatchableObject entry : metadata.getWatchableObjects()) {
+                if (entry == null) continue;
 
                 final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
                 wrappedDataValueList.add(
@@ -154,7 +144,9 @@ public class Bubble {
 
             metaPacket.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         }
-        else metaPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
+        catch (Throwable e) {
+            metaPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
+        }
         return metaPacket;
     }
 
