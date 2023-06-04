@@ -3,7 +3,7 @@ package thedivazo.bubblemessagemanager;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import thedivazo.BubbleMessage;
+import thedivazo.bubble.BubbleMessage;
 import thedivazo.MessageOverHead;
 import thedivazo.config.ConfigBubble;
 

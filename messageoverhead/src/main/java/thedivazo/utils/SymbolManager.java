@@ -1,17 +1,12 @@
 package thedivazo.utils;
 
-import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.entity.Player;
-import thedivazo.MessageOverHead;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringUtil {
+public class SymbolManager {
 
-    private StringUtil() {
+    private SymbolManager() {
     }
 
     public static LinkedHashMap<Integer, String> stripsSymbol(String str, Pattern pattern) {
@@ -104,34 +99,4 @@ public class StringUtil {
     }
 
 
-    public static List<String> splitText(String text, int maxSizeLine) {
-        ArrayList<String> result = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile("(\\S{0,"+maxSizeLine+"}\\s?)");
-        Matcher matcher = pattern.matcher(text);
-        StringBuilder testString = new StringBuilder();
-        while (matcher.find()) {
-            if (testString.length() < maxSizeLine) {
-                testString.append(matcher.group());
-            }
-            else {
-                result.add(testString.toString());
-                testString = new StringBuilder(matcher.group());
-            }
-        }
-        result.add(testString.toString());
-
-        return result;
-    }
-
-    public static String setEmoji(Player player, String text) {
-        if(text==null) return text;
-        if(MessageOverHead.getConfigManager().isIALoaded()) text = FontImageWrapper.replaceFontImages(player, text);
-        return text;
-    }
-
-    public static String setPlaceholders(Player player, String text) {
-        if(MessageOverHead.getConfigManager().isPAPILoaded() && text!=null) text = PlaceholderAPI.setPlaceholders(player, text);
-        return text;
-    }
 }

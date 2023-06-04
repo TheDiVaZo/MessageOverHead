@@ -8,7 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import thedivazo.MessageOverHead;
-import thedivazo.utils.ConfigUtils;
+import thedivazo.utils.ConfigWrapper;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -103,18 +103,18 @@ public class ConfigBubble {
     }
 
     void saveFormatFromConfig(ConfigurationSection configBubbleSettings) {
-        ConfigUtils configBubbleSettingsWrapper = new ConfigUtils(configBubbleSettings);
+        ConfigWrapper configBubbleSettingsWrapper = new ConfigWrapper(configBubbleSettings);
         messageFormat.clear();
         ConfigurationSection permissionsFormat = configBubbleSettings.getConfigurationSection("settings.format");
 
         if (permissionsFormat == null) {
-            List<String> formatsMessage = configBubbleSettingsWrapper.getAlwaysListString("settings.format");
+            List<String> formatsMessage = configBubbleSettingsWrapper.getListString("settings.format");
             if(!formatsMessage.isEmpty()) messageFormat.put(0, new Format(formatsMessage, null));
         } else {
             for (String priority : permissionsFormat.getKeys(false)) {
                 ConfigurationSection sectionFormat = permissionsFormat.getConfigurationSection(priority);
                 if (sectionFormat != null) {
-                    List<String> formatsMessage = configBubbleSettingsWrapper.getAlwaysListString("format", sectionFormat).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                    List<String> formatsMessage = configBubbleSettingsWrapper.getListString("format", sectionFormat).stream().filter(Objects::nonNull).collect(Collectors.toList());
                     if (!formatsMessage.isEmpty()) {
                         String perm = sectionFormat.getString("perm");
                         messageFormat.put(Integer.parseInt(priority), new ConfigBubble.Format(formatsMessage, perm));

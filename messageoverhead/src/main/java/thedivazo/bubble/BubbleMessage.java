@@ -1,4 +1,4 @@
-package thedivazo;
+package thedivazo.bubble;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

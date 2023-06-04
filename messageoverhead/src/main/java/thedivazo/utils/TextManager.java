@@ -1,9 +1,12 @@
 package thedivazo.utils;
 
+import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
-import java.awt.*;
-
+import org.bukkit.entity.Player;
 import thedivazo.MessageOverHead;
+
+import java.awt.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +14,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringColorUtils {
-    private StringColorUtils(){}
+public class TextManager {
+    private TextManager(){}
 
     public static final Pattern HEX_PAT = Pattern.compile("&#[a-fA-F0-9]{6}");
     public static final Pattern HEX_PATv2 = Pattern.compile("\\{#([a-fA-F0-9]{6})}");
@@ -136,9 +139,6 @@ public class StringColorUtils {
 
     public static String ofText(String message) {
         message = ChatColor.translateAlternateColorCodes('&', message);
-        if (MessageOverHead.getVersion() < 1.16f) {
-            return message;
-        }
         Matcher match = HEX_PAT.matcher(message);
         while(match.find()) {
             String color = message.substring(match.start(), match.end());
@@ -153,9 +153,40 @@ public class StringColorUtils {
         ArrayList<String> colorLines = new ArrayList<>();
         for (String message : messages) {
             colorLines.add(shiftColor + message);
-            StringUtil.stripsSymbol(StringColorUtils.ofText(message), StringColorUtils.CHAT_COLOR_PAT)
+            SymbolManager.stripsSymbol(TextManager.ofText(message), TextManager.CHAT_COLOR_PAT)
                     .forEach((index, color)->shiftColor.append(color));
         }
         return colorLines;
+    }
+
+    public static List<String> splitText(String text, int maxSizeLine) {
+        ArrayList<String> result = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("(\\S{0,"+maxSizeLine+"}\\s?)");
+        Matcher matcher = pattern.matcher(text);
+        StringBuilder testString = new StringBuilder();
+        while (matcher.find()) {
+            if (testString.length() < maxSizeLine) {
+                testString.append(matcher.group());
+            }
+            else {
+                result.add(testString.toString());
+                testString = new StringBuilder(matcher.group());
+            }
+        }
+        result.add(testString.toString());
+
+        return result;
+    }
+
+    public static String setEmoji(Player player, String text) {
+        if(text==null) return null;
+        if(MessageOverHead.getConfigManager().isIALoaded()) text = FontImageWrapper.replaceFontImages(player, text);
+        return text;
+    }
+
+    public static String setPlaceholders(Player player, String text) {
+        if(MessageOverHead.getConfigManager().isPAPILoaded() && text!=null) text = PlaceholderAPI.setPlaceholders(player, text);
+        return text;
     }
 }

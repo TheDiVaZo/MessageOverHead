@@ -21,14 +21,14 @@ import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
 import thedivazo.listener.chatlistener.ListenerWrapper;
 import thedivazo.metrics.MetricsManager;
+import thedivazo.utils.VersionWrapper;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Plugin(name = MessageOverHead.NAME, version = MessageOverHead.VERSION)
+@Plugin(name = MessageOverHead.NAME, version = "4.0.0")
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
         @SoftDependency(value = "PlaceholderAPI"),
@@ -41,7 +41,10 @@ import java.util.stream.Collectors;
 @Author(value = "TheDiVaZo")
 @ApiVersion(value = ApiVersion.Target.v1_13)
 public class MessageOverHead extends JavaPlugin {
-    public static final String VERSION = "3.4";
+
+    public static final VersionWrapper PLUGIN_VERSION = VersionWrapper.valueOf("4.0.0");
+    public static final VersionWrapper MINECRAFT_VERSION = VersionWrapper.valueOf(Bukkit.getVersion(), Pattern.compile("\\(MC: ([0-9]+)\\.([0-9]+)\\.([0-9]+)"), 0, 1, 2);
+
     public static final String NAME = "MessageOverHead";
 
     private static ConfigManager configManager;
@@ -70,6 +73,7 @@ public class MessageOverHead extends JavaPlugin {
     public void onEnable() {
         Logger.init(new JULHandler(getLogger()));
         Logger.info("Starting...");
+
         setConfigManager(new ConfigManager(MessageOverHead.getInstance()));
         setBubbleMessageManager(new DefaultBubbleMessageManager());
         this.checkPluginVersion();
@@ -100,7 +104,7 @@ public class MessageOverHead extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!MessageOverHead.VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
+                if (!MessageOverHead.PLUGIN_VERSION.equals(ConfigManager.getLastVersionOfPlugin())) {
                     for (int i = 0; i < 5; i++) {
                         Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
                     }
@@ -109,17 +113,6 @@ public class MessageOverHead extends JavaPlugin {
                 }
             }
         }.runTaskAsynchronously(this);
-    }
-
-    public static Float getVersion() {
-        String version = Bukkit.getVersion();
-        Pattern pattern = Pattern.compile("\\(MC: ([0-9]+\\.[0-9]+)");
-        Matcher matcher = pattern.matcher(version);
-        if (matcher.find())
-        {
-            return Float.parseFloat(matcher.group(1));
-        }
-        else return null;
     }
 
     private void registerCommands() {

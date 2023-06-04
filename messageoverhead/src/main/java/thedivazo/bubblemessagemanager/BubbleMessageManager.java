@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import thedivazo.BubbleMessage;
+import thedivazo.bubble.BubbleMessage;
 import thedivazo.MessageOverHead;
 import thedivazo.config.ConfigBubble;
 import thedivazo.config.ConfigManager;
-import thedivazo.utils.StringColorUtils;
-import thedivazo.utils.StringUtil;
+import thedivazo.utils.TextManager;
+import thedivazo.utils.SymbolManager;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -74,7 +74,7 @@ public abstract class BubbleMessageManager<T> {
         List<String> formatLines = configBubble.getFormatOfPlayer(formatter);
         for(String format: formatLines) {
             if(format != null) {
-                messageLines.addAll(StringColorUtils.ofText(convertMsgToLinesBubble(configBubble,format.replace("%message%", configManager.isClearColorFromMessage() ? StringColorUtils.toNoColorString(message):message))));
+                messageLines.addAll(TextManager.ofText(convertMsgToLinesBubble(configBubble,format.replace("%message%", configManager.isClearColorFromMessage() ? TextManager.toNoColorString(message):message))));
             }
         }
         return messageLines;
@@ -118,7 +118,7 @@ public abstract class BubbleMessageManager<T> {
     }
 
     public List<String> convertMsgToLinesBubble(ConfigBubble configBubble, String msg) {
-        msg = StringColorUtils.ofText(msg);
-        return StringUtil.insertsSymbol(StringUtil.stripsSymbol(msg, StringColorUtils.CHAT_COLOR_PAT), StringUtil.splitText(ChatColor.stripColor(msg), configBubble.getSizeLine()));
+        msg = TextManager.ofText(msg);
+        return SymbolManager.insertsSymbol(SymbolManager.stripsSymbol(msg, TextManager.CHAT_COLOR_PAT), TextManager.splitText(ChatColor.stripColor(msg), configBubble.getSizeLine()));
     }
 }

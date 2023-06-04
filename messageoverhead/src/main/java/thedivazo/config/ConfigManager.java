@@ -11,7 +11,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import thedivazo.MessageOverHead;
 import thedivazo.listener.chatlistener.*;
 import thedivazo.manager.vanish.*;
-import thedivazo.utils.ConfigUtils;
+import thedivazo.utils.ConfigWrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class ConfigManager {
     private final MessageOverHead plugin;
     private FileConfiguration fileConfig;
     @Getter
-    private ConfigUtils configUtils;
+    private ConfigWrapper configWrapper;
 
     @Getter
     private boolean isPAPILoaded = false;
@@ -71,7 +71,7 @@ public class ConfigManager {
     public ConfigManager(MessageOverHead plugin) {
         this.plugin = plugin;
         this.fileConfig = plugin.getConfig();
-        this.configUtils = new ConfigUtils(fileConfig);
+        this.configWrapper = new ConfigWrapper(fileConfig);
         plugin.saveDefaultConfig();
         updateConfig();
         reloadConfigFile();
@@ -170,7 +170,7 @@ public class ConfigManager {
 
     public void reloadConfigFile() {
         this.fileConfig = plugin.getConfig();
-        this.configUtils.setConfig(fileConfig);
+        //this.configWrapper.setConfig(fileConfig);
         getAdditionalListeners().clear();
         saveSoftDependCondition();
         saveVanishManager();

@@ -1,4 +1,4 @@
-package thedivazo;
+package thedivazo.bubble;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -14,7 +14,9 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import thedivazo.utils.StringUtil;
+import thedivazo.MessageOverHead;
+import thedivazo.utils.TextManager;
+import thedivazo.utils.VersionWrapper;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -30,16 +32,27 @@ public class Bubble {
 
     private final ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 
+    // 1.18 | 1.17 | 1.14 | 1.13 | 1.12
+
+    private static final VersionWrapper MC_VERSION = MessageOverHead.MINECRAFT_VERSION;
+    private static final VersionWrapper MC_1_18 = VersionWrapper.valueOf("1.18");
+    private static final VersionWrapper MC_1_17 = VersionWrapper.valueOf("1.17");
+    private static final VersionWrapper MC_1_16 = VersionWrapper.valueOf("1.16");
+    private static final VersionWrapper MC_1_15 = VersionWrapper.valueOf("1.15");
+    private static final VersionWrapper MC_1_14 = VersionWrapper.valueOf("1.14");
+    private static final VersionWrapper MC_1_13 = VersionWrapper.valueOf("1.13");
+    private static final VersionWrapper MC_1_12 = VersionWrapper.valueOf("1.12");
+
     private static final int CUSTOM_NAME_INDEX = 2;
     private static final int CUSTOM_NAME_VISIBLE_INDEX = 3;
     private static final int PARAM_ARMOR_STAND_INDEX;
 
     static {
-        if (MessageOverHead.getVersion() >= 1.17f) {
+        if (MC_VERSION.equalsMinor(MC_1_17) || MC_VERSION.greaterMinor(MC_1_17)) {
             PARAM_ARMOR_STAND_INDEX = 15;
-        } else if (MessageOverHead.getVersion() > 1.14f) {
+        } else if (MC_VERSION.greaterMinor(MC_1_14)) {
             PARAM_ARMOR_STAND_INDEX = 14;
-        } else if (MessageOverHead.getVersion() == 1.14f) {
+        } else if (MC_VERSION.equalsMinor(MC_1_14)) {
             PARAM_ARMOR_STAND_INDEX = 13;
         } else {
             PARAM_ARMOR_STAND_INDEX = 11;
@@ -84,14 +97,14 @@ public class Bubble {
     }
 
     private void setMetadata(Player player) {
-        String modifyMessages = StringUtil.setEmoji(player,StringUtil.setPlaceholders(player, message));
+        String modifyMessages = TextManager.setEmoji(player, TextManager.setPlaceholders(player, message));
         Optional<?> opt;
-        if (MessageOverHead.getVersion() <= 1.13f) {
+        if (MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
             opt = Optional.of(WrappedChatComponent.fromText(modifyMessages).getHandle());
         } else {
             opt = Optional.of(WrappedChatComponent.fromChatMessage(modifyMessages)[0].getHandle());
         }
-        if(MessageOverHead.getVersion()>1.12f) {
+        if(MC_VERSION.greaterMinor(MC_1_14) || MC_VERSION.equalsMinor(MC_1_14)) {
             Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
             metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
         } else {
@@ -110,7 +123,7 @@ public class Bubble {
             getModifier().writeDefaults();
             getIntegers().write(0, id);
 
-            if(MessageOverHead.getVersion() <= 1.13f) {
+            if(MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
                 getIntegers().write(6, 78);
             } else {
                 getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
@@ -176,11 +189,11 @@ public class Bubble {
     public void remove() {
         if (isRemovedBubble) return;
         PacketContainer removeStandPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-        if(MessageOverHead.getVersion() >= 1.18f) {
+        if(MC_VERSION.greaterMinor(MC_1_18) || MC_VERSION.equalsMinor(MC_1_18)) {
             List<Integer> entity = new ArrayList<>();
             entity.add(id);
             removeStandPacket.getIntLists().write(0, entity);
-        } else if(MessageOverHead.getVersion() == 1.17f) {
+        } else if(MC_VERSION.equalsMinor(MC_1_17)) {
             try {
                 removeStandPacket.getModifier().write(0, new IntArrayList(new int[]{id}));
             } catch (Throwable e) {
