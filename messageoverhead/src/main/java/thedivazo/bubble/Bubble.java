@@ -15,7 +15,6 @@ import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import thedivazo.MessageOverHead;
-import thedivazo.utils.TextManager;
 import thedivazo.utils.VersionWrapper;
 
 import java.util.*;
@@ -69,47 +68,41 @@ public class Bubble {
     private final int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private final UUID uuid = UUID.randomUUID();
 
+    private final Set<Player> showers = new HashSet<>();
+
     public Bubble(String message, Location loc) {
         this.message = message;
         setPosition(loc);
     }
 
-    public void spawn(int distance, Player placeholderPlayer) {
-        for (Player p : Objects.requireNonNull(loc.getWorld()).getPlayers()) {
-            if (p.getLocation().distance(loc) <= distance) {
-                spawn(p, placeholderPlayer);
-            }
-        }
-    }
-
-    public void spawn(Player player, Player placeholderPlayer) {
-        setMetadata(placeholderPlayer);
+    public void show(Player player) {
+        setMetadata();
         PacketContainer metaPacket = getMetaPacket();
         PacketContainer fakeStandPacket = getFakeStandPacket();
 
         try {
             pm.sendServerPacket(player, fakeStandPacket);
             pm.sendServerPacket(player, metaPacket);
+            showers.add(player);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private void setMetadata(Player player) {
-        String modifyMessages = TextManager.setEmoji(player, TextManager.setPlaceholders(player, message));
+    private void setMetadata() {
         Optional<?> opt;
         if (MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
-            opt = Optional.of(WrappedChatComponent.fromText(modifyMessages).getHandle());
+            opt = Optional.of(WrappedChatComponent.fromText(message).getHandle());
         } else {
-            opt = Optional.of(WrappedChatComponent.fromChatMessage(modifyMessages)[0].getHandle());
+            opt = Optional.of(WrappedChatComponent.fromChatMessage(message)[0].getHandle());
         }
         if(MC_VERSION.greaterMinor(MC_1_14) || MC_VERSION.equalsMinor(MC_1_14)) {
             Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
             metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serChatComponent), opt);
         } else {
             Serializer serString = WrappedDataWatcher.Registry.get(String.class);
-            metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serString), modifyMessages);
+            metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serString), message);
         }
         metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_VISIBLE_INDEX, serBoolean), true);
         metadata.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(PARAM_ARMOR_STAND_INDEX, serByte), (byte)
@@ -186,8 +179,7 @@ public class Bubble {
         setPosition();
     }
 
-    public void remove() {
-        if (isRemovedBubble) return;
+    public void hide(Player... players) {
         PacketContainer removeStandPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
         if(MC_VERSION.greaterMinor(MC_1_18) || MC_VERSION.equalsMinor(MC_1_18)) {
             List<Integer> entity = new ArrayList<>();
@@ -202,7 +194,13 @@ public class Bubble {
         } else {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }
+        for (Player player : players) {
+            pm.sendServerPacket(player ,removeStandPacket);
+            showers.remove(player);
+        }
+    }
 
-        pm.broadcastServerPacket(removeStandPacket);
+    public void hideAll() {
+        hide(showers.toArray(new Player[0]));
     }
 }

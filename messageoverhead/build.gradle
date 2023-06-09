@@ -17,6 +17,7 @@ version "4.0.0"
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url 'https://mvnrepository.com/artifact/org.apache.commons/commons-collections4' }
     maven { url 'https://maven.pkg.github.com/LoneDev6/API-ItemsAdder' }
     maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
@@ -40,33 +41,26 @@ compileJava {
 }
 
 dependencies {
-    implementation 'org.projectlombok:lombok:1.18.22'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
-
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 
-    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0";
-
-    compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
-    compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
-
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
-
-    compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
 
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0";
+    compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
+    compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
+    compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.10'
-
-    implementation 'org.bstats:bstats-bukkit:3.0.0'
-
     compileOnly 'com.github.LeonMangler:SuperVanish:6.2.6-4'
-
-    implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
-
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
 
+    implementation 'org.projectlombok:lombok:1.18.26'
+    implementation 'org.bstats:bstats-bukkit:3.0.1'
+    implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
 shadowJar {
     relocate 'org.bstats', 'thedivazo.bstats'

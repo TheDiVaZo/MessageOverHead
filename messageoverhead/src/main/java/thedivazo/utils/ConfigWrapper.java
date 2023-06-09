@@ -14,14 +14,26 @@ public class ConfigWrapper {
         this.configurationSection = configurationSection;
     }
 
-    public List<String> getListString(String path) {
-        return getListString(path, configurationSection);
+    public boolean isString(String path) {
+        return configurationSection.isString(path);
     }
 
-    public List<String> getListString(String path, ConfigurationSection section) {
+    public boolean isInt(String path) {
+        return configurationSection.isInt(path);
+    }
+
+    public boolean isDouble(String path) {
+        return configurationSection.isDouble(path);
+    }
+
+    public boolean isConfigurationSection(String path) {
+        return configurationSection.isConfigurationSection(path);
+    }
+
+    public List<String> getListString(String path) {
         ArrayList<String> result = new ArrayList<>();
-        if(section.isList(path)) result.addAll(section.getStringList(path));
-        else result.add(section.getString(path));
+        if(configurationSection.isList(path)) result.addAll(configurationSection.getStringList(path));
+        else result.add(configurationSection.getString(path));
         return result;
     }
 

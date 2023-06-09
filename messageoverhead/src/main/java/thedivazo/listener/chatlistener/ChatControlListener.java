@@ -14,7 +14,7 @@ public final class ChatControlListener implements ChatListener<ChatChannelEvent,
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(ChatChannelEvent e) {
         if(!(e.getSender() instanceof Player)) return;
-        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getRecipients());
+        //MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getRecipients());
     }
 
     @Override
@@ -22,7 +22,7 @@ public final class ChatControlListener implements ChatListener<ChatChannelEvent,
     public void onPlayerPrivateChat(PrePrivateMessageEvent e) {
         if (!(e.getSender() instanceof Player)) return;
 
-        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getReceiver());
+        //MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), (Player) e.getSender(), e.getMessage(), e.getReceiver());
     }
 
     @Override

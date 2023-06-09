@@ -1,29 +1,22 @@
 package thedivazo.bubble;
 
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.config.ConfigBubble;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BubbleMessage<T> {
+public class BubbleWrapper {
 
     private final List<Bubble> bubbleMessages = new ArrayList<>();
     private final Location loc;
 
-    public ConfigBubble getConfigBubble() {
-        return configBubble;
-    }
-
-    private ConfigBubble configBubble;
     private BukkitTask[] tasksRunnable = null;
-    private final T id;
 
-    public BubbleMessage(T id, Location loc, List<String> message, ConfigBubble configBubble) {
-        this.configBubble = configBubble;
-        this.id = id;
+    public BubbleWrapper(Location loc, List<String> message) {
         this.loc = loc;
         for (int i = 0; i < message.size(); i++) {
             if (message.get(message.size() - 1 - i).length() > 0 && !message.get(message.size() - 1 - i).equals(" ")) {
@@ -33,13 +26,9 @@ public class BubbleMessage<T> {
         }
     }
 
-    public T getBubbleID() {
-        return this.id;
-    }
-
-    public void show(Player player, Player placeholderPlayer) {
+    public void show(Player player) {
         for (Bubble msg : bubbleMessages) {
-            msg.spawn(player, placeholderPlayer);
+            msg.show(player);
         }
     }
 
@@ -61,26 +50,19 @@ public class BubbleMessage<T> {
             }
         }
 
-        bubbleMessages.forEach(Bubble::remove);
+        bubbleMessages.forEach(Bubble::hideAll);
     }
 
-    public void playParticle(Player player) {
-        player.spawnParticle(configBubble.getParticleType(), loc,
-                configBubble.getParticleCount(),
-                configBubble.getParticleOffsetX(),
-                configBubble.getParticleOffsetY(),
-                configBubble.getParticleOffsetZ());
+    public void playParticle(Player player, Particle particle, int count, double offsetX, double offsetY, double offsetZ) {
+        player.spawnParticle(particle, loc, count, offsetX, offsetY, offsetZ);
     }
 
     public void setTask(BukkitTask... tasksRunnable) {
         this.tasksRunnable = tasksRunnable;
     }
 
-    public void playSound(Player player) {
-        player.playSound(loc,
-                configBubble.getSoundType(),
-                configBubble.getSoundVolume(),
-                configBubble.getSoundPitch());
+    public void playSound(Player player, Sound sound, int volume, int pitch) {
+        player.playSound(loc, sound, volume, pitch);
     }
 }
 

@@ -4,9 +4,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SymbolManager {
+public class SymbolUtil {
 
-    private SymbolManager() {
+    private SymbolUtil() {
     }
 
     public static LinkedHashMap<Integer, String> stripsSymbol(String str, Pattern pattern) {

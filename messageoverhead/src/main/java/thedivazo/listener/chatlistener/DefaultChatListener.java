@@ -12,7 +12,7 @@ public final class DefaultChatListener implements ListenerWrapper, ChatListener<
     @Override
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(AsyncPlayerChatEvent e) {
-        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), e.getPlayer(), e.getMessage());
+        //MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), e.getPlayer(), e.getMessage());
     }
 
     @Override
@@ -29,7 +29,7 @@ public final class DefaultChatListener implements ListenerWrapper, ChatListener<
         args[1] = "";
         String message = String.join(" ", args);
 
-        MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), player, message, targetPlayer);
+        //MessageOverHead.createBubbleMessage(MessageOverHead.getConfigManager().getConfigBubble("messages"), player, message, targetPlayer);
     }
 
     @Override

@@ -1,8 +1,8 @@
-package thedivazo.manager.vanish;
+package thedivazo.vanish;
 
 import org.bukkit.entity.Player;
 
-public interface VanishManager {
+public interface VanishWrapper {
     boolean canSee(Player viewer, Player viewed);
     boolean isInvisible(Player player);
 }

@@ -2,64 +2,62 @@
 #=MESSAGE=OVER=HEADER=#
 #######################
 
-version: 1.3 #DONT TOUCH!
+version: 1.4 #DONT TOUCH!
 
 settings: #plugin settings
-  listener: #General listener. If it is disabled, holograms can only be called by a command.
-    enable: true
-    chat:
-      enable: true #Chat listener
-      generalChat: #The hologram appears if the player wrote a message in the general chat
-        enable: true
-        bubbleConfig: "messages" #The configuration for this message. In this case, the "messages" configuration applies
-      privateChat: # /tell or /msg command
-        enable: true
-        bubbleConfig: "privateMessages"
-  command:
-    moh-send:
+  listeners:
+    chat-channels:
       enable: true
-      bubbleConfig: "messages"
+      local:
+        model-bubble: "test-local-chat-bubble"
+      global:
+        model-bubble: "test-global-chat-bubble"
+      private: # any private chat (/tell /msg or private messages in the chat manager)
+        model-bubble: "private-message"
+  command:
+    model-bubble: "test-command-model-bubble"
 
-testConfigBubble1: #Some message configuration
-  isBubble: true
-  particle:
-    enable: false
-  sound:
-    enable: false
-  settings:
-    format: '&7%message%'
+models:
+  test-model-bubble: #Some message configuration
+    settings:
+      format: '&7%message%'
 
-privateMessages:
-  isBubble: true
-  settings:
-    format: '&7%message%'
-    #There are no other fields specified in this config, so the other fields have a default value.
-
-messages: #default
-  isBubble: true #don't touch. It magic
-  particle:
-    enable: true
-    particleType: CLOUD # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-    count: 4 #count of particle
-    offsetX: 0.2 #the maximum random offset on the X axis
-    offsetY: 0.2 #the maximum random offset on the X axis
-    offsetZ: 0.2 #the maximum random offset on the Z axis
-  sound:
-    enable: true
-    soundType: BLOCK_ANVIL_STEP # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
-    volume: 3 #The volume of the sound
-    pitch: 3 #The pitch of the sound
-  settings:
-    format: '%player_name% %message%' #Default format! Supports PlaceholderAPI and HEX colors (example: &#123456)
-    #format: #Group format!
-     #'0': #priority
-        #format: '%message%' #default format. format haven't permission
-     #'1':
-        #perm: 'perm.vip' #perm.vip
-        #format: '&cVIP &e%message%' #format of perm.vip
-    distance: 10
-    biasY: 2.15 #height spawn of Bubble Message. The value is calculated experimentally.
-    visibleTextForOwner: true
-    delay: 4 #in seconds. Bubble life time
-    sizeLine: 24 #Maximum size of one bubble
-    clearColorFromPlayerMessage: true
+  test-private-messages:
+    settings:
+      format: '&7%message%'
+      #There are no other fields specified in this config, so the other fields have a default value.
+  test-global-message: #defaul
+    #The priority of a bubble model is determined by its position in the config. The higher, the more priority the model.
+    permission: "moh.global-message"
+    particle:
+      enable: true
+      type: CLOUD # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+      count: 4 #count of particle
+      offset-x: 0.2 #the maximum random offset on the X axis
+      offset-y: 0.2 #the maximum random offset on the X axis
+      offset-z: 0.2 #the maximum random offset on the Z axis
+    sound:
+      enable: true
+      type: BLOCK_ANVIL_STEP # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+      volume: 3 #The volume of the sound
+      pitch: 3 #The pitch of the sound
+    settings:
+      format: '%player_name% %message%' #Default format. Supports PlaceholderAPI and HEX colors (example: &#123456)
+      #format: #Group format!
+        #The priority is determined by the position of the format. The higher the priority.
+        #premium:
+          #permission: 'moh.global-message.premium'
+          #format: '&ePREMIUM &b&l%message%'
+        #vip:
+          #permission: 'moh.global-message.vip'
+          #format: '&cVIP &e%message%'
+        #default:
+          #format: '%message%' #default format. format haven't permission
+      distance: 10
+      bias-y: 2.15 #height spawn of bubbles. The value is calculated experimentally.
+      visible-text-for-owner: true
+      lifetime: #Automatic lifetime bubbles settings
+        time-per-char: 2 #Time per one character
+        min-time: 3 #Minimum lifetime
+        max-time: 20 #Maximum lifetime
+      max-size-line: 24 #Maximum size of one bubble

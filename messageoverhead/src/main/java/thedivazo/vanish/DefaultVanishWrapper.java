@@ -1,10 +1,10 @@
-package thedivazo.manager.vanish;
+package thedivazo.vanish;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-public class DefaultVanishManager implements VanishManager{
+public class DefaultVanishWrapper implements VanishWrapper {
     @Override
     public boolean canSee(Player viewer, Player viewed) {
         return !viewed.getGameMode().equals(GameMode.SPECTATOR) &&

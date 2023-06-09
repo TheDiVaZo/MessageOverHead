@@ -13,18 +13,18 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        MessageOverHead.getBubbleMessageManager().removeBubble(player);
+        //MessageOverHead.getBubbleMessageManager().removeBubble(player);
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        MessageOverHead.getBubbleMessageManager().removeBubble(e.getEntity());
+        //MessageOverHead.getBubbleMessageManager().removeBubble(e.getEntity());
     }
 
     @EventHandler
     public void onInvisible(EntityPotionEffectEvent e) {
         if(!e.getModifiedType().equals(PotionEffectType.INVISIBILITY)) return;
         if(!(e.getEntity() instanceof Player)) return;
-        MessageOverHead.getBubbleMessageManager().removeBubble((Player) e.getEntity());
+       //MessageOverHead.getBubbleMessageManager().removeBubble((Player) e.getEntity());
     }
 }
