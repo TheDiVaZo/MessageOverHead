@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.awt.*;
 import java.util.*;
@@ -104,6 +105,7 @@ public class ColoredString implements CharSequence {
                 if (matchResult.start() != prevStart) {
                     result.add(new Chunk(str.substring(prevStart, matchResult.start()), prevColor));
                 }
+                else if (prevColor.length != 0) result.add(new Chunk("", prevColor));
                 result.addAll(List.of(getGradient(matchResult.group())));
                 prevStart = matchResult.end();
                 prevColor = new ChatColor[0];
