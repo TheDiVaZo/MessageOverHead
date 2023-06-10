@@ -17,9 +17,6 @@ public class VanishWrapperManager implements VanishWrapper {
         if (pluginManager.isPluginEnabled("CMI")) {
             vanishWrappers.add(new CMIVanishWrapper());
         }
-        if (pluginManager.isPluginEnabled("Essentials")) {
-            vanishWrappers.add(new EssentialsVanishWrapper());
-        }
         if (pluginManager.isPluginEnabled("SuperVanish")) {
             vanishWrappers.add(new SuperVanishVanishWrapper());
         }

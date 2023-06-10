@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import thedivazo.bubble.BubbleWrapper;
 import thedivazo.manager.config.BubbleModel;
-import thedivazo.utils.text.TextColorProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,8 @@ public class BubbleMessage {
     }
 
     public List<String> getFormatMessage(Player player) {
+        return null;
+        /*
         @Unmodifiable List<BubbleModel.FormatMessageModel> formatMessageModels = bubbleModel.getFormatMessageModels();
         for (int i = 0; i < formatMessageModels.size(); i++) {
             BubbleModel.FormatMessageModel formatMessageModel = formatMessageModels.get(i);
@@ -38,6 +39,7 @@ public class BubbleMessage {
             }
         }
         return new ArrayList<>();
+         */
     }
 
     private List<String> getMessageLines(Player player) {

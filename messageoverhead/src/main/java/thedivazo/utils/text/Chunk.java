@@ -1,14 +1,12 @@
 package thedivazo.utils.text;
 
+import io.th0rgal.oraxen.shaded.jetbrains.annotations.Nullable;
 import io.th0rgal.oraxen.shaded.jetbrains.annotations.Unmodifiable;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,18 +14,26 @@ public class Chunk implements CharSequence {
     @Getter
     private String text;
 
+    @Nullable
     @Getter
     @Unmodifiable
-    private List<Color> colors;
+    private ChatColor[] colors;
 
-    public Chunk(String text, List<Color> colors) {
+    public Chunk(String text, ChatColor... colors) {
         this.text = text;
-        this.colors = Collections.unmodifiableList(colors);
+        this.colors = colors;
     }
 
     public Chunk(String text, Color... colors) {
         this.text = text;
-        this.colors = List.of(colors);
+        this.colors = Arrays.stream(colors).map(ChatColor::of).collect(Collectors.toList()).toArray(ChatColor[]::new);
+    }
+
+
+
+    public Chunk(String text) {
+        this.text = text;
+        this.colors = null;
     }
 
     public boolean isEmpty() {
@@ -215,12 +221,12 @@ public class Chunk implements CharSequence {
     @Override
     public CharSequence subSequence(int start, int end) {
         CharSequence charSequence = text.subSequence(start, end);
-        return new Chunk(new StringBuilder(charSequence.length()).append(charSequence).toString(), colors);
+        return new Chunk(String.valueOf(charSequence), colors);
     }
 
     @Override
     public String toString() {
-        return colors.stream().map(color -> ChatColor.of(color).toString()).collect(Collectors.joining(""))+text;
+        return Arrays.stream(colors).map(ChatColor::toString).collect(Collectors.joining("")) + text;
     }
 
     public String toNoColorString() {
