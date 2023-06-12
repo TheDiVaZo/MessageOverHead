@@ -18,6 +18,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://mvnrepository.com/artifact/org.apache.commons/commons-collections4' }
+    maven { url 'https://mvnrepository.com/artifact/org.apache.commons/commons-lang3' }
     maven { url 'https://maven.pkg.github.com/LoneDev6/API-ItemsAdder' }
     maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
@@ -60,7 +61,11 @@ dependencies {
     implementation group: 'it.unimi.dsi', name: 'fastutil', version: '8.2.1'
     implementation 'org.bstats:bstats-bukkit:3.0.1'
     implementation "co.aikar:acf-paper:0.5.1-SNAPSHOT"
+    implementation 'org.jetbrains:annotations:24.0.1'
+
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
 
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
     testAnnotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
@@ -71,13 +76,12 @@ dependencies {
     testCompileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
 
     testImplementation 'org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT'
-    testImplementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
 shadowJar {
-    relocate 'org.bstats', 'thedivazo.bstats'
     minimize()
+    relocate 'org.bstats', 'thedivazo.bstats'
     relocate 'co.aikar.commands', 'thedivazo.acf'
     relocate 'co.aikar.locales', 'thedivazo.locales'
 }
