@@ -29,6 +29,7 @@ repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public/" }
     maven { url "https://jitpack.io" }
     maven { url "https://repo.dmulloy2.net/repository/public/" }
+    maven { url "https://mvnrepository.com/artifact/org.mockito/mockito-core" }
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -78,6 +79,8 @@ dependencies {
     testImplementation 'org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
+
 }
 shadowJar {
     minimize()

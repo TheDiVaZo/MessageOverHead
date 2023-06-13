@@ -3,17 +3,18 @@ package thedivazo.utils.text.customize;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TextFormatting implements TextChatColorDecorator {
 
-    public static final TextFormatting RESET = new TextFormatting(ChatColor.RESET);
     public static final TextFormatting BOLD = new TextFormatting(ChatColor.BOLD);
     public static final TextFormatting ITALIC = new TextFormatting(ChatColor.ITALIC);
     public static final TextFormatting UNDERLINE = new TextFormatting(ChatColor.UNDERLINE);
@@ -41,9 +42,6 @@ public class TextFormatting implements TextChatColorDecorator {
     }
 
     public static TextFormatting of(ChatColor chatColor) {
-        if (ChatColor.RESET.equals(chatColor)) {
-            return RESET;
-        }
         if (ChatColor.BOLD.equals(chatColor)) {
             return BOLD;
         }

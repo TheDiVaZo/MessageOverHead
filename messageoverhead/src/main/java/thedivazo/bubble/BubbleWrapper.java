@@ -6,15 +6,14 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BubbleWrapper {
 
-    private final List<Bubble> bubbleMessages = new ArrayList<>();
+    private final List<Bubble> bubbleMessages = new CopyOnWriteArrayList<>();
     private final Location loc;
-
-    private BukkitTask[] tasksRunnable = null;
 
     public BubbleWrapper(Location loc, List<String> message) {
         this.loc = loc;
@@ -27,9 +26,7 @@ public class BubbleWrapper {
     }
 
     public void show(Player player) {
-        for (Bubble msg : bubbleMessages) {
-            msg.show(player);
-        }
+        bubbleMessages.forEach(bubble -> bubble.show(player));
     }
 
     public void setPosition(Location position) {
@@ -44,12 +41,6 @@ public class BubbleWrapper {
     }
 
     public void remove() {
-        if (tasksRunnable != null) {
-            for (BukkitTask task : tasksRunnable) {
-                task.cancel();
-            }
-        }
-
         bubbleMessages.forEach(Bubble::hideAll);
     }
 
@@ -57,9 +48,6 @@ public class BubbleWrapper {
         player.spawnParticle(particle, loc, count, offsetX, offsetY, offsetZ);
     }
 
-    public void setTask(BukkitTask... tasksRunnable) {
-        this.tasksRunnable = tasksRunnable;
-    }
 
     public void playSound(Player player, Sound sound, int volume, int pitch) {
         player.playSound(loc, sound, volume, pitch);

@@ -18,14 +18,15 @@ import thedivazo.MessageOverHead;
 import thedivazo.utils.VersionWrapper;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 public class Bubble {
-    private boolean isSmall = true;
-    private boolean noBasePlate = true;
-    private boolean isMarker = true;
-    private boolean invisible = true;
+    private final boolean isSmall = true;
+    private final boolean noBasePlate = true;
+    private final boolean isMarker = true;
+    private final boolean invisible = true;
 
     private final String message;
 
@@ -58,24 +59,27 @@ public class Bubble {
         }
     }
 
-    private boolean isRemovedBubble = false;
     private final Serializer serBoolean = WrappedDataWatcher.Registry.get(Boolean.class);
     private final Serializer serByte = WrappedDataWatcher.Registry.get(Byte.class);
 
     private final WrappedDataWatcher metadata = new WrappedDataWatcher();
 
-    private Location loc;
+    private volatile Location loc;
     private final int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private final UUID uuid = UUID.randomUUID();
 
-    private final Set<Player> showers = new HashSet<>();
+    private final Set<Player> showers = ConcurrentHashMap.newKeySet();
+
+    public Set<Player> getShowers() {
+        return Collections.unmodifiableSet(showers);
+    }
 
     public Bubble(String message, Location loc) {
         this.message = message;
         setPosition(loc);
     }
 
-    public void show(Player player) {
+    public synchronized void show(Player player) {
         setMetadata();
         PacketContainer metaPacket = getMetaPacket();
         PacketContainer fakeStandPacket = getFakeStandPacket();
@@ -90,7 +94,7 @@ public class Bubble {
 
     }
 
-    private void setMetadata() {
+    private synchronized void setMetadata() {
         Optional<?> opt;
         if (MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
             opt = Optional.of(WrappedChatComponent.fromText(message).getHandle());
@@ -111,7 +115,7 @@ public class Bubble {
         metadata.setObject(0, serByte, (byte) (invisible ? 0x20 : 0));
     }
 
-    private PacketContainer getFakeStandPacket() {
+    private synchronized PacketContainer getFakeStandPacket() {
         return new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY) {{
             getModifier().writeDefaults();
             getIntegers().write(0, id);
@@ -129,7 +133,7 @@ public class Bubble {
         }};
     }
 
-    private PacketContainer getMetaPacket() {
+    private synchronized PacketContainer getMetaPacket() {
         PacketContainer metaPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
         metaPacket.getIntegers().write(0, id);
         try {
@@ -156,8 +160,8 @@ public class Bubble {
         return metaPacket;
     }
 
-    private void setPosition() {
-        PacketContainer teleportPacket = new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT) {{
+    private synchronized PacketContainer getTeleportPositionPacket() {
+        return new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT) {{
             getModifier().writeDefaults();
             getIntegers().write(0, id);
             getDoubles().write(0, loc.getX());
@@ -165,21 +169,22 @@ public class Bubble {
             getDoubles().write(2, loc.getZ());
             getBooleans().write(0, false);
         }};
-        pm.broadcastServerPacket(teleportPacket);
-
     }
 
-    public void setPosition(Location loc) {
+    private synchronized void updatePositionForShowers() {
+        PacketContainer newPositionPacket = getTeleportPositionPacket();
+        showers.forEach(player -> pm.sendServerPacket(player, newPositionPacket));
+    }
+
+    public synchronized void setPosition(Location loc) {
         this.loc = loc;
-        setPosition();
     }
 
-    public void setPosition(double x, double y, double z) {
+    public synchronized void setPosition(double x, double y, double z) {
         this.loc = new Location(loc.getWorld(), x, y, z);
-        setPosition();
     }
 
-    public void hide(Player... players) {
+    public synchronized void hide(Player... players) {
         PacketContainer removeStandPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
         if(MC_VERSION.greaterMinor(MC_1_18) || MC_VERSION.equalsMinor(MC_1_18)) {
             List<Integer> entity = new ArrayList<>();
@@ -195,12 +200,13 @@ public class Bubble {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }
         for (Player player : players) {
-            pm.sendServerPacket(player ,removeStandPacket);
-            showers.remove(player);
+            if(showers.remove(player))
+                pm.sendServerPacket(player ,removeStandPacket);
         }
     }
 
-    public void hideAll() {
-        hide(showers.toArray(new Player[0]));
+    public synchronized void hideAll() {
+        if(!showers.isEmpty())
+            hide(showers.toArray(new Player[0]));
     }
 }

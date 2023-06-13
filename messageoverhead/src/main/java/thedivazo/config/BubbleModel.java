@@ -1,4 +1,4 @@
-package thedivazo.manager.config;
+package thedivazo.config;
 
 import io.th0rgal.oraxen.shaded.jetbrains.annotations.Unmodifiable;
 import lombok.*;

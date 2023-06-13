@@ -1,4 +1,4 @@
-package thedivazo.manager.config;
+package thedivazo.config;
 
 import api.logging.Logger;
 import lombok.Getter;

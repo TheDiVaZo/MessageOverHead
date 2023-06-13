@@ -1,4 +1,4 @@
-package thedivazo.manager.config;
+package thedivazo.config;
 
 import lombok.Builder;
 import lombok.Getter;

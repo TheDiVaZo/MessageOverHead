@@ -6,16 +6,19 @@ import thedivazo.utils.text.customize.TextColor;
 import thedivazo.utils.text.customize.TextFormatting;
 
 import java.util.List;
+import java.util.Set;
 
+@ToString
 @Getter
-@Builder(setterPrefix = "set")
+@EqualsAndHashCode
+@Builder(setterPrefix = "set", toBuilder = true)
 public class Chunk implements CharSequence {
     private final String text;
 
     private final TextColor color;
 
     @Singular("format")
-    private final List<TextFormatting> textFormatting;
+    private final Set<TextFormatting> textFormatting;
 
 
     @Override
@@ -32,10 +35,5 @@ public class Chunk implements CharSequence {
     @Override
     public CharSequence subSequence(int start, int end) {
         return new Chunk(text.substring(start, end), color, textFormatting);
-    }
-
-    @Override
-    public String toString() {
-        return text;
     }
 }

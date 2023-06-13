@@ -1,14 +1,13 @@
 package thedivazo.utils.text;
 
 import com.google.common.collect.Collections2;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Singular;
+import lombok.*;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import thedivazo.utils.text.chunk.Chunk;
 import thedivazo.utils.text.customize.TextColor;
+import thedivazo.utils.text.customize.TextDecorator;
 import thedivazo.utils.text.customize.TextFormatting;
 import thedivazo.utils.text.customize.TextOperator;
 
@@ -18,15 +17,18 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@ToString
 @Builder
+@EqualsAndHashCode
 public class DecoratedString implements CharSequence {
+
     @Singular
     private final List<Chunk> chunks;
 
 
     @Override
     public int length() {
-        return 0;
+        return chunks.stream().mapToInt(Chunk::length).sum();
     }
 
     @Override
@@ -58,16 +60,6 @@ public class DecoratedString implements CharSequence {
         }
 
         return new DecoratedString(trimmedChunks);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    public static DecoratedString contact(DecoratedString s1, DecoratedString s2) {
-        List<Chunk> commonChunks = Stream.concat(s1.chunks.stream(), s2.chunks.stream()).collect(Collectors.toList());
-        return new DecoratedString(commonChunks);
     }
 
     public String toMinecraftColoredString() {
@@ -171,12 +163,14 @@ public class DecoratedString implements CharSequence {
         return new DecoratedString(newChunks);
     }
 
+    @ToString
     enum Type {
         COLOR,
         FORMAT,
         OPERATOR,
     }
 
+    @ToString
     @AllArgsConstructor
     static class TypeMatchResult {
         private final MatchResult matchResult;
@@ -209,5 +203,31 @@ public class DecoratedString implements CharSequence {
         public int groupCount() {
             return matchResult.groupCount();
         }
+    }
+
+    DecoratedString subDecoratedString(int beginIndex, int endIndex) {
+        return (DecoratedString) subSequence(beginIndex, endIndex);
+    }
+
+    DecoratedString subDecoratedString(int beginIndex) {
+        return (DecoratedString) subSequence(beginIndex, length());
+    }
+
+    String getNoColorString() {
+        return chunks.stream().map(Chunk::getText).collect(Collectors.joining(""));
+    }
+
+    DecoratedString insertColor(int index, TextColor textColor) {
+        List<Chunk> newChunks = new ArrayList<>();
+        if(index != 0) {
+            newChunks.addAll(subDecoratedString(0, index).chunks);
+            List<Chunk> nextChunks = subDecoratedString(index).chunks;
+            if(!nextChunks.isEmpty()) nextChunks.set(0, nextChunks.get(0)
+                    .toBuilder()
+                    .setColor(textColor)
+                    .build());
+            newChunks.addAll(nextChunks);
+        }
+        return new DecoratedString(newChunks);
     }
 }
