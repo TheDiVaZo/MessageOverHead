@@ -25,22 +25,22 @@ public class BubbleWrapper {
         }
     }
 
-    public void show(Player player) {
+    public synchronized void show(Player player) {
         bubbleMessages.forEach(bubble -> bubble.show(player));
     }
 
-    public void setPosition(Location position) {
+    public synchronized void setPosition(Location position) {
         setPosition(position.getX(), position.getY(), position.getZ());
     }
 
-    public void setPosition(double x, double y, double z) {
+    public synchronized void setPosition(double x, double y, double z) {
         for (int i = 0; i < bubbleMessages.size(); i++) {
             Location locBubble = new Location(loc.getWorld(), x, y + i * 0.3, z);
             bubbleMessages.get(i).setPosition(locBubble);
         }
     }
 
-    public void remove() {
+    public synchronized void remove() {
         bubbleMessages.forEach(Bubble::hideAll);
     }
 
