@@ -1,15 +1,12 @@
 package thedivazo.utils.text;
 
-import com.google.common.collect.Collections2;
 import lombok.*;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import thedivazo.utils.text.chunk.Chunk;
+import thedivazo.utils.text.element.Chunk;
 import thedivazo.utils.text.customize.TextColor;
-import thedivazo.utils.text.customize.TextDecorator;
 import thedivazo.utils.text.customize.TextFormatting;
 import thedivazo.utils.text.customize.TextOperator;
+import thedivazo.utils.text.element.DecoratedChar;
 
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -229,5 +226,21 @@ public class DecoratedString implements CharSequence {
             newChunks.addAll(nextChunks);
         }
         return new DecoratedString(newChunks);
+    }
+
+    public int indexOf(DecoratedChar decoratedChar) {
+
+    }
+
+    public int indexOf(DecoratedChar decoratedChar, int fromIndex) {
+
+    }
+
+    public int lastIndexOf(DecoratedChar decoratedChar) {
+
+    }
+
+    public int lastIndexOf(DecoratedChar decoratedChar, int fromIndex) {
+
     }
 }

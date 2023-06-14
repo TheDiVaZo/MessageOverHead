@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Data
-public class Bubble {
+public final class Bubble {
     private final boolean isSmall = true;
     private final boolean noBasePlate = true;
     private final boolean isMarker = true;
@@ -68,28 +68,23 @@ public class Bubble {
     private final int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private final UUID uuid = UUID.randomUUID();
 
-    private final Set<Player> showers = ConcurrentHashMap.newKeySet();
-
-    public Set<Player> getShowers() {
-        return Collections.unmodifiableSet(showers);
-    }
-
     public Bubble(String message, Location loc) {
         this.message = message;
         setPosition(loc);
     }
 
-    public synchronized void show(Player player) {
+    public synchronized void show(Player... players) {
         setMetadata();
         PacketContainer metaPacket = getMetaPacket();
         PacketContainer fakeStandPacket = getFakeStandPacket();
 
-        try {
-            pm.sendServerPacket(player, fakeStandPacket);
-            pm.sendServerPacket(player, metaPacket);
-            showers.add(player);
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (Player player : players) {
+            try {
+                pm.sendServerPacket(player, fakeStandPacket);
+                pm.sendServerPacket(player, metaPacket);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -171,9 +166,9 @@ public class Bubble {
         }};
     }
 
-    private synchronized void updatePositionForShowers() {
+    private void updatePosition(Player... players) {
         PacketContainer newPositionPacket = getTeleportPositionPacket();
-        showers.forEach(player -> pm.sendServerPacket(player, newPositionPacket));
+        Arrays.stream(players).forEach(player -> pm.sendServerPacket(player, newPositionPacket));
     }
 
     public synchronized void setPosition(Location loc) {
@@ -199,14 +194,6 @@ public class Bubble {
         } else {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }
-        for (Player player : players) {
-            if(showers.remove(player))
-                pm.sendServerPacket(player ,removeStandPacket);
-        }
-    }
-
-    public synchronized void hideAll() {
-        if(!showers.isEmpty())
-            hide(showers.toArray(new Player[0]));
+        Arrays.stream(players).forEach(player-> pm.sendServerPacket(player ,removeStandPacket));
     }
 }

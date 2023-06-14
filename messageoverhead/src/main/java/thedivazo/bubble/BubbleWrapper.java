@@ -4,16 +4,17 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BubbleWrapper {
 
     private final List<Bubble> bubbleMessages = new CopyOnWriteArrayList<>();
-    private final Location loc;
+    private volatile Location loc;
+
+    private final Set<Player> showers = ConcurrentHashMap.newKeySet();
 
     public BubbleWrapper(Location loc, List<String> message) {
         this.loc = loc;
@@ -25,23 +26,22 @@ public class BubbleWrapper {
         }
     }
 
-    public synchronized void show(Player player) {
-        bubbleMessages.forEach(bubble -> bubble.show(player));
+    public synchronized void show(Player... players) {
+        showers.addAll(List.of(players));
+        bubbleMessages.forEach(bubble -> bubble.show(players));
     }
 
     public synchronized void setPosition(Location position) {
-        setPosition(position.getX(), position.getY(), position.getZ());
-    }
-
-    public synchronized void setPosition(double x, double y, double z) {
+        this.loc = position;
         for (int i = 0; i < bubbleMessages.size(); i++) {
-            Location locBubble = new Location(loc.getWorld(), x, y + i * 0.3, z);
+            Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3, loc.getZ());
             bubbleMessages.get(i).setPosition(locBubble);
         }
     }
 
-    public synchronized void remove() {
-        bubbleMessages.forEach(Bubble::hideAll);
+    public void remove() {
+        bubbleMessages.forEach(bubble -> bubble.hide(showers.toArray(Player[]::new)));
+        showers.clear();
     }
 
     public void playParticle(Player player, Particle particle, int count, double offsetX, double offsetY, double offsetZ) {

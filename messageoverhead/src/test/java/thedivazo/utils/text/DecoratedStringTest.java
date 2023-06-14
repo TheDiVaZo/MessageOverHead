@@ -1,10 +1,7 @@
 package thedivazo.utils.text;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.junit.jupiter.api.Test;
-import thedivazo.utils.text.chunk.Chunk;
+import thedivazo.utils.text.element.Chunk;
 import thedivazo.utils.text.customize.TextColor;
 import thedivazo.utils.text.customize.TextFormatting;
 
