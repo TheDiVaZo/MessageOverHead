@@ -36,6 +36,14 @@ public class Chunk implements CharSequence {
         return new Chunk(text.substring(start, end), color, textFormatting);
     }
 
+    public boolean equalsDecorate(Chunk chunk) {
+        return textFormatting.equals(chunk.textFormatting) && color.equals(chunk.color);
+    }
+
+    public boolean equalsDecorate(DecoratedChar chunk) {
+        return textFormatting.equals(chunk.getTextFormatting()) && color.equals(chunk.getColor());
+    }
+
     public int indexOf(int ch) {
         return text.indexOf(ch);
     }
@@ -66,5 +74,37 @@ public class Chunk implements CharSequence {
 
     public int lastIndexOf(@NotNull String str, int fromIndex) {
         return text.lastIndexOf(str, fromIndex);
+    }
+
+    public int indexOf(DecoratedChar decoratedChar) {
+        return indexOf(decoratedChar, 0);
+    }
+
+    public int indexOf(DecoratedChar decoratedChar, int fromIndex) {
+        return equalsDecorate(decoratedChar) ? indexOf(decoratedChar.getCharWrapped(), fromIndex) : -1;
+    }
+
+    public int lastIndexOf(DecoratedChar decoratedChar) {
+        return lastIndexOf(decoratedChar, text.length());
+    }
+
+    public int lastIndexOf(DecoratedChar decoratedChar, int fromIndex) {
+        return equalsDecorate(decoratedChar) ? lastIndexOf(decoratedChar.getCharWrapped(), fromIndex) : -1;
+    }
+
+    public boolean isEmpty() {
+        return text.isEmpty();
+    }
+
+    public int indexOf(Chunk chunk) {
+        return equalsDecorate(chunk) ? indexOf(chunk.text) : -1;
+    }
+
+    public boolean endsWith(Chunk chunk) {
+        return equalsDecorate(chunk) && text.endsWith(chunk.text);
+    }
+
+    public boolean startsWith(Chunk chunk) {
+        return equalsDecorate(chunk) && text.startsWith(chunk.text);
     }
 }

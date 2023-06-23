@@ -165,9 +165,9 @@ class DecoratedStringTest {
         DecoratedString sub1 = (DecoratedString) decoratedString.subSequence(0, 25);
         DecoratedString sub2 = (DecoratedString) decoratedString.subSequence(25, 29);
         DecoratedString sub3 = (DecoratedString) decoratedString.subSequence(29, 45);
-        System.out.println(sub1.toMinecraftColoredString());
-        System.out.println(sub2.toMinecraftColoredString());
-        System.out.println(sub3.toMinecraftColoredString());
+        System.out.println(sub1.getMinecraftColoredString());
+        System.out.println(sub2.getMinecraftColoredString());
+        System.out.println(sub3.getMinecraftColoredString());
 
         DecoratedString expectedSub1 = DecoratedString.builder()
                 .chunk(Chunk.builder()
@@ -199,9 +199,9 @@ class DecoratedStringTest {
         DecoratedString sub1 = (DecoratedString) decoratedString.subSequence(0, 25);
         DecoratedString sub2 = (DecoratedString) decoratedString.subSequence(25, 29);
         DecoratedString sub3 = (DecoratedString) decoratedString.subSequence(29, 45);
-        System.out.println(sub1.toMinecraftColoredString());
-        System.out.println(sub2.toMinecraftColoredString());
-        System.out.println(sub3.toMinecraftColoredString());
+        System.out.println(sub1.getMinecraftColoredString());
+        System.out.println(sub2.getMinecraftColoredString());
+        System.out.println(sub3.getMinecraftColoredString());
     }
 
 }

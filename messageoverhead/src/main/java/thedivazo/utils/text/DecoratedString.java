@@ -1,6 +1,7 @@
 package thedivazo.utils.text;
 
 import lombok.*;
+import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.jetbrains.annotations.NotNull;
 import thedivazo.utils.text.element.Chunk;
 import thedivazo.utils.text.customize.TextColor;
@@ -15,17 +16,67 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ToString
-@Builder
 @EqualsAndHashCode
 public class DecoratedString implements CharSequence {
 
-    @Singular
     private final List<Chunk> chunks;
+    @Getter
+    private final String noColorString;
+    @Getter
+    private final String minecraftColoredString;
+
+    public DecoratedString() {
+        this(new ArrayList<>());
+    }
+
+    @Builder
+    private DecoratedString(@Singular List<Chunk> chunks) {
+        this.chunks = chunks;
+        this.noColorString = calculateNoColorString();
+        this.minecraftColoredString = calculateMinecraftColoredString();
+    }
+
+    private String calculateNoColorString() {
+        return chunks.stream().map(Chunk::getText).collect(Collectors.joining());
+    }
+
+    private String calculateMinecraftColoredString() {
+        StringBuilder result = new StringBuilder();
+        ListIterator<Chunk> chunkListIterator = chunks.listIterator();
+        Chunk previousChunk = null;
+        while (chunkListIterator.hasNext()) {
+            StringBuilder chunkString = new StringBuilder();
+            Chunk chunk = chunkListIterator.next();
+            if(!Objects.isNull(previousChunk)) {
+                Chunk finalPreviousChunk = previousChunk;
+                if(new HashSet<>(chunk.getTextFormatting()).containsAll(previousChunk.getTextFormatting())) {
+                    List<TextFormatting> uniqueTextFormatting = Stream.concat(chunk.getTextFormatting().stream(), previousChunk.getTextFormatting().stream())
+                            .distinct()
+                            .filter(f -> !chunk.getTextFormatting().contains(f) || !finalPreviousChunk.getTextFormatting().contains(f))
+                            .collect(Collectors.toList());
+                    chunkString.append(uniqueTextFormatting.stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
+                }
+                else {
+                    chunkString.append(TextOperator.RESET.getStringDecorator()).append(chunk.getTextFormatting().stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
+                }
+                if (!chunk.getColor().equals(previousChunk.getColor())) chunkString.append(chunk.getColor().getStringDecorator());
+            }
+            else {
+                chunkString.append(chunk.getColor().getStringDecorator());
+                chunkString.append(chunk.getTextFormatting().stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
+
+            }
+            chunkString.append(chunk.getText());
+            result.append(chunkString);
+            previousChunk = chunk;
+        }
+        return result.toString();
+    }
 
 
     @Override
     public int length() {
-        return chunks.stream().mapToInt(Chunk::length).sum();
+        return noColorString.length();
     }
 
     @Override
@@ -57,39 +108,6 @@ public class DecoratedString implements CharSequence {
         }
 
         return new DecoratedString(trimmedChunks);
-    }
-
-    public String toMinecraftColoredString() {
-        StringBuilder result = new StringBuilder();
-        ListIterator<Chunk> chunkListIterator = chunks.listIterator();
-        Chunk previousChunk = null;
-        while (chunkListIterator.hasNext()) {
-            StringBuilder chunkString = new StringBuilder();
-            Chunk chunk = chunkListIterator.next();
-            if(!Objects.isNull(previousChunk)) {
-                Chunk finalPreviousChunk = previousChunk;
-                if(new HashSet<>(chunk.getTextFormatting()).containsAll(previousChunk.getTextFormatting())) {
-                    List<TextFormatting> uniqueTextFormatting = Stream.concat(chunk.getTextFormatting().stream(), previousChunk.getTextFormatting().stream())
-                            .distinct()
-                            .filter(f -> !chunk.getTextFormatting().contains(f) || !finalPreviousChunk.getTextFormatting().contains(f))
-                            .collect(Collectors.toList());
-                    chunkString.append(uniqueTextFormatting.stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
-                }
-                else {
-                    chunkString.append(TextOperator.RESET.getStringDecorator()).append(chunk.getTextFormatting().stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
-                }
-                if (!chunk.getColor().equals(previousChunk.getColor())) chunkString.append(chunk.getColor().getStringDecorator());
-            }
-            else {
-                chunkString.append(chunk.getColor().getStringDecorator());
-                chunkString.append(chunk.getTextFormatting().stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
-
-            }
-            chunkString.append(chunk.getText());
-            result.append(chunkString);
-            previousChunk = chunk;
-        }
-        return result.toString();
     }
 
     public static DecoratedString valueOf(String minecraftColoredString) {
@@ -210,11 +228,8 @@ public class DecoratedString implements CharSequence {
         return (DecoratedString) subSequence(beginIndex, length());
     }
 
-    String getNoColorString() {
-        return chunks.stream().map(Chunk::getText).collect(Collectors.joining(""));
-    }
-
     DecoratedString insertColor(int index, TextColor textColor) {
+        if (length() >= index) throw  new IndexOutOfBoundsException("You have gone beyond the line boundaries. Index: " + index+ ". Length: " + length());
         List<Chunk> newChunks = new ArrayList<>();
         if(index != 0) {
             newChunks.addAll(subDecoratedString(0, index).chunks);
@@ -229,18 +244,101 @@ public class DecoratedString implements CharSequence {
     }
 
     public int indexOf(DecoratedChar decoratedChar) {
-
+        return indexOf(decoratedChar, 0);
     }
 
     public int indexOf(DecoratedChar decoratedChar, int fromIndex) {
+        if (length() >= fromIndex) return -1;
+        int previousLength = 0;
+        int charIndex = -1;
+        for (Chunk chunk : chunks) {
+            int charIndexFromCurrentChunk = chunk.indexOf(decoratedChar);
+            if(chunk.length() + previousLength > fromIndex && charIndexFromCurrentChunk != -1 && previousLength+charIndexFromCurrentChunk >= fromIndex ) {
+                charIndex = charIndexFromCurrentChunk + previousLength;
+                break;
+            }
+            previousLength += chunk.length();
+        }
+        return charIndex;
+    }
 
+    public int indexOf(DecoratedString decoratedString) {
+        return indexOf(decoratedString, 0);
+    }
+
+    public int indexOf(DecoratedString decoratedString, int fromIndex) {
+        if (length() >= fromIndex || decoratedString.length() > length()) return -1;
+        int previousLength = 0;
+        int startDecStringIndex = -1;
+        if(decoratedString.isEmpty()) return fromIndex;
+        List<Chunk> otherChunks = decoratedString.chunks;
+        Chunk firstChunk = chunks.get(0);
+        Chunk lastChunk = chunks.get(chunks.size()-1);
+        boolean flag = false;
+        int tempBeginIndex = 0;
+        int indexOtherChunks = 0;
+        for (Chunk chunk : chunks) {
+            int indexFromCurrentChunk = chunk.indexOf(firstChunk);
+            if (!flag && indexFromCurrentChunk != -1 && chunk.endsWith(firstChunk) && chunk.length() + previousLength > fromIndex && previousLength+indexFromCurrentChunk >= fromIndex)  {
+                flag = true;
+                tempBeginIndex = indexFromCurrentChunk;
+            }
+            if (flag && indexOtherChunks < otherChunks.size()-1) {
+                Chunk otherChunk = otherChunks.get(indexOtherChunks);
+                if (chunk.equals(otherChunk)) {
+                    indexOtherChunks++;
+                }
+                else {
+                    indexOtherChunks = 0;
+                    tempBeginIndex = 0;
+                    flag = false;
+                }
+            }
+            else if (flag && indexOtherChunks == otherChunks.size()-1) {
+                if (chunk.startsWith(lastChunk)) {
+                    startDecStringIndex = previousLength + tempBeginIndex;
+                    return startDecStringIndex;
+                }
+                else {
+                    indexOtherChunks = 0;
+                    tempBeginIndex = 0;
+                    flag = false;
+                }
+            }
+            previousLength += chunk.length();
+        }
+        return startDecStringIndex;
     }
 
     public int lastIndexOf(DecoratedChar decoratedChar) {
-
+        return lastIndexOf(decoratedChar, length());
     }
 
     public int lastIndexOf(DecoratedChar decoratedChar, int fromIndex) {
+        if (fromIndex < 0) return -1;
+        int previousLength = length();
+        int charIndex = -1;
+        for (ReverseListIterator<Chunk> iterator = new ReverseListIterator<>(chunks); iterator.hasNext(); ) {
+            Chunk chunk = iterator.next();
+            int charIndexFromCurrentChunk = chunk.lastIndexOf(decoratedChar);
+            if (previousLength - chunk.length() <= fromIndex && charIndexFromCurrentChunk != -1 && previousLength - (chunk.length() - charIndexFromCurrentChunk) <= fromIndex) {
+                charIndex = previousLength - (chunk.length() - charIndexFromCurrentChunk);
+                break;
+            }
+            previousLength += chunk.length();
+        }
+        return charIndex;
+    }
 
+    public int lastIndexOf(DecoratedString decoratedChar) {
+
+    }
+
+    public int lastIndexOf(DecoratedString decoratedChar, int fromIndex) {
+
+    }
+
+    public boolean isEmpty() {
+        return chunks.isEmpty() || chunks.stream().allMatch(Chunk::isEmpty);
     }
 }
