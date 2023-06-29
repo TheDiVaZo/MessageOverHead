@@ -5,6 +5,12 @@ import thedivazo.utils.text.element.Chunk;
 import thedivazo.utils.text.customize.TextColor;
 import thedivazo.utils.text.customize.TextFormatting;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DecoratedStringTest {
@@ -160,7 +166,7 @@ class DecoratedStringTest {
     }
 
     @Test
-    void SimpleTestSubSequence() {
+    void simpleTestSubSequence() {
         DecoratedString decoratedString = DecoratedString.valueOf("&cI study computer science &eand &blove programming");
         DecoratedString sub1 = (DecoratedString) decoratedString.subSequence(0, 25);
         DecoratedString sub2 = (DecoratedString) decoratedString.subSequence(25, 29);
@@ -194,7 +200,7 @@ class DecoratedStringTest {
     }
 
     @Test
-    void UnevenColorTestSubSequence() {
+    void unevenColorTestSubSequence() {
         DecoratedString decoratedString = DecoratedString.valueOf("&cI stu&ldy compu&4ter scie&mnce &r&ean&ld &blove prog&1&oramming");
         DecoratedString sub1 = (DecoratedString) decoratedString.subSequence(0, 25);
         DecoratedString sub2 = (DecoratedString) decoratedString.subSequence(25, 29);
@@ -202,6 +208,19 @@ class DecoratedStringTest {
         System.out.println(sub1.getMinecraftColoredString());
         System.out.println(sub2.getMinecraftColoredString());
         System.out.println(sub3.getMinecraftColoredString());
+
+    }
+
+    @Test
+    void indexOf() {
+        DecoratedString decoratedString = DecoratedString.valueOf("&cHaHa &eEeEe &cHaHaJ &eEeEe &cHaHa");
+        System.out.println(decoratedString.indexOf(DecoratedString.valueOf("&cHaHaJ"), 3));
+    }
+
+    @Test
+    void lastIndexOf() {
+        DecoratedString decoratedString = DecoratedString.valueOf("&cHaHa &eEeEe &cHaHaJ &eEeEe &cHaHa");
+        System.out.println(decoratedString.lastIndexOf(DecoratedString.valueOf("&cHaHaJ"), 100));
     }
 
 }

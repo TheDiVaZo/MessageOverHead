@@ -3,13 +3,12 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-compileJava.options.encoding = 'UTF-8' // устанавливает кодировку для компилируемого кода
 javadoc.options.encoding = 'UTF-8' // устанавливает кодировку для генерируемой документации
 compileTestJava.options.encoding = 'UTF-8'
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
+//tasks.withType(JavaCompile) {
+//    options.encoding = 'UTF-8'
+//}
 
 group 'com.github.TheDiVaZo.MessageOverHead'
 version "4.0.0"
@@ -36,9 +35,10 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 compileJava {
-    //options.compilerArgs += ["-parameters"]
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ["-parameters"]
     options.fork = true
-    options.forkOptions.executable = "C:\\Program Files\\Java\\jdk-11.0.2\\bin\\javac.exe"
+    options.forkOptions.executable = "C:\\Program Files\\Java\\jdk-11\\bin\\javac.exe"
     //options.setDebug(false);
 }
 
@@ -87,17 +87,6 @@ shadowJar {
     relocate 'org.bstats', 'thedivazo.bstats'
     relocate 'co.aikar.commands', 'thedivazo.acf'
     relocate 'co.aikar.locales', 'thedivazo.locales'
-}
-
-task buildAndCopyJar {
-    dependsOn(tasks.jar)
-    dependsOn(shadowJar)
-    doLast {
-        copy {
-            from "$projectDir/build/libs/" + rootProject.name + "-" + version + "-all.jar"
-            into 'D:/testServer/plugins'
-        }
-    }
 }
 
 test {

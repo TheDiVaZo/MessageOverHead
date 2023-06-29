@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import thedivazo.utils.text.customize.TextColor;
 import thedivazo.utils.text.customize.TextFormatting;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @ToString
@@ -12,9 +13,12 @@ import java.util.Set;
 @EqualsAndHashCode
 @Builder(setterPrefix = "set", toBuilder = true)
 public class Chunk implements CharSequence {
-    private final String text;
 
-    private final TextColor color;
+    @Builder.Default
+    private final String text = "";
+
+    @Builder.Default
+    private final TextColor color = TextColor.WHITE;
 
     @Singular("format")
     private final Set<TextFormatting> textFormatting;
@@ -100,11 +104,19 @@ public class Chunk implements CharSequence {
         return equalsDecorate(chunk) ? indexOf(chunk.text) : -1;
     }
 
+    public int lastIndexOf(Chunk chunk) {
+        return equalsDecorate(chunk) ? lastIndexOf(chunk.text) : -1;
+    }
+
     public boolean endsWith(Chunk chunk) {
         return equalsDecorate(chunk) && text.endsWith(chunk.text);
     }
 
     public boolean startsWith(Chunk chunk) {
         return equalsDecorate(chunk) && text.startsWith(chunk.text);
+    }
+
+    public boolean contains(Chunk chunk) {
+        return equalsDecorate(chunk) && text.contains(chunk.text);
     }
 }

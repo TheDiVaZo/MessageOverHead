@@ -265,49 +265,42 @@ public class DecoratedString implements CharSequence {
     public int indexOf(DecoratedString decoratedString) {
         return indexOf(decoratedString, 0);
     }
+    
+    private static int indexOfOneChunk(List<Chunk> chunks, Chunk searchableChunk, int fromIndex) {
+        int lastLength = 0;
+        for (Chunk chunk : chunks) {
+            int localIndex = chunk.indexOf(searchableChunk);
+            if (localIndex != -1 && lastLength + localIndex >= fromIndex) {
+                return lastLength + localIndex;
+            } else lastLength += chunk.length();
+        }
+        return -1;
+    }
+
+    private static int indexOfMoreChunks(List<Chunk> chunks, List<Chunk> searchableChunks, int fromIndex) {
+        int lastLength = 0;
+        Chunk firstChunk = searchableChunks.get(0);
+        Chunk lastChunk = searchableChunks.get(searchableChunks.size()-1);
+        List<Chunk> middleSearchableChunks = searchableChunks.stream().skip(1).limit(searchableChunks.size()-2).collect(Collectors.toList());
+        ListIterator<Chunk> mainChunksIterator = chunks.listIterator();
+        while (mainChunksIterator.hasNext()) {
+            int chunkIndex = mainChunksIterator.nextIndex();
+            Chunk chunk = mainChunksIterator.next();
+            int localIndex = chunk.indexOf(firstChunk);
+            if (chunkIndex + searchableChunks.size() > chunks.size()) return -1;
+            if (chunk.endsWith(firstChunk) && chunks.get(chunkIndex + searchableChunks.size()-1).startsWith(lastChunk) && localIndex != -1 && lastLength + localIndex >= fromIndex) {
+                 if (equalsElementsFromChunkIterators(chunks.listIterator(chunkIndex+1), middleSearchableChunks.iterator())) return lastLength + localIndex;
+            }
+            else lastLength += chunk.length();
+        }
+        return -1;
+    }
 
     public int indexOf(DecoratedString decoratedString, int fromIndex) {
-        if (length() >= fromIndex || decoratedString.length() > length()) return -1;
-        int previousLength = 0;
-        int startDecStringIndex = -1;
-        if(decoratedString.isEmpty()) return fromIndex;
-        List<Chunk> otherChunks = decoratedString.chunks;
-        Chunk firstChunk = chunks.get(0);
-        Chunk lastChunk = chunks.get(chunks.size()-1);
-        boolean flag = false;
-        int tempBeginIndex = 0;
-        int indexOtherChunks = 0;
-        for (Chunk chunk : chunks) {
-            int indexFromCurrentChunk = chunk.indexOf(firstChunk);
-            if (!flag && indexFromCurrentChunk != -1 && chunk.endsWith(firstChunk) && chunk.length() + previousLength > fromIndex && previousLength+indexFromCurrentChunk >= fromIndex)  {
-                flag = true;
-                tempBeginIndex = indexFromCurrentChunk;
-            }
-            if (flag && indexOtherChunks < otherChunks.size()-1) {
-                Chunk otherChunk = otherChunks.get(indexOtherChunks);
-                if (chunk.equals(otherChunk)) {
-                    indexOtherChunks++;
-                }
-                else {
-                    indexOtherChunks = 0;
-                    tempBeginIndex = 0;
-                    flag = false;
-                }
-            }
-            else if (flag && indexOtherChunks == otherChunks.size()-1) {
-                if (chunk.startsWith(lastChunk)) {
-                    startDecStringIndex = previousLength + tempBeginIndex;
-                    return startDecStringIndex;
-                }
-                else {
-                    indexOtherChunks = 0;
-                    tempBeginIndex = 0;
-                    flag = false;
-                }
-            }
-            previousLength += chunk.length();
-        }
-        return startDecStringIndex;
+        if (length() <= fromIndex || decoratedString.length() > length()) return -1;
+        else if (decoratedString.chunks.isEmpty()) return fromIndex;
+        List<Chunk> searchableChunks = decoratedString.chunks;
+        return searchableChunks.size() == 1 ? indexOfOneChunk(chunks, searchableChunks.get(0), fromIndex) : indexOfMoreChunks(chunks, searchableChunks, fromIndex);
     }
 
     public int lastIndexOf(DecoratedChar decoratedChar) {
@@ -330,12 +323,69 @@ public class DecoratedString implements CharSequence {
         return charIndex;
     }
 
-    public int lastIndexOf(DecoratedString decoratedChar) {
-
+    public int lastIndexOf(DecoratedString decoratedString) {
+        return lastIndexOf(decoratedString, 0);
     }
 
-    public int lastIndexOf(DecoratedString decoratedChar, int fromIndex) {
+    private static int lastIndexOfOneChunk(List<Chunk> chunks, Chunk searchableChunk, int fromIndex) {
+        int lastLength = chunks.stream().mapToInt(Chunk::length).sum();
+        for (ReverseListIterator<Chunk> iterator = new ReverseListIterator<>(chunks); iterator.hasNext(); ) {
+            Chunk chunk = iterator.next();
+            int localIndex = chunk.indexOf(searchableChunk);
+            if (localIndex != -1 && lastLength - (chunk.length() - localIndex) <= fromIndex) {
+                return lastLength - (chunk.length()- localIndex);
+            } else lastLength -= chunk.length();
+        }
+        return -1;
+    }
 
+    private static int lastIndexOfMoreChunks(List<Chunk> chunks, List<Chunk> searchableChunks, int fromIndex) {
+        int lastLength = chunks.stream().mapToInt(Chunk::length).sum();
+        Chunk firstChunk = searchableChunks.get(0);
+        Chunk lastChunk = searchableChunks.get(searchableChunks.size()-1);
+        List<Chunk> middleSearchableChunks = searchableChunks.stream().skip(1).limit(searchableChunks.size()-2).collect(Collectors.toList());
+        ListIterator<Chunk> mainChunksIterator = new ReverseListIterator<>(chunks);
+        while (mainChunksIterator.hasNext()) {
+            int chunkIndex = mainChunksIterator.nextIndex();
+            Chunk chunk = mainChunksIterator.next();
+            int localIndex = chunk.lastIndexOf(lastChunk);
+            if (searchableChunks.size() - chunkIndex < 0) return -1;
+            if (
+                    chunk.startsWith(lastChunk) &&
+                    chunks.get(searchableChunks.size()-chunkIndex).endsWith(firstChunk) &&
+                    localIndex != -1 &&
+                    lastLength - (chunk.length() - localIndex) <= fromIndex &&
+                    equalsElementsFromChunkIterators(chunks.listIterator(chunkIndex+1), middleSearchableChunks.iterator())
+            )
+                return lastLength - (chunk.length() - localIndex);
+            else lastLength -= chunk.length();
+        }
+        return -1;
+    }
+
+    public int lastIndexOf(DecoratedString decoratedString, int fromIndex) {
+        if (fromIndex < 0) return -1;
+        else if (decoratedString.chunks.isEmpty()) return fromIndex;
+        List<Chunk> searchableChunks = decoratedString.chunks;
+        return searchableChunks.size() == 1 ? lastIndexOfOneChunk(chunks, searchableChunks.get(0), fromIndex) : lastIndexOfMoreChunks(chunks, searchableChunks, fromIndex);
+    }
+
+    private static boolean equalsElementsFromChunkIterators(Iterator<Chunk> intermediateChunksIterator, Iterator<Chunk> middleSearchableChunksIterator) {
+        boolean flag = true;
+        while (intermediateChunksIterator.hasNext() && middleSearchableChunksIterator.hasNext()) {
+            if(!intermediateChunksIterator.next().equals(middleSearchableChunksIterator.next())) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+    public boolean contains(DecoratedString decoratedString) {
+        return indexOf(decoratedString) > -1;
+    }
+
+    public boolean contains(DecoratedChar decoratedChar) {
+        return indexOf(decoratedChar) > -1;
     }
 
     public boolean isEmpty() {
