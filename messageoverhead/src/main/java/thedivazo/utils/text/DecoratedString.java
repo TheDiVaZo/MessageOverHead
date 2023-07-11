@@ -29,7 +29,7 @@ public class DecoratedString implements CharSequence {
         this(new ArrayList<>());
     }
 
-    @Builder
+    @Builder(toBuilder = true)
     private DecoratedString(@Singular List<Chunk> chunks) {
         this.chunks = chunks;
         this.noColorString = calculateNoColorString();
@@ -243,6 +243,14 @@ public class DecoratedString implements CharSequence {
         return new DecoratedString(newChunks);
     }
 
+    public int indexOf(String str) {
+        return noColorString.indexOf(str);
+    }
+
+    public int indexOf(String str, int fromIndex) {
+        return noColorString.indexOf(str, fromIndex);
+    }
+
     public int indexOf(DecoratedChar decoratedChar) {
         return indexOf(decoratedChar, 0);
     }
@@ -301,6 +309,14 @@ public class DecoratedString implements CharSequence {
         else if (decoratedString.chunks.isEmpty()) return fromIndex;
         List<Chunk> searchableChunks = decoratedString.chunks;
         return searchableChunks.size() == 1 ? indexOfOneChunk(chunks, searchableChunks.get(0), fromIndex) : indexOfMoreChunks(chunks, searchableChunks, fromIndex);
+    }
+
+    public int lastIndexOf(String str) {
+        return noColorString.lastIndexOf(str);
+    }
+
+    public int lastIndexOf(String str, int fromIndex) {
+        return noColorString.lastIndexOf(str, fromIndex);
     }
 
     public int lastIndexOf(DecoratedChar decoratedChar) {
@@ -380,6 +396,11 @@ public class DecoratedString implements CharSequence {
         }
         return flag;
     }
+
+    public boolean contains(String str) {
+        return indexOf(str) > -1;
+    }
+
     public boolean contains(DecoratedString decoratedString) {
         return indexOf(decoratedString) > -1;
     }
@@ -390,5 +411,13 @@ public class DecoratedString implements CharSequence {
 
     public boolean isEmpty() {
         return chunks.isEmpty() || chunks.stream().allMatch(Chunk::isEmpty);
+    }
+
+    public DecoratedString trim() {
+        List<Chunk> newChunks = new ArrayList<>();
+        newChunks.add(chunks.get(0).toBuilder().setText(chunks.get(0).getText().trim()).build());
+        newChunks.addAll(chunks.subList(1, chunks.size()-1));
+        newChunks.add(chunks.get(chunks.size()-1).toBuilder().setText(chunks.get(chunks.size()-1).getText().trim()).build());
+        return toBuilder().chunks(newChunks).build();
     }
 }
