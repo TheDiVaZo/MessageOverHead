@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import thedivazo.utils.text.element.Chunk;
 import thedivazo.utils.text.customize.TextColor;
 import thedivazo.utils.text.customize.TextFormatting;
+import thedivazo.utils.text.element.DecoratedChar;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -223,4 +224,17 @@ class DecoratedStringTest {
         System.out.println(decoratedString.lastIndexOf(DecoratedString.valueOf("&cHaHaJ"), 100));
     }
 
+    @Test
+    void testReplace1() {
+        DecoratedString decoratedString = DecoratedString.valueOf("&cEe Ee &eEe");
+        System.out.println(decoratedString.replace(DecoratedString.valueOf("&cEe"), DecoratedString.valueOf("&eHh")).getMinecraftColoredString());
+    }
+
+    @Test
+    void testReplace2() {
+    }
+
+    @Test
+    void testReplace3() {
+    }
 }

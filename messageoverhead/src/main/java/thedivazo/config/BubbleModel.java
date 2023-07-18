@@ -4,6 +4,7 @@ import io.th0rgal.oraxen.shaded.jetbrains.annotations.Unmodifiable;
 import lombok.*;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import thedivazo.utils.text.DecoratedString;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class BubbleModel {
         private final String permission;
         @Singular
         @Unmodifiable
-        private final List<String> lines;
+        private final List<DecoratedString> lines;
     }
 
     @EqualsAndHashCode

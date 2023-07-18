@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import thedivazo.MessageOverHead;
 import thedivazo.utils.VersionWrapper;
+import thedivazo.utils.text.DecoratedString;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,13 +29,15 @@ public final class Bubble {
     private final boolean isMarker = true;
     private final boolean invisible = true;
 
-    private final String message;
+    private final DecoratedString message;
 
     private final ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 
     // 1.18 | 1.17 | 1.14 | 1.13 | 1.12
 
     private static final VersionWrapper MC_VERSION = MessageOverHead.MINECRAFT_VERSION;
+    private static final VersionWrapper MC_1_20 = VersionWrapper.valueOf("1.20");
+    private static final VersionWrapper MC_1_19 = VersionWrapper.valueOf("1.19");
     private static final VersionWrapper MC_1_18 = VersionWrapper.valueOf("1.18");
     private static final VersionWrapper MC_1_17 = VersionWrapper.valueOf("1.17");
     private static final VersionWrapper MC_1_16 = VersionWrapper.valueOf("1.16");
@@ -68,7 +71,7 @@ public final class Bubble {
     private final int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private final UUID uuid = UUID.randomUUID();
 
-    public Bubble(String message, Location loc) {
+    public Bubble(DecoratedString message, Location loc) {
         this.message = message;
         setPosition(loc);
     }
@@ -92,9 +95,9 @@ public final class Bubble {
     private synchronized void setMetadata() {
         Optional<?> opt;
         if (MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
-            opt = Optional.of(WrappedChatComponent.fromText(message).getHandle());
+            opt = Optional.of(WrappedChatComponent.fromText(message.getMinecraftColoredString()).getHandle());
         } else {
-            opt = Optional.of(WrappedChatComponent.fromChatMessage(message)[0].getHandle());
+            opt = Optional.of(WrappedChatComponent.fromChatMessage(message.getMinecraftColoredString())[0].getHandle());
         }
         if(MC_VERSION.greaterMinor(MC_1_14) || MC_VERSION.equalsMinor(MC_1_14)) {
             Serializer serChatComponent = WrappedDataWatcher.Registry.getChatComponentSerializer(true);

@@ -5,8 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import thedivazo.utils.text.customize.TextColor;
 import thedivazo.utils.text.customize.TextFormatting;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ToString
 @Getter
@@ -104,19 +109,71 @@ public class Chunk implements CharSequence {
         return equalsDecorate(chunk) ? indexOf(chunk.text) : -1;
     }
 
+    public int indexOf(Chunk chunk, int fromIndex) {
+        return equalsDecorate(chunk) ? indexOf(chunk.text, fromIndex) : -1;
+    }
+
+    public int lastIndexOf(Chunk chunk, int fromIndex) {
+        return equalsDecorate(chunk) ? lastIndexOf(chunk.text, fromIndex) : -1;
+    }
+
     public int lastIndexOf(Chunk chunk) {
         return equalsDecorate(chunk) ? lastIndexOf(chunk.text) : -1;
+    }
+
+    public boolean endsWith(DecoratedChar decoratedChar) {
+        return equalsDecorate(decoratedChar) && text.endsWith(String.valueOf(decoratedChar.getCharWrapped()));
+    }
+
+    public boolean endsWith(String str) {
+        return text.endsWith(str);
     }
 
     public boolean endsWith(Chunk chunk) {
         return equalsDecorate(chunk) && text.endsWith(chunk.text);
     }
 
+    public boolean startsWith(DecoratedChar decoratedChar) {
+        return equalsDecorate(decoratedChar) && text.startsWith(String.valueOf(decoratedChar.getCharWrapped()));
+    }
+
+    public boolean startsWith(String str) {
+        return text.startsWith(str);
+    }
+
     public boolean startsWith(Chunk chunk) {
         return equalsDecorate(chunk) && text.startsWith(chunk.text);
     }
 
+    public boolean contains(String str) {
+        return text.contains(str);
+    }
+
+    public boolean contains(DecoratedChar decoratedChar) {
+        return equalsDecorate(decoratedChar) && text.contains(String.valueOf(decoratedChar.getCharWrapped()));
+    }
+
     public boolean contains(Chunk chunk) {
         return equalsDecorate(chunk) && text.contains(chunk.text);
+    }
+
+    public Chunk replace(char oldChar, char newChar) {
+        return toBuilder().setText(getText().replace(oldChar, newChar)).build();
+    }
+
+    public Chunk replace(String oldStr, String newStr) {
+        return toBuilder().setText(getText().replace(oldStr, newStr)).build();
+    }
+
+    public Chunk trim() {
+        return toBuilder().setText(getText().trim()).build();
+    }
+
+    public Chunk trimStart() {
+        return toBuilder().setText(getText().replaceAll("^ +", "")).build();
+    }
+
+    public Chunk trimEnd() {
+        return toBuilder().setText(getText().replaceAll(" +$","")).build();
     }
 }

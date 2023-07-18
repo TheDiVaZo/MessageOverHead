@@ -1,13 +1,18 @@
 package thedivazo.utils.text;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
+import thedivazo.utils.text.element.Chunk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class DecoratingStringUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class DecoratedStringUtils {
     public static List<DecoratedString> splitText(DecoratedString text, int maxSizeLine) {
         List<DecoratedString> result = new ArrayList<>();
         int currentIndex = 0;
@@ -31,8 +36,12 @@ public class DecoratingStringUtils {
         return result;
     }
 
-    public static String setPlaceholders(Player player, String text) {
-        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) return PlaceholderAPI.setPlaceholders(player, text);
-        else return text;
+    public static DecoratedString insertPlaceholders(DecoratedString text, OfflinePlayer player) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) return text;
+        return DecoratedString.builder().chunks(text.toChunksList().stream().map(chunk -> chunk.toBuilder().setText(PlaceholderAPI.setPlaceholders(player,chunk.getText())).build()).collect(Collectors.toList())).build();
+    }
+
+    public static DecoratedString wrapString(String str) {
+        return DecoratedString.builder().chunks(new ArrayList<>(){{add(Chunk.builder().setText(str).build());}}).build();
     }
 }

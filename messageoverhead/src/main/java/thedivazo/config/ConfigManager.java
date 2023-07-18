@@ -7,20 +7,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.configuration.InvalidConfigurationException;
 import thedivazo.utils.ConfigWrapper;
+import thedivazo.utils.text.DecoratedString;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public class ConfigManager {
-
-    private final Set<ChatChannelSetting> chatChannelSettings = new HashSet<>();
-
-    public Set<ChatChannelSetting> getChatChannelSettings() {
-        return Collections.unmodifiableSet(chatChannelSettings);
-    }
-
-    @Getter
-    private String commandSendModelBubble = "";
+    private boolean experimental_1_20 = false;
 
     Map<String, BubbleModel> bubbleModelMap = new LinkedHashMap<>();
 
@@ -67,13 +61,13 @@ public class ConfigManager {
                     ConfigWrapper formatMessageModel = formatMessageModels.getRequiredConfigurationSection(formatMessageModelName);
                     BubbleModel.FormatMessageModel.FormatMessageModelBuilder formatMessageModelBuilder = BubbleModel.FormatMessageModel.builder();
                     formatMessageModelBuilder
-                            .lines(formatMessageModel.getListString("format"))
+                            .lines(formatMessageModel.getListString("format").stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
                             .permission(formatMessageModel.getString("permission", null));
                     bubbleModelBuilder.formatMessageModel(formatMessageModelBuilder.build());
                 }
             }
             else bubbleModelBuilder.formatMessageModel(BubbleModel.FormatMessageModel.builder()
-                    .lines(bubbleModel.getListString("format"))
+                    .lines(bubbleModel.getListString("format").stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
                     .permission(bubbleModel.getString("permission", null))
                     .build()
             );
@@ -109,41 +103,8 @@ public class ConfigManager {
     private void loadSettings() throws InvalidConfigurationException {
         Logger.info("Settings loading...");
         ConfigWrapper settings = currentConfig.getRequiredConfigurationSection("settings");
-
-        ConfigWrapper listeners = settings.getRequiredConfigurationSection("listeners");
-        loadListeners(listeners);
-
-        commandSendModelBubble = settings.getRequiredString("command.model-bubble");
-        if (!bubbleModelMap.containsKey(commandSendModelBubble)) throw new InvalidConfigurationException("Model '"+commandSendModelBubble+"' not found in config!");
+        experimental_1_20 = settings.getBoolean("1_20_experimental", false);
         Logger.info("Setting loaded");
-    }
-
-    private void loadListeners(ConfigWrapper listeners) throws InvalidConfigurationException {
-        ConfigWrapper chatChannelSettingsConfig = listeners.getRequiredConfigurationSection("chat-channels");
-        loadChatChannelSettings(chatChannelSettingsConfig);
-    }
-
-    private void loadChatChannelSettings(ConfigWrapper chatChannelSettingsConfig) throws InvalidConfigurationException {
-        chatChannelSettings.clear();
-        Set<String> chatChannelNames = chatChannelSettingsConfig.getKeys(false);
-        Logger.info("Chat channels loading...");
-        chatChannelNames.remove("enable");
-        for (String chatChannelName : chatChannelNames) {
-            Logger.info("Chat channel '"+chatChannelName+"' loading...");
-            ConfigWrapper chatChannelSetting = chatChannelSettingsConfig.getRequiredConfigurationSection(chatChannelName);
-            ChatChannelSetting.ChatChannelSettingBuilder chatChannelSettingBuilder = ChatChannelSetting.builder();
-            List<String> bubbleModels = chatChannelSetting.getListString("model-bubble");
-            for (String bubbleModel : bubbleModels) {
-                if (!bubbleModelMap.containsKey(bubbleModel)) throw new InvalidConfigurationException("Model '"+bubbleModel+"' not found in config!");
-            }
-            chatChannelSettings.add(chatChannelSettingBuilder
-                    .enable(chatChannelSettingsConfig.getBoolean("enable", true))
-                    .modelBubbles(bubbleModels)
-                    .build()
-            );
-            Logger.info("Chat channel '"+chatChannelName+"' loaded");
-        }
-        Logger.info("Chat channels loaded");
     }
 
 }

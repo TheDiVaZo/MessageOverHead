@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import thedivazo.utils.text.DecoratedString;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ public class BubbleWrapper {
 
     private final Set<Player> showers = ConcurrentHashMap.newKeySet();
 
-    public BubbleWrapper(Location loc, List<String> message) {
+    public BubbleWrapper(Location loc, List<DecoratedString> message) {
         this.loc = loc;
         for (int i = 0; i < message.size(); i++) {
             if (message.get(message.size() - 1 - i).length() > 0 && !message.get(message.size() - 1 - i).equals(" ")) {
