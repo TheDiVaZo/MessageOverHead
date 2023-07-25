@@ -52,7 +52,7 @@ models:
       bias-y: 2.15 #height spawn of bubbles. The value is calculated experimentally.
       visible-text-for-owner: true
       lifetime: #Automatic lifetime bubbles settings
-        time-per-char: 2 #Time per one character
-        min-time: 3 #Minimum lifetime
+        time-per-char: 0.7 #Time per one character
+        min-time: 2 #Minimum lifetime
         max-time: 20 #Maximum lifetime
       max-size-line: 24 #Maximum size of one bubble
