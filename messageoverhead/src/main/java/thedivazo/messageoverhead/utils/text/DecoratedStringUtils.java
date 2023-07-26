@@ -13,26 +13,29 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DecoratedStringUtils {
-    public static List<DecoratedString> splitText(DecoratedString text, int maxSizeLine) {
+
+    public static List<DecoratedString> splitText(DecoratedString text, int maxSize) {
         List<DecoratedString> result = new ArrayList<>();
-        int currentIndex = 0;
-        int prevSpaceIndex = -1;
-        for (int i = maxSizeLine;currentIndex < text.length(); i+=maxSizeLine) {
-            int currentSpaceIndex = text.lastIndexOf(" ", Math.min(currentIndex+maxSizeLine, text.length()));
-            if (currentSpaceIndex == prevSpaceIndex) {
-                result.add(text.subDecoratedString(currentIndex, Math.min(currentIndex+maxSizeLine, text.length())));
-                currentIndex = Math.min(currentIndex+maxSizeLine, text.length());
-            }
-            else {
-                prevSpaceIndex = currentSpaceIndex;
-                result.add(text.subDecoratedString(currentIndex, currentSpaceIndex));
-                currentIndex += currentSpaceIndex - currentIndex;
-                //skip space
-                currentIndex += 1;
+
+        while (text.length() > maxSize) {
+            int endIndex = maxSize;
+
+            while (endIndex > 0 && !Character.isWhitespace(text.charAt(endIndex))) {
+                endIndex--;
             }
 
-            if (i>text.length()) break;
+            if (endIndex == 0) {
+                endIndex = maxSize;
+            }
+
+            result.add(text.subDecoratedString(0, endIndex));
+            text = text.subDecoratedString(endIndex);
         }
+
+        if (!text.isEmpty()) {
+            result.add(text);
+        }
+
         return result;
     }
 

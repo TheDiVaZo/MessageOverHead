@@ -225,6 +225,8 @@ class DecoratedStringTest {
 
     @Test
     void testReplace2() {
+        DecoratedString decoratedString = DecoratedString.valueOf("&cEe Ee {message}");
+        System.out.println(decoratedString.replace("{message}", DecoratedString.valueOf("&cHh")));
     }
 
     @Test

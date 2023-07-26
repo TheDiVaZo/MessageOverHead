@@ -61,22 +61,22 @@ public class ConfigManager {
                     .visibleTextForOwner(bubbleModel.getBoolean("visible-text-for-owner", true))
                     .maxSizeLine(bubbleModel.getInt("max-size-line", 24));
             if (bubbleModel.isString("channel") || bubbleModel.isList("channel"))
-                bubbleModel.getWrappedStringInListOrGetStringList("channel").forEach(channelName->bubbleModelBuilder.channel(ChannelFactory.create(channelName)));
+                bubbleModel.getWrappedStringInListOrGetStringList("channel", new ArrayList<>(){{add("all");}}).forEach(channelName->bubbleModelBuilder.channel(ChannelFactory.create(channelName)));
             else bubbleModelBuilder.channel(ChannelFactory.create("all"));
-            if(bubbleModel.isConfigurationSection("format")) {
-                ConfigWrapper formatMessageModels = bubbleModel.getRequiredConfigurationSection("format");
+            if(bubbleModel.isConfigurationSection("settings.format")) {
+                ConfigWrapper formatMessageModels = bubbleModel.getRequiredConfigurationSection("settings.format");
                 for (String formatMessageModelName : formatMessageModels.getKeys(false)) {
                     ConfigWrapper formatMessageModel = formatMessageModels.getRequiredConfigurationSection(formatMessageModelName);
                     BubbleModel.FormatMessageModel.FormatMessageModelBuilder formatMessageModelBuilder = BubbleModel.FormatMessageModel.builder();
                     formatMessageModelBuilder
-                            .lines(formatMessageModel.getWrappedStringInListOrGetStringList("format").stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
+                            .lines(formatMessageModel.getWrappedStringInListOrGetStringList("format", new ArrayList<>(){{add("{message}");}}).stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
                             .permission(formatMessageModel.getString("permission", null));
                     bubbleModelBuilder.formatMessageModel(formatMessageModelBuilder.build());
                 }
             }
             else bubbleModelBuilder.formatMessageModel(BubbleModel.FormatMessageModel.builder()
-                    .lines(bubbleModel.getWrappedStringInListOrGetStringList("format").stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
-                    .permission(bubbleModel.getString("permission", null))
+                    .lines(bubbleModel.getWrappedStringInListOrGetStringList("settings.format", new ArrayList<>(){{add("{message}");}}).stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
+                    .permission(null)
                     .build()
             );
             particleModelBuilder
@@ -93,9 +93,9 @@ public class ConfigManager {
                     .volume(bubbleModel.getInt("sound.volume", 3))
                     .pitch(bubbleModel.getInt("sound.pitch", 3));
             lifeTimeModelBuilder
-                    .timePerChar(bubbleModel.getDouble("time-per-char", 2))
-                    .minTime(bubbleModel.getDouble("min-time", 3))
-                    .maxTime(bubbleModel.getDouble("max-time", 20));
+                    .timePerChar(bubbleModel.getDouble("lifetime.time-per-char", 2))
+                    .minTime(bubbleModel.getDouble("lifetime.min-time", 3))
+                    .maxTime(bubbleModel.getDouble("lifetime.max-time", 20));
             bubbleModelBuilder
                     .particleModel(particleModelBuilder.build())
                     .soundModel(soundModelBuilder.build())

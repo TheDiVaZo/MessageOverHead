@@ -13,11 +13,11 @@ models:
     #channels are used only to adjust the visibility of the message to certain players
     channel: "#local" #the channel to which the Bubble Model belongs. By default, "all". All channels start with the sign "#". Supports custom channels from plugins to chat channels ("#global", "#local", "#custom-channel")
     settings:
-      format: '&7%message%'
+      format: '&7{message}'
   test-private-model:
     channel: "private" #When the "private" channel is specified (without #), the bubble of this model will be visible to players who communicate in private messages using the /tell or /msg command (custom private messages implemented by other plugins are supported)
     settings:
-      format: '&7%message%'
+      format: '&7{message}'
       #There are no other fields specified in this config, so the other fields have a default value.
   test-more-channel-model:
     channel: ["#global", "#local", "private", "command"] #You can specify multiple channels. private - showing bubble model for private messages. command - showing bubble model for bubble called with the command.
@@ -37,7 +37,7 @@ models:
       volume: 3 #The volume of the sound
       pitch: 3 #The pitch of the sound
     settings:
-      format: '%player_name% %message%' #Default format. Supports PlaceholderAPI and HEX colors (example: &#123456)
+      format: '%player_name% {message}' #Default format. Supports PlaceholderAPI and HEX colors (example: &#123456)
       #format: #Group format!
         #The priority is determined by the position of the format. The higher the priority.
         #premium:

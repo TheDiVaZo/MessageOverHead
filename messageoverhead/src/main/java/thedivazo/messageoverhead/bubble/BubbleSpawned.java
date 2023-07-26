@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import thedivazo.messageoverhead.MessageOverHead;
+import thedivazo.messageoverhead.api.logging.Logger;
 import thedivazo.messageoverhead.config.BubbleModel;
 
 import java.util.Set;

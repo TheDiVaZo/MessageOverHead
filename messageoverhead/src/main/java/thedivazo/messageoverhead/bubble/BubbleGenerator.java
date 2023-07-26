@@ -29,26 +29,19 @@ public class BubbleGenerator {
         return allFormatMessage.get(allFormatMessage.size()-1).getLines();
     }
 
-    private DecoratedString insertPlaceholders(DecoratedString text, OfflinePlayer player) {
-        DecoratedString result = text;
-        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            result = DecoratedStringUtils.insertPlaceholders(result, player);
-        }
-        return result;
-    }
-
-    private List<DecoratedString> processText(DecoratedString text, Player player) {
+    private List<DecoratedString> processText(DecoratedString playerText, Player player) {
         List<DecoratedString> format = getPlayerFormat(player);
         List<DecoratedString> result = new ArrayList<>();
-
         for (DecoratedString line : format) {
-            result.addAll(DecoratedStringUtils.splitText(insertPlaceholders(line, player).replace("{message}",text), bubbleModel.getMaxSizeLine()));
+            line = DecoratedStringUtils.insertPlaceholders(line, player).replace("{message}",playerText);
+            List<DecoratedString> splintedText = DecoratedStringUtils.splitText(line, bubbleModel.getMaxSizeLine());
+            result.addAll(splintedText);
         }
         return result;
     }
 
-    public BubbleWrapper generateBubble(DecoratedString text, Player ownerBubble) {
-        return new BubbleWrapper(ownerBubble.getLocation(), bubbleModel, processText(text, ownerBubble));
+    public BubbleWrapper generateBubble(DecoratedString playerText, Player ownerBubble) {
+        return new BubbleWrapper(ownerBubble.getLocation(), bubbleModel, processText(playerText, ownerBubble));
     }
 
     public String getName() {

@@ -72,7 +72,7 @@ public final class Bubble {
 
     public Bubble(DecoratedString message, Location loc) {
         this.message = message;
-        setPosition(loc);
+        this.loc = loc;
     }
 
     public synchronized void show(Player... players) {
@@ -171,17 +171,18 @@ public final class Bubble {
         }};
     }
 
-    private void updatePosition(Player... players) {
+    private void updatePosition(Set<Player> players) {
         PacketContainer newPositionPacket = getTeleportPositionPacket();
-        Arrays.stream(players).forEach(player -> pm.sendServerPacket(player, newPositionPacket));
+        players.forEach(player -> pm.sendServerPacket(player, newPositionPacket));
     }
 
-    public synchronized void setPosition(Location loc) {
+    public synchronized void setPosition(Location loc, Set<Player> players) {
         this.loc = loc;
+        updatePosition(players);
     }
 
-    public synchronized void setPosition(double x, double y, double z) {
-        this.loc = new Location(loc.getWorld(), x, y, z);
+    public synchronized void setPosition(double x, double y, double z, Set<Player> players) {
+        setPosition(new Location(loc.getWorld(), x, y, z), players);
     }
 
     public synchronized void hide(Player... players) {

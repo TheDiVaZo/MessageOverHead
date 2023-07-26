@@ -3,7 +3,6 @@ package thedivazo.messageoverhead.vanish;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
-import thedivazo.vanish.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,6 +3,7 @@ package thedivazo.messageoverhead.utils.text;
 import lombok.*;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.jetbrains.annotations.NotNull;
+import thedivazo.messageoverhead.api.logging.Logger;
 import thedivazo.messageoverhead.utils.text.element.Chunk;
 import thedivazo.messageoverhead.utils.text.customize.TextColor;
 import thedivazo.messageoverhead.utils.text.customize.TextFormatting;
@@ -82,7 +83,7 @@ public class DecoratedString implements CharSequence {
 
     @Override
     public char charAt(int index) {
-        return 0;
+        return noColorString.charAt(index);
     }
 
     @NotNull

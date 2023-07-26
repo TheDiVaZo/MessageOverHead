@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 public class MessageOverHead extends JavaPlugin {
 
     public static final VersionWrapper PLUGIN_VERSION = VersionWrapper.valueOf("4.0.0");
-    public static final VersionWrapper MINECRAFT_VERSION = VersionWrapper.valueOf(Bukkit.getVersion(), Pattern.compile("\\(MC: ([0-9]+)\\.([0-9]+)\\.([0-9]+)"), 0, 1, 2);
+    public static final VersionWrapper MINECRAFT_VERSION = VersionWrapper.valueOf(Bukkit.getVersion(), Pattern.compile("\\(MC: ([0-9]+)\\.([0-9]+)\\.([0-9]+)"), 1, 2, 3);
 
     public static final String NAME = "MessageOverHead";
 

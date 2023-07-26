@@ -32,30 +32,30 @@ public class BubbleWrapper {
             DecoratedString line = message.get(message.size() - 1 - i);
             if (line.length() > 0 && !line.getNoColorString().equals(" ")) {
                 textLength += line.length();
-                Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.1D, loc.getZ());
+                Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3 + bubbleModel.getBiasY(), loc.getZ());
                 this.bubbleMessages.add(new Bubble(line, locBubble));
             }
         }
         this.textLength = textLength;
     }
 
-    public synchronized void show(Player... players) {
+    public void show(Player... players) {
         Set<Player> playerSet = Stream.of(players).filter(player->!showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(playerSet);
         bubbleMessages.forEach(bubble -> bubble.show(playerSet));
     }
 
-    public synchronized void show(Set<Player> players) {
+    public void show(Set<Player> players) {
         Set<Player> filteredPlayers = players.stream().filter(player->!showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(filteredPlayers);
         bubbleMessages.forEach(bubble -> bubble.show(filteredPlayers));
     }
 
-    public synchronized void setPosition(Location position) {
+    public void setPosition(Location position) {
         this.loc = position;
         for (int i = 0; i < bubbleMessages.size(); i++) {
-            Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3, loc.getZ());
-            bubbleMessages.get(i).setPosition(locBubble);
+            Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3 + bubbleModel.getBiasY(), loc.getZ());
+            bubbleMessages.get(i).setPosition(locBubble, showers);
         }
     }
 
