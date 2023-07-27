@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.api.logging;
+package thedivazo.messageoverhead.logging;
 
 public final class Logger {
 

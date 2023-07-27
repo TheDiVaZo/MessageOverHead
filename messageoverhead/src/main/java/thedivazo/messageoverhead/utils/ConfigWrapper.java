@@ -3,7 +3,7 @@ package thedivazo.messageoverhead.utils;
 import io.th0rgal.oraxen.shaded.jetbrains.annotations.NotNull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import thedivazo.messageoverhead.api.logging.Logger;
+import thedivazo.messageoverhead.logging.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;

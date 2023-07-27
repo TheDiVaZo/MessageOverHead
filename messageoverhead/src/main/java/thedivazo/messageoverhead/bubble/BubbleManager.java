@@ -1,10 +1,10 @@
 package thedivazo.messageoverhead.bubble;
 
-import thedivazo.messageoverhead.api.logging.Logger;
+import thedivazo.messageoverhead.logging.Logger;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.bubble.exception.BubbleModelNotFoundException;
-import thedivazo.messageoverhead.config.channel.Channel;
+import thedivazo.messageoverhead.channel.Channel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +20,10 @@ public class BubbleManager {
         this.bubbleGeneratorManager = bubbleGeneratorManager;
     }
 
-    public void spawnBubble(String playerText, Channel channel, Player ownerPlayer, Set<Player> showers) {
-        if (bubbles.containsKey(ownerPlayer)) bubbles.get(ownerPlayer).remove();
+    public void spawnBubble(String playerText, Channel channel, Player sender, Set<Player> showers) {
+        if (bubbles.containsKey(sender)) bubbles.get(sender).remove();
         try {
-            bubbles.put(ownerPlayer, bubbleGeneratorManager.spawnBubble(playerText, channel, ownerPlayer, showers));
+            bubbles.put(sender, bubbleGeneratorManager.getBubbleGenerator(sender, channel).spawnBubble(playerText, sender, showers));
         } catch (BubbleModelNotFoundException e) {
             Logger.debug(e.getMessage());
         }

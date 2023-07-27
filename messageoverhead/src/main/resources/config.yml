@@ -11,7 +11,7 @@ settings: #plugin settings
 models:
   test-model-bubble: #Some message configuration
     #channels are used only to adjust the visibility of the message to certain players
-    channel: "#local" #the channel to which the Bubble Model belongs. By default, "all". All channels start with the sign "#". Supports custom channels from plugins to chat channels ("#global", "#local", "#custom-channel")
+    channel: "#local" #the channel to which the BubbleArmorStand Model belongs. By default, "all". All channels start with the sign "#". Supports custom channels from plugins to chat channels ("#global", "#local", "#custom-channel")
     settings:
       format: '&7{message}'
   test-private-model:

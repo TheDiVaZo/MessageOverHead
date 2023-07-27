@@ -33,7 +33,7 @@ public class BubbleWrapper {
             if (line.length() > 0 && !line.getNoColorString().equals(" ")) {
                 textLength += line.length();
                 Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3 + bubbleModel.getBiasY(), loc.getZ());
-                this.bubbleMessages.add(new Bubble(line, locBubble));
+                this.bubbleMessages.add(new BubbleArmorStand(line.getMinecraftColoredString(), locBubble));
             }
         }
         this.textLength = textLength;
@@ -60,7 +60,7 @@ public class BubbleWrapper {
     }
 
     public void remove() {
-        bubbleMessages.forEach(bubble -> bubble.hide(showers.toArray(Player[]::new)));
+        bubbleMessages.forEach(bubble -> bubble.hide(showers));
         showers.clear();
     }
 

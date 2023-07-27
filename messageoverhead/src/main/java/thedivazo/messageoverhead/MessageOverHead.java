@@ -1,7 +1,7 @@
 package thedivazo.messageoverhead;
 
-import thedivazo.messageoverhead.api.logging.Logger;
-import thedivazo.messageoverhead.api.logging.handlers.JULHandler;
+import thedivazo.messageoverhead.logging.Logger;
+import thedivazo.messageoverhead.logging.handlers.JULHandler;
 import co.aikar.commands.PaperCommandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;

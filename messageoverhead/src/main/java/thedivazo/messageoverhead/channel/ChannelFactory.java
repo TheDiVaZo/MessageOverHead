@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.config.channel;
+package thedivazo.messageoverhead.channel;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

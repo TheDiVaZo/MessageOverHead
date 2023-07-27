@@ -1,7 +1,7 @@
-package thedivazo.messageoverhead.api.logging.handlers;
+package thedivazo.messageoverhead.logging.handlers;
 
 
-import thedivazo.messageoverhead.api.logging.LoggerHandler;
+import thedivazo.messageoverhead.logging.LoggerHandler;
 
 import java.util.Objects;
 import java.util.logging.Level;

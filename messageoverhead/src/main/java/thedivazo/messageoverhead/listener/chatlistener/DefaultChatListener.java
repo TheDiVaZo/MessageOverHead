@@ -7,19 +7,38 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import thedivazo.messageoverhead.MessageOverHead;
-import thedivazo.messageoverhead.config.channel.ChannelFactory;
+import thedivazo.messageoverhead.channel.ChannelFactory;
 
+import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DefaultChatListener implements Listener {
-    @EventHandler(priority = EventPriority.NORMAL)
+
+    Pattern privateCommandPattern = Pattern.compile("^/(w|tell|msg) (\\S+) (.+)");
+
+    @EventHandler(priority = EventPriority.LOWEST)
     private void onChat(AsyncPlayerChatEvent chatEvent) {
         String message = chatEvent.getMessage();
         Player sender = chatEvent.getPlayer();
         Set<Player> recipients = chatEvent.getRecipients();
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("all"), sender, recipients);
     }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onPrivateCommand(PlayerCommandPreprocessEvent event) {
+        Matcher matcher = privateCommandPattern.matcher(event.getMessage());
+        if(!matcher.matches()) return;
+        Player player = Bukkit.getPlayer(matcher.group(2));
+        String message = matcher.group(3);
+        if(Objects.isNull(player)) return;
+        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("private"), event.getPlayer(), Set.of(player));
+    }
+
+
 
     public void register() {
         Bukkit.getPluginManager().registerEvents(this, MessageOverHead.getInstance());

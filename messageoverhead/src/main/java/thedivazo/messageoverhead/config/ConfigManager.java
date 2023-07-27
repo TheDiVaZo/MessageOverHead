@@ -1,6 +1,6 @@
 package thedivazo.messageoverhead.config;
 
-import thedivazo.messageoverhead.api.logging.Logger;
+import thedivazo.messageoverhead.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -8,7 +8,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
 import thedivazo.messageoverhead.bubble.BubbleManager;
-import thedivazo.messageoverhead.config.channel.ChannelFactory;
+import thedivazo.messageoverhead.channel.ChannelFactory;
 import thedivazo.messageoverhead.utils.text.DecoratedString;
 import thedivazo.messageoverhead.utils.ConfigWrapper;
 

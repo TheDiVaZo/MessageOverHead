@@ -3,7 +3,6 @@ package thedivazo.messageoverhead.utils.text;
 import lombok.*;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.jetbrains.annotations.NotNull;
-import thedivazo.messageoverhead.api.logging.Logger;
 import thedivazo.messageoverhead.utils.text.element.Chunk;
 import thedivazo.messageoverhead.utils.text.customize.TextColor;
 import thedivazo.messageoverhead.utils.text.customize.TextFormatting;

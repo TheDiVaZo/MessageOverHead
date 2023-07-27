@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.config.channel;
+package thedivazo.messageoverhead.channel;
 
 public enum Type {
     COMMAND,

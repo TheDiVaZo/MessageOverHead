@@ -5,7 +5,7 @@ import io.th0rgal.oraxen.shaded.jetbrains.annotations.Unmodifiable;
 import lombok.*;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import thedivazo.messageoverhead.config.channel.Channel;
+import thedivazo.messageoverhead.channel.Channel;
 import thedivazo.messageoverhead.utils.text.DecoratedString;
 
 import java.util.List;
