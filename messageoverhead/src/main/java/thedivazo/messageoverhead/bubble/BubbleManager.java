@@ -8,10 +8,17 @@ import thedivazo.messageoverhead.channel.Channel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class BubbleManager {
     private final Map<Player, BubbleSpawned> bubbles = new HashMap<>();
+
+    public Optional<BubbleSpawned> getBubbleSpawned(Player player) {
+        return Optional.ofNullable(bubbles.get(player));
+    }
+
+
 
     @Getter
     private final BubbleGeneratorManager bubbleGeneratorManager;
@@ -20,13 +27,17 @@ public class BubbleManager {
         this.bubbleGeneratorManager = bubbleGeneratorManager;
     }
 
+    public void spawnBubble(String playerText, BubbleGenerator bubbleGenerator, Player sender, Set<Player> showers) {
+        bubbles.put(sender,bubbleGenerator.spawnBubble(playerText, sender, showers));
+    }
+
     public void spawnBubble(String playerText, Channel channel, Player sender, Set<Player> showers) {
         if (bubbles.containsKey(sender)) bubbles.get(sender).remove();
-        try {
-            bubbles.put(sender, bubbleGeneratorManager.getBubbleGenerator(sender, channel).spawnBubble(playerText, sender, showers));
-        } catch (BubbleModelNotFoundException e) {
-            Logger.debug(e.getMessage());
-        }
+        bubbleGeneratorManager
+                .getBubbleGenerator(sender, channel)
+                .ifPresentOrElse(
+                        bubbleGenerator -> spawnBubble(playerText, bubbleGenerator, sender, showers),
+                        ()->Logger.debug("no bubble model found for player '{0}' (UUID: '{1}' )", sender.getName(), sender.getUniqueId().toString()));
     }
 
     public void removeAllBubbles() {

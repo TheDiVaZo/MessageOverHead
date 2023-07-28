@@ -42,12 +42,12 @@ public class BubbleGenerator {
     }
 
     private BubbleWrapper generateBubble(DecoratedString playerText, Player ownerBubble) {
-        return new BubbleWrapper(ownerBubble.getLocation(), bubbleModel, processText(playerText, ownerBubble));
+        return new BubbleWrapper(ownerBubble.getLocation(), processText(playerText, ownerBubble));
     }
 
     public BubbleSpawned spawnBubble(String playerText, Player sender, Set<Player> showers) {
         BubbleWrapper bubbleWrapper = generateBubble(DecoratedStringUtils.wrapString(playerText), sender);
-        BubbleSpawned bubbleSpawned = new BubbleSpawned(bubbleWrapper, sender, showers);
+        BubbleSpawned bubbleSpawned = new BubbleSpawned(bubbleModel, bubbleWrapper, sender, showers);
         Bukkit.getPluginManager().callEvent(new BubbleSendEvent(bubbleSpawned, sender));
         return bubbleSpawned;
     }

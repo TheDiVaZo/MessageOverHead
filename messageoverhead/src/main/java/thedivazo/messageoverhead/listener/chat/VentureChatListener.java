@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.listener.chatlistener;
+package thedivazo.messageoverhead.listener.chat;
 
 import mineverse.Aust1n46.chat.api.MineverseChatPlayer;
 import mineverse.Aust1n46.chat.api.events.VentureChatEvent;

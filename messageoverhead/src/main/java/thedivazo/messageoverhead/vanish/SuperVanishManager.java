@@ -1,9 +1,10 @@
 package thedivazo.messageoverhead.vanish;
 
 import de.myzelyam.api.vanish.VanishAPI;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.entity.Player;
 
-public final class SuperVanishVanishWrapper implements VanishWrapper {
+public final class SuperVanishManager implements VanishManager {
     @Override
     public boolean canSee(Player viewer, Player viewed) {
         return VanishAPI.canSee(viewer, viewed);

@@ -1,5 +1,8 @@
 package thedivazo.messageoverhead;
 
+import lombok.Getter;
+import thedivazo.messageoverhead.command.DefaultCommands;
+import thedivazo.messageoverhead.integration.IntegrationManager;
 import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.logging.handlers.JULHandler;
 import co.aikar.commands.PaperCommandManager;
@@ -14,9 +17,9 @@ import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.messageoverhead.config.ConfigManager;
-import thedivazo.messageoverhead.listener.chatlistener.DefaultChatListener;
+import thedivazo.messageoverhead.listener.chat.DefaultChatListener;
 import thedivazo.messageoverhead.utils.VersionWrapper;
-import thedivazo.messageoverhead.vanish.VanishWrapperManager;
+import thedivazo.messageoverhead.vanish.VanishManager;
 import thedivazo.messageoverhead.metrics.MetricsManager;
 import thedivazo.messageoverhead.utils.ConfigWrapper;
 
@@ -25,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Plugin(name = MessageOverHead.NAME, version = "4.0.0")
@@ -44,15 +49,17 @@ public class MessageOverHead extends JavaPlugin {
     public static final VersionWrapper PLUGIN_VERSION = VersionWrapper.valueOf("4.0.0");
     public static final VersionWrapper MINECRAFT_VERSION = VersionWrapper.valueOf(Bukkit.getVersion(), Pattern.compile("\\(MC: ([0-9]+)\\.([0-9]+)\\.([0-9]+)"), 1, 2, 3);
 
+    @Getter
     public static final String NAME = "MessageOverHead";
 
     private static ConfigManager configManager = new ConfigManager();
 
-    private static VanishWrapperManager vanishWrapperManager = new VanishWrapperManager();
-
     public static ConfigManager getConfigManager() {
         return MessageOverHead.configManager;
     }
+
+    @Getter
+    private static Set<VanishManager> vanishManagers;
 
     public static MessageOverHead getInstance() {
         return JavaPlugin.getPlugin(MessageOverHead.class);
@@ -91,11 +98,11 @@ public class MessageOverHead extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(MessageOverHead.getInstance());
             return;
         }
-        vanishWrapperManager.loadVanish();
 
         checkPluginVersion();
         new MetricsManager(this);
-        registerEvent();
+        registerListeners();
+        registerManagers();
         registerCommands();
     }
 
@@ -114,21 +121,25 @@ public class MessageOverHead extends JavaPlugin {
         }.runTaskAsynchronously(this);
     }
 
-    private void registerEvent() {
-        new DefaultChatListener().register();
-    }
-
     private void registerCommands() {
         PaperCommandManager manager = new PaperCommandManager(this);
 
-        //manager.registerCommand(new DefaultCommands());
+        manager.registerCommand(new DefaultCommands());
         //manager.registerCommand(new DebugCommands());
 
         manager.setDefaultExceptionHandler((command, registeredCommand, sender, args, t)-> {
             getLogger().warning("Error occurred while executing command "+command.getName());
             return true;
         });
-        //manager.getCommandCompletions().registerCompletion("configBubbles", c -> getConfigManager().getConfigBubblesName());
+    }
+
+    private void registerListeners() {
+        IntegrationManager.getChatListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
+        IntegrationManager.getVanishListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
+    }
+
+    private void registerManagers() {
+        vanishManagers = IntegrationManager.getVanishManagers();
     }
 
 

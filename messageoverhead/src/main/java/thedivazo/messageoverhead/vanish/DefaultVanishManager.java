@@ -4,7 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-public class DefaultVanishWrapper implements VanishWrapper {
+public class DefaultVanishManager implements VanishManager {
     @Override
     public boolean canSee(Player viewer, Player viewed) {
         return !viewed.getGameMode().equals(GameMode.SPECTATOR) &&

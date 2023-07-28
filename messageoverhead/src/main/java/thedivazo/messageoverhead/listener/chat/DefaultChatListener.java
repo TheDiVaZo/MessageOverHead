@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.listener.chatlistener;
+package thedivazo.messageoverhead.listener.chat;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -36,15 +36,5 @@ public class DefaultChatListener implements Listener {
         String message = matcher.group(3);
         if(Objects.isNull(player)) return;
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("private"), event.getPlayer(), Set.of(player));
-    }
-
-
-
-    public void register() {
-        Bukkit.getPluginManager().registerEvents(this, MessageOverHead.getInstance());
-    }
-
-    public void unregister() {
-        HandlerList.unregisterAll(this);
     }
 }

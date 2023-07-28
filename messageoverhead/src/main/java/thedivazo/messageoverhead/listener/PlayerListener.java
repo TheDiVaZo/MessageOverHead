@@ -5,25 +5,40 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
+import thedivazo.messageoverhead.MessageOverHead;
+import thedivazo.messageoverhead.bubble.BubbleManager;
+import thedivazo.messageoverhead.bubble.BubbleSpawned;
 
 public class PlayerListener implements Listener {
     @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
-        //MessageOverHead.getBubbleMessageManager().removeBubble(player);
+    public void onJoin(PlayerJoinEvent event) {
+        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        Player player = event.getPlayer();
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent e) {
-        //MessageOverHead.getBubbleMessageManager().removeBubble(e.getEntity());
+    public void onQuit(PlayerQuitEvent event) {
+        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        Player player = event.getPlayer();
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
     }
 
     @EventHandler
-    public void onInvisible(EntityPotionEffectEvent e) {
-        if(!e.getModifiedType().equals(PotionEffectType.INVISIBILITY)) return;
-        if(!(e.getEntity() instanceof Player)) return;
-       //MessageOverHead.getBubbleMessageManager().removeBubble((Player) e.getEntity());
+    public void onKick(PlayerKickEvent event) {
+        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        Player player = event.getPlayer();
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        Player player = event.getEntity();
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
     }
 }

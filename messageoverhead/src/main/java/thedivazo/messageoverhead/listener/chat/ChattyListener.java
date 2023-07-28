@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.listener.chatlistener;
+package thedivazo.messageoverhead.listener.chat;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

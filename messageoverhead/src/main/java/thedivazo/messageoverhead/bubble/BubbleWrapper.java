@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 
 public class BubbleWrapper {
     @Getter
-    private final BubbleModel bubbleModel;
     private final List<Bubble> bubbleMessages = new CopyOnWriteArrayList<>();
     @Getter
     private final int textLength;
@@ -24,66 +23,93 @@ public class BubbleWrapper {
 
     private final Set<Player> showers = ConcurrentHashMap.newKeySet();
 
-    public BubbleWrapper(Location loc, BubbleModel bubbleModel, List<DecoratedString> message) {
+    @Getter
+    private boolean hided = false;
+
+    @Getter
+    private boolean removed = false;
+
+    public BubbleWrapper(Location loc, List<DecoratedString> message) {
         this.loc = loc;
-        this.bubbleModel = bubbleModel;
-        int textLength = 0;
+        int tempTextLength = 0;
         for (int i = 0; i < message.size(); i++) {
             DecoratedString line = message.get(message.size() - 1 - i);
             if (line.length() > 0 && !line.getNoColorString().equals(" ")) {
-                textLength += line.length();
-                Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3 + bubbleModel.getBiasY(), loc.getZ());
+                tempTextLength += line.length();
+                Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3, loc.getZ());
                 this.bubbleMessages.add(new BubbleArmorStand(line.getMinecraftColoredString(), locBubble));
             }
         }
-        this.textLength = textLength;
+        this.textLength = tempTextLength;
     }
 
     public void show(Player... players) {
+        if (isRemoved() || !isHided()) return;
+        hided = false;
         Set<Player> playerSet = Stream.of(players).filter(player->!showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(playerSet);
         bubbleMessages.forEach(bubble -> bubble.show(playerSet));
     }
 
+    public void show() {
+        if (isRemoved() || !isHided()) return;
+        hided = false;
+        bubbleMessages.forEach(bubble -> bubble.show(showers));
+    }
+
     public void show(Set<Player> players) {
+        if (isRemoved() || !isHided()) return;
+        hided = false;
         Set<Player> filteredPlayers = players.stream().filter(player->!showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(filteredPlayers);
         bubbleMessages.forEach(bubble -> bubble.show(filteredPlayers));
     }
 
     public void setPosition(Location position) {
+        if (isRemoved()) return;
         this.loc = position;
         for (int i = 0; i < bubbleMessages.size(); i++) {
-            Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3 + bubbleModel.getBiasY(), loc.getZ());
+            Location locBubble = new Location(loc.getWorld(), loc.getX(), loc.getY() + i * 0.3, loc.getZ());
             bubbleMessages.get(i).setPosition(locBubble, showers);
         }
     }
 
-    public void remove() {
+    public void hide() {
+        if (isRemoved() || isHided()) return;
         bubbleMessages.forEach(bubble -> bubble.hide(showers));
+        hided = true;
+    }
+
+    public void remove() {
+        if(isRemoved()) return;
+        removed = true;
+        hide();
+        clearShowers();
+    }
+
+    public void clearShowers() {
+        if (isRemoved()) return;
         showers.clear();
     }
 
-    public void playParticle(Particle particle, int count, double offsetX, double offsetY, double offsetZ, Player... players) {
-        for (Player player : players) {
+    public void addShowers(Set<Player> players) {
+        showers.addAll(players);
+    }
+
+    public void addShower(Player player) {
+        showers.add(player);
+    }
+
+    public void playParticle(Particle particle, int count, double offsetX, double offsetY, double offsetZ) {
+        if (isRemoved() || !isHided()) return;
+        for (Player player : showers) {
             player.spawnParticle(particle, loc, count, offsetX, offsetY, offsetZ);
         }
     }
 
-    public void playParticle(Particle particle, int count, double offsetX, double offsetY, double offsetZ, Set<Player> players) {
-        for (Player player : players) {
-            player.spawnParticle(particle, loc, count, offsetX, offsetY, offsetZ);
-        }
-    }
-
-    public void playSound(Sound sound, int volume, int pitch, Player... players) {
-        for (Player player : players) {
-            player.playSound(loc, sound, volume, pitch);
-        }
-    }
-
-    public void playSound(Sound sound, int volume, int pitch, Set<Player> players) {
-        for (Player player : players) {
+    public void playSound(Sound sound, int volume, int pitch) {
+        if (isRemoved() || !isHided()) return;
+        for (Player player : showers) {
             player.playSound(loc, sound, volume, pitch);
         }
     }

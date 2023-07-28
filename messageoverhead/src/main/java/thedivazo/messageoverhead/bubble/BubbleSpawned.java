@@ -2,8 +2,10 @@ package thedivazo.messageoverhead.bubble;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import thedivazo.messageoverhead.BubbleActiveStatus;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.config.BubbleModel;
 
@@ -22,55 +24,76 @@ public class BubbleSpawned {
     @Getter
     private final Player sender;
 
-    @Getter
-    private boolean removed = false;
-
     private Set<Player> filterShowers(Player sender, Set<Player> showers) {
         return showers.stream().filter(player ->
                 sender.getWorld().equals(player.getWorld())
-                && sender.getLocation().distance(player.getLocation()) <= bubbleWrapper.getBubbleModel().getDistance()
+                && getLocationPlusBiasY(sender).distance(player.getLocation()) <= bubbleModel.getDistance()
                 ).collect(Collectors.toSet());
+    }
+    
+    private Location getLocationPlusBiasY(Player sender) {
+        Location location = sender.getLocation();
+        location.setY(location.getY()+bubbleModel.getBiasY());
+        return location;
+    }
+
+    public void playParticle() {
+        if (bubbleModel.getParticleModel().isEnable() && isShowable()) {
+            BubbleModel.ParticleModel particleModel = bubbleModel.getParticleModel();
+            bubbleWrapper.playParticle(particleModel.getParticle(), particleModel.getCount(), particleModel.getOffsetX(), particleModel.getOffsetY(), particleModel.getOffsetZ());
+        }
+    }
+
+    public void playSound() {
+        if (bubbleModel.getSoundModel().isEnable() && isShowable()) {
+            BubbleModel.SoundModel soundModel = bubbleModel.getSoundModel();
+            bubbleWrapper.playSound(soundModel.getSound(), soundModel.getPitch(), soundModel.getVolume());
+        }
     }
 
 
-    public BubbleSpawned(BubbleWrapper bubbleWrapper, Player sender, Set<Player> showers) {
+    public BubbleSpawned(BubbleModel bubbleModel, BubbleWrapper bubbleWrapper, Player sender, Set<Player> showers) {
+        this.bubbleModel = bubbleModel;
         this.bubbleWrapper = bubbleWrapper;
         this.sender = sender;
-        this.bubbleModel = bubbleWrapper.getBubbleModel();
-        BubbleModel bubbleModel = bubbleWrapper.getBubbleModel();
-        if (bubbleModel.isVisibleTextForOwner()) bubbleWrapper.show(sender);
+        if (bubbleModel.isVisibleTextForOwner()) bubbleWrapper.addShower(sender);
         Set<Player> filteredShowers = filterShowers(sender, showers);
-        bubbleWrapper.show(filteredShowers);
-        if (bubbleModel.getParticleModel().isEnable()) {
-            BubbleModel.ParticleModel particleModel = bubbleModel.getParticleModel();
-            bubbleWrapper.playParticle(particleModel.getParticle(), particleModel.getCount(), particleModel.getOffsetX(), particleModel.getOffsetY(), particleModel.getOffsetZ(), showers);
-        }
-        if (bubbleModel.getSoundModel().isEnable()) {
-            BubbleModel.SoundModel soundModel = bubbleModel.getSoundModel();
-            bubbleWrapper.playSound(soundModel.getSound(), soundModel.getPitch(), soundModel.getVolume(), filteredShowers);
-        }
+        bubbleWrapper.addShowers(filteredShowers);
+        show();
+        playParticle();
+        playSound();
         positionTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MessageOverHead.getInstance(), ()-> {
-            bubbleWrapper.setPosition(sender.getLocation());
+            bubbleWrapper.setPosition(getLocationPlusBiasY(sender));
         }, 0, 1);
         removeTask = Bukkit.getScheduler().runTaskLaterAsynchronously(MessageOverHead.getInstance(), ()-> {
             positionTask.cancel();
             bubbleWrapper.remove();
-            removed = true;
         }, Math.round(getLifeTimeBubble()*20));
     }
 
     public void remove() {
-        if (!positionTask.isCancelled() || !removeTask.isCancelled() || !removed) {
+        if (!positionTask.isCancelled() || !removeTask.isCancelled() || !bubbleWrapper.isRemoved()) {
             positionTask.cancel();
             removeTask.cancel();
             bubbleWrapper.remove();
-            removed = true;
         }
+    }
 
+    public void hide() {
+        bubbleWrapper.hide();
+    }
+
+    public void show() {
+        if (isShowable())
+            bubbleWrapper.show();
+    }
+
+    public boolean isShowable() {
+        return MessageOverHead.getVanishManagers().stream().noneMatch(vanishManager -> vanishManager.isInvisible(sender)) || BubbleActiveStatus.getStatus(sender).equals(BubbleActiveStatus.Status.ENABLED);
     }
 
     public double getLifeTimeBubble() {
-        BubbleModel.LifeTimeModel lifeTimeModel = bubbleWrapper.getBubbleModel().getLifeTimeModel();
+        BubbleModel.LifeTimeModel lifeTimeModel = bubbleModel.getLifeTimeModel();
         double currentLifeTime = lifeTimeModel.getTimePerChar() * bubbleWrapper.getTextLength();
         return Math.min(Math.max(currentLifeTime, lifeTimeModel.getMinTime()), lifeTimeModel.getMaxTime());
     }

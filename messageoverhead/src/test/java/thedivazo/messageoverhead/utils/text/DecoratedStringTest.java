@@ -1,6 +1,8 @@
 package thedivazo.messageoverhead.utils.text;
 
 import org.junit.jupiter.api.Test;
+import thedivazo.messageoverhead.logging.Logger;
+import thedivazo.messageoverhead.logging.handlers.JULHandler;
 import thedivazo.messageoverhead.utils.text.element.Chunk;
 import thedivazo.messageoverhead.utils.text.customize.TextColor;
 import thedivazo.messageoverhead.utils.text.customize.TextFormatting;

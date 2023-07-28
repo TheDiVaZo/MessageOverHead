@@ -2,7 +2,7 @@ package thedivazo.messageoverhead.vanish;
 
 import org.bukkit.entity.Player;
 
-public interface VanishWrapper {
+public interface VanishManager {
     boolean canSee(Player viewer, Player viewed);
     boolean isInvisible(Player player);
 }
