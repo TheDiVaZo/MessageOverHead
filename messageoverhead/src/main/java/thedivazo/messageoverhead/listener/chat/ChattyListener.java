@@ -1,5 +1,6 @@
 package thedivazo.messageoverhead.listener.chat;
 
+import lombok.EqualsAndHashCode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,10 +12,11 @@ import thedivazo.messageoverhead.channel.ChannelFactory;
 
 import java.util.Set;
 
-public class ChattyListener implements Listener {
+@EqualsAndHashCode(callSuper = false)
+public class ChattyListener extends AbstractChatListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onChat(ChattyMessageEvent chatEvent) {
+    public void onChat(ChattyMessageEvent chatEvent) {
         Player sender = chatEvent.getPlayer();
         String message = chatEvent.getMessage();
         Chat channel = chatEvent.getChat();

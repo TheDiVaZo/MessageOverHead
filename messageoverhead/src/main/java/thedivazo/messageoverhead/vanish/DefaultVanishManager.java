@@ -1,17 +1,11 @@
 package thedivazo.messageoverhead.vanish;
 
+import lombok.EqualsAndHashCode;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
-
+@EqualsAndHashCode(callSuper = false)
 public class DefaultVanishManager implements VanishManager {
-    @Override
-    public boolean canSee(Player viewer, Player viewed) {
-        return !viewed.getGameMode().equals(GameMode.SPECTATOR) &&
-                !viewed.hasPotionEffect(PotionEffectType.INVISIBILITY) &&
-                viewer.canSee(viewed) &&
-                viewer.getWorld().equals(viewed.getWorld());
-    }
 
     @Override
     public boolean isInvisible(Player player) {

@@ -1,9 +1,11 @@
 package thedivazo.messageoverhead.bubble;
 
+import com.comphenix.protocol.PacketType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.api.event.BubbleSendEvent;
 import thedivazo.messageoverhead.config.BubbleModel;
 import thedivazo.messageoverhead.channel.Channel;
@@ -48,8 +50,13 @@ public class BubbleGenerator {
     public BubbleSpawned spawnBubble(String playerText, Player sender, Set<Player> showers) {
         BubbleWrapper bubbleWrapper = generateBubble(DecoratedStringUtils.wrapString(playerText), sender);
         BubbleSpawned bubbleSpawned = new BubbleSpawned(bubbleModel, bubbleWrapper, sender, showers);
-        Bukkit.getPluginManager().callEvent(new BubbleSendEvent(bubbleSpawned, sender));
+        callEvent(bubbleSpawned, sender);
         return bubbleSpawned;
+    }
+
+    private void callEvent(BubbleSpawned bubbleSpawned, Player sender) {
+        Bukkit.getScheduler()
+                .runTask(MessageOverHead.getInstance(), ()-> Bukkit.getPluginManager().callEvent(new BubbleSendEvent(bubbleSpawned, sender)));
     }
 
     public String getName() {

@@ -14,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 public class BubbleWrapper {
     @Getter
     private final List<Bubble> bubbleMessages = new CopyOnWriteArrayList<>();
@@ -24,7 +25,7 @@ public class BubbleWrapper {
     private final Set<Player> showers = ConcurrentHashMap.newKeySet();
 
     @Getter
-    private boolean hided = false;
+    private boolean hided = true;
 
     @Getter
     private boolean removed = false;
@@ -45,24 +46,24 @@ public class BubbleWrapper {
 
     public void show(Player... players) {
         if (isRemoved() || !isHided()) return;
-        hided = false;
         Set<Player> playerSet = Stream.of(players).filter(player->!showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(playerSet);
         bubbleMessages.forEach(bubble -> bubble.show(playerSet));
+        hided = false;
     }
 
     public void show() {
         if (isRemoved() || !isHided()) return;
-        hided = false;
         bubbleMessages.forEach(bubble -> bubble.show(showers));
+        hided = false;
     }
 
     public void show(Set<Player> players) {
         if (isRemoved() || !isHided()) return;
-        hided = false;
         Set<Player> filteredPlayers = players.stream().filter(player->!showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(filteredPlayers);
         bubbleMessages.forEach(bubble -> bubble.show(filteredPlayers));
+        hided = false;
     }
 
     public void setPosition(Location position) {
@@ -82,9 +83,9 @@ public class BubbleWrapper {
 
     public void remove() {
         if(isRemoved()) return;
-        removed = true;
         hide();
         clearShowers();
+        removed = true;
     }
 
     public void clearShowers() {
@@ -101,18 +102,30 @@ public class BubbleWrapper {
     }
 
     public void playParticle(Particle particle, int count, double offsetX, double offsetY, double offsetZ) {
-        if (isRemoved() || !isHided()) return;
+        if (isRemoved() || isHided()) return;
         for (Player player : showers) {
             player.spawnParticle(particle, loc, count, offsetX, offsetY, offsetZ);
         }
     }
 
     public void playSound(Sound sound, int volume, int pitch) {
-        if (isRemoved() || !isHided()) return;
+        if (isRemoved() || isHided()) return;
         for (Player player : showers) {
             player.playSound(loc, sound, volume, pitch);
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BubbleWrapper)) return false;
+        BubbleWrapper that = (BubbleWrapper) o;
+        return getTextLength() == that.getTextLength() && getBubbleMessages().equals(that.getBubbleMessages());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBubbleMessages(), getTextLength());
+    }
 }
 

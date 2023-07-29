@@ -1,5 +1,6 @@
 package thedivazo.messageoverhead.listener.chat;
 
+import lombok.EqualsAndHashCode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,10 +15,11 @@ import thedivazo.messageoverhead.channel.ChannelFactory;
 import java.util.Objects;
 import java.util.Set;
 
-public class ChatControlListener implements Listener {
+@EqualsAndHashCode(callSuper = false)
+public class ChatControlListener extends AbstractChatListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onChat(ChatChannelEvent chatEvent) {
+    public void onChat(ChatChannelEvent chatEvent) {
         String message = chatEvent.getMessage();
         CommandSender sender = chatEvent.getSender();
         if (!(sender instanceof Player)) return;
@@ -27,7 +29,7 @@ public class ChatControlListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onPrivateCommand(PrePrivateMessageEvent event) {
+    public void onPrivateCommand(PrePrivateMessageEvent event) {
         CommandSender sender = event.getSender();
         if (!(sender instanceof Player)) return;
         Player receiver = event.getReceiver();

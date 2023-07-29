@@ -1,13 +1,11 @@
 package thedivazo.messageoverhead.vanish;
 
 import com.Zrips.CMI.CMI;
+import lombok.EqualsAndHashCode;
 import org.bukkit.entity.Player;
 
+@EqualsAndHashCode(callSuper = false)
 public class CMIVanishManager implements VanishManager {
-    @Override
-    public boolean canSee(Player viewer, Player viewed) {
-        return !CMI.getInstance().getPlayerManager().getUser(viewed).isVanished();
-    }
 
     @Override
     public boolean isInvisible(Player player) {

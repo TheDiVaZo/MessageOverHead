@@ -1,5 +1,6 @@
 package thedivazo.messageoverhead.listener.vanish;
 
+import lombok.EqualsAndHashCode;
 import net.ess3.api.events.VanishStatusChangeEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -7,8 +8,14 @@ import org.bukkit.event.Listener;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.bubble.BubbleSpawned;
+import thedivazo.messageoverhead.vanish.EssentialsXVanishManager;
 
-public class EssentialsXVanishListener implements Listener {
+@EqualsAndHashCode(callSuper = false)
+public class EssentialsXVanishListener extends AbstractVanishListener {
+
+    public EssentialsXVanishListener() {
+        super(new EssentialsXVanishManager());
+    }
 
     @EventHandler
     public void onVanish(VanishStatusChangeEvent event) {
@@ -16,7 +23,7 @@ public class EssentialsXVanishListener implements Listener {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         if (event.getValue())
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
-        else
+        else if (getShowablePredicate().test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
     }
 }

@@ -14,31 +14,25 @@ import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.bubble.BubbleSpawned;
 
 public class PlayerListener implements Listener {
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
-        Player player = event.getPlayer();
-        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
-    }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         Player player = event.getPlayer();
-        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::remove);
     }
 
     @EventHandler
     public void onKick(PlayerKickEvent event) {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         Player player = event.getPlayer();
-        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::remove);
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         Player player = event.getEntity();
-        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
+        bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::remove);
     }
 }

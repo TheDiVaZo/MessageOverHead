@@ -1,5 +1,6 @@
 package thedivazo.messageoverhead.utils.text;
 
+import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Test;
 import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.logging.handlers.JULHandler;
@@ -229,9 +230,5 @@ class DecoratedStringTest {
     void testReplace2() {
         DecoratedString decoratedString = DecoratedString.valueOf("&cEe Ee {message}");
         System.out.println(decoratedString.replace("{message}", DecoratedString.valueOf("&cHh")));
-    }
-
-    @Test
-    void testReplace3() {
     }
 }

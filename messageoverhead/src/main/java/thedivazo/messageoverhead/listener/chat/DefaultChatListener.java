@@ -1,5 +1,6 @@
 package thedivazo.messageoverhead.listener.chat;
 
+import lombok.EqualsAndHashCode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,12 +17,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DefaultChatListener implements Listener {
+@EqualsAndHashCode(callSuper = false)
+public class DefaultChatListener extends AbstractChatListener {
 
     Pattern privateCommandPattern = Pattern.compile("^/(w|tell|msg) (\\S+) (.+)");
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onChat(AsyncPlayerChatEvent chatEvent) {
+    public void onChat(AsyncPlayerChatEvent chatEvent) {
         String message = chatEvent.getMessage();
         Player sender = chatEvent.getPlayer();
         Set<Player> recipients = chatEvent.getRecipients();
@@ -29,7 +31,7 @@ public class DefaultChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    private void onPrivateCommand(PlayerCommandPreprocessEvent event) {
+    public void onPrivateCommand(PlayerCommandPreprocessEvent event) {
         Matcher matcher = privateCommandPattern.matcher(event.getMessage());
         if(!matcher.matches()) return;
         Player player = Bukkit.getPlayer(matcher.group(2));

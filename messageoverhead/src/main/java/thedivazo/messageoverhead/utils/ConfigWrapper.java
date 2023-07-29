@@ -3,7 +3,6 @@ package thedivazo.messageoverhead.utils;
 import io.th0rgal.oraxen.shaded.jetbrains.annotations.NotNull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import thedivazo.messageoverhead.logging.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,9 +39,6 @@ public class ConfigWrapper {
         if(configurationSection.isList(path)) result.addAll(configurationSection.getStringList(path));
         else if (configurationSection.isString(path)) result.add(configurationSection.getString(path));
         else return def;
-        Logger.info("ddddd");
-        Logger.info(path);
-        result.forEach(str->Logger.info("ttt -> " + Objects.toString(str)));
         return result;
     }
 

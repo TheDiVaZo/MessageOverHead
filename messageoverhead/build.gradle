@@ -76,6 +76,7 @@ dependencies {
     testCompileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
     testCompileOnly 'me.clip:placeholderapi:2.10.10'
     testCompileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    testCompileOnly 'org.projectlombok:lombok:1.18.26'
 
     testImplementation 'org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'

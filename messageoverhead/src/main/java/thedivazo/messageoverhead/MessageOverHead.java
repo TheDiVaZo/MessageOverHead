@@ -58,9 +58,6 @@ public class MessageOverHead extends JavaPlugin {
         return MessageOverHead.configManager;
     }
 
-    @Getter
-    private static Set<VanishManager> vanishManagers;
-
     public static MessageOverHead getInstance() {
         return JavaPlugin.getPlugin(MessageOverHead.class);
     }
@@ -102,7 +99,6 @@ public class MessageOverHead extends JavaPlugin {
         checkPluginVersion();
         new MetricsManager(this);
         registerListeners();
-        registerManagers();
         registerCommands();
     }
 
@@ -125,7 +121,6 @@ public class MessageOverHead extends JavaPlugin {
         PaperCommandManager manager = new PaperCommandManager(this);
 
         manager.registerCommand(new DefaultCommands());
-        //manager.registerCommand(new DebugCommands());
 
         manager.setDefaultExceptionHandler((command, registeredCommand, sender, args, t)-> {
             getLogger().warning("Error occurred while executing command "+command.getName());
@@ -136,10 +131,6 @@ public class MessageOverHead extends JavaPlugin {
     private void registerListeners() {
         IntegrationManager.getChatListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
         IntegrationManager.getVanishListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
-    }
-
-    private void registerManagers() {
-        vanishManagers = IntegrationManager.getVanishManagers();
     }
 
 

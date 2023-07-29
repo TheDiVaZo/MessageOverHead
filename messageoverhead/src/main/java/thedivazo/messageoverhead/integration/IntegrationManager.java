@@ -1,8 +1,11 @@
 package thedivazo.messageoverhead.integration;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import thedivazo.messageoverhead.listener.chat.*;
 import thedivazo.messageoverhead.listener.vanish.*;
@@ -36,6 +39,13 @@ public class IntegrationManager {
         return isPlugin("ProtocolLib");
     }
 
+    public static boolean isItemsAdder() {
+        return isPlugin("ItemsAdder");
+    }
+
+    public static boolean isOraxen() {
+        return isPlugin("Oraxen");
+    }
 
     public static boolean isChatty() {
         return isPlugin("Chatty");
@@ -73,8 +83,9 @@ public class IntegrationManager {
     public static Set<Listener> getVanishListeners() {
         Set<Listener> listenerSet = new HashSet<>();
         if (isCMI()) listenerSet.add(new CMIVanishListener());
-        if (isEssentialsX()) listenerSet.add(new SuperVanishListener());
-        listenerSet.add(new DefaultChatListener());
+        if (isEssentialsX()) listenerSet.add(new EssentialsXVanishListener());
+        if (isSuperVanish()) listenerSet.add(new SuperVanishListener());
+        listenerSet.add(new DefaultVanishListener());
         return listenerSet;
     }
 
