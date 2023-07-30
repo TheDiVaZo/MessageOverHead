@@ -17,17 +17,9 @@ public class BubbleManager {
     private final Map<Player, BubbleSpawned> bubbles = new HashMap<>();
 
     @Getter
-    private static VanishManagerSet vanishManagers = new VanishManagerSet(IntegrationManager.getVanishManagers());
-
-    @Getter
-    private static Predicate<Player> noSpectatorPredicate = player -> !player.getGameMode().equals(GameMode.SPECTATOR);
-    @Getter
-    private static Predicate<Player> statusEnabledPredicate = player -> BubbleActiveStatus.getStatus(player).equals(BubbleActiveStatus.Status.ENABLED);
-    @Getter
+    private static VanishManagerSet vanishManagers = new VanishManagerSet(IntegrationManager.getVanishManagers());@Getter
     private static Predicate<Player> visiblePredicate = player -> vanishManagers.visibleForAll().test(player);
 
-    @Getter
-    private static Predicate<Player> showPredicate = player -> visiblePredicate.and(noSpectatorPredicate).and(statusEnabledPredicate).test(player);
     public Optional<BubbleSpawned> getBubbleSpawned(Player player) {
         return Optional.ofNullable(bubbles.get(player));
     }
@@ -45,7 +37,7 @@ public class BubbleManager {
     }
 
     public void spawnBubble(String playerText, Channel channel, Player sender, Set<Player> showers) {
-        if (!getStatusEnabledPredicate().test(sender)) return;
+        if (BubbleActiveStatus.getStatus(sender).equals(BubbleActiveStatus.Status.DISABLED)) return;
         bubbleGeneratorManager
                 .getBubbleGenerator(sender, channel)
                 .ifPresentOrElse(

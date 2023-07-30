@@ -1,11 +1,5 @@
 package thedivazo.messageoverhead.listener.vanish;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
 import lombok.EqualsAndHashCode;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -13,18 +7,16 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.bubble.BubbleSpawned;
-import thedivazo.messageoverhead.vanish.DefaultVanishManager;
+import thedivazo.messageoverhead.vanish.GameModeVanishManager;
+import thedivazo.messageoverhead.vanish.PotionVanishManager;
 import thedivazo.messageoverhead.vanish.VanishManager;
 
 import java.util.HashMap;
@@ -34,18 +26,16 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @EqualsAndHashCode(callSuper = false)
-public class DefaultVanishListener extends AbstractVanishListener {
+public class DefaultVanishListener implements VanishListener {
+
+    private static VanishManager gameModeVanishManager = new GameModeVanishManager();
+    private static VanishManager potionVanishManager = new PotionVanishManager();
+
+    private static Predicate<Player> showableIgnoreGameMode = BubbleManager.getVanishManagers().visibleForAll(List.of(gameModeVanishManager), false);
+
+    private static Predicate<Player> showableIgnorePotion = BubbleManager.getVanishManagers().visibleForAll(List.of(potionVanishManager), false);
 
     private static final Map<Player, BukkitTask> invisiblePlayers = new HashMap<>();
-
-    public DefaultVanishListener() {
-        super(new DefaultVanishManager());
-    }
-
-    @Override
-    public Predicate<Player> getShowablePredicate() {
-        return BubbleManager.getStatusEnabledPredicate().and(BubbleManager.getVanishManagers().visibleForAll(List.of(vanishManager), false));
-    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onGameModeChangeEvent(PlayerGameModeChangeEvent event) {
@@ -54,7 +44,7 @@ public class DefaultVanishListener extends AbstractVanishListener {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         if (newGameMode.equals(GameMode.SPECTATOR))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
-        else if (getShowablePredicate().test(player))
+        else if (showableIgnoreGameMode.test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
 
     }
@@ -71,7 +61,7 @@ public class DefaultVanishListener extends AbstractVanishListener {
             BukkitTask currentBukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(
                     MessageOverHead.getInstance(),
                     ()-> {
-                        if (super.getShowablePredicate().test(player))
+                        if (showableIgnorePotion.test(player))
                             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
                     }, potionEffect.getDuration()+5L);
             Optional.ofNullable(invisiblePlayers.get(player)).ifPresent(BukkitTask::cancel);

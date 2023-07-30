@@ -9,8 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class EssentialsXVanishManager implements VanishManager{
 
     @Override
-    public boolean isInvisible(Player player) {
+    public boolean isInvisible(Player viewer) {
         Essentials essentials = JavaPlugin.getPlugin(Essentials.class);
-        return essentials.getUser(player).isVanished();
+        return essentials.getUser(viewer).isVanished();
     }
 }

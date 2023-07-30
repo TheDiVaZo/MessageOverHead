@@ -9,13 +9,17 @@ import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.bubble.BubbleSpawned;
 import thedivazo.messageoverhead.vanish.EssentialsXVanishManager;
+import thedivazo.messageoverhead.vanish.SuperVanishManager;
+import thedivazo.messageoverhead.vanish.VanishManager;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 @EqualsAndHashCode(callSuper = false)
-public class EssentialsXVanishListener extends AbstractVanishListener {
+public class EssentialsXVanishListener implements VanishListener {
 
-    public EssentialsXVanishListener() {
-        super(new EssentialsXVanishManager());
-    }
+    private static VanishManager vanishManager = new EssentialsXVanishManager();
+    private static Predicate<Player> showable = BubbleManager.getVanishManagers().visibleForAll(List.of(vanishManager), false);
 
     @EventHandler
     public void onVanish(VanishStatusChangeEvent event) {
@@ -23,7 +27,7 @@ public class EssentialsXVanishListener extends AbstractVanishListener {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         if (event.getValue())
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
-        else if (getShowablePredicate().test(player))
+        else if (showable.test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
     }
 }

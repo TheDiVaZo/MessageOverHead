@@ -94,7 +94,9 @@ public class IntegrationManager {
         if (isEssentialsX()) managerSet.add(new EssentialsXVanishManager());
         if (isCMI()) managerSet.add(new CMIVanishManager());
         if (isSuperVanish()) managerSet.add(new SuperVanishManager());
-        managerSet.add(new DefaultVanishManager());
+        managerSet.add(new PotionVanishManager());
+        managerSet.add(new GameModeVanishManager());
+        managerSet.add(new BubbleActiveStatusVanishManager());
         return managerSet;
     }
 }

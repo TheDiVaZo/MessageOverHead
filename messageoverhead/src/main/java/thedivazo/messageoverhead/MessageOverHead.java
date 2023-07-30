@@ -1,6 +1,14 @@
 package thedivazo.messageoverhead;
 
+import co.aikar.commands.BukkitCommandExecutionContext;
+import co.aikar.commands.CommandContexts;
 import lombok.Getter;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import thedivazo.messageoverhead.bubble.BubbleGenerator;
+import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
+import thedivazo.messageoverhead.bubble.BubbleManager;
+import thedivazo.messageoverhead.command.AdminCommands;
 import thedivazo.messageoverhead.command.DefaultCommands;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 import thedivazo.messageoverhead.logging.Logger;
@@ -120,7 +128,17 @@ public class MessageOverHead extends JavaPlugin {
     private void registerCommands() {
         PaperCommandManager manager = new PaperCommandManager(this);
 
+        CommandContexts<BukkitCommandExecutionContext> commandContexts = manager.getCommandContexts();
+
+        commandContexts.registerContext(BubbleGenerator.class, command -> {
+            String generatorName = command.popFirstArg();
+            BubbleGeneratorManager bubbleGeneratorManager = MessageOverHead.getConfigManager().getBubbleManager().getBubbleGeneratorManager();
+            return bubbleGeneratorManager.getBubbleGenerator(generatorName)
+                    .orElseThrow(() -> new IllegalArgumentException("Bubble Model not found. Please check the correctness of the data"));
+        });
+
         manager.registerCommand(new DefaultCommands());
+        manager.registerCommand(new AdminCommands());
 
         manager.setDefaultExceptionHandler((command, registeredCommand, sender, args, t)-> {
             getLogger().warning("Error occurred while executing command "+command.getName());

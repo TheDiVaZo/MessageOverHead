@@ -1,14 +1,13 @@
 package thedivazo.messageoverhead.vanish;
 
-import com.Zrips.CMI.CMI;
 import lombok.EqualsAndHashCode;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 @EqualsAndHashCode(callSuper = false)
-public class CMIVanishManager implements VanishManager {
-
+public class PotionVanishManager implements VanishManager{
     @Override
     public boolean isInvisible(Player viewer) {
-        return !CMI.getInstance().getPlayerManager().getUser(viewer).isVanished();
+        return viewer.hasPotionEffect(PotionEffectType.INVISIBILITY);
     }
 }

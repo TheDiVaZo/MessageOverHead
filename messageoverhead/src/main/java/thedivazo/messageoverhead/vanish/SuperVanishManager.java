@@ -1,7 +1,6 @@
 package thedivazo.messageoverhead.vanish;
 
 import de.myzelyam.api.vanish.VanishAPI;
-import de.myzelyam.supervanish.SuperVanish;
 import lombok.EqualsAndHashCode;
 import org.bukkit.entity.Player;
 @EqualsAndHashCode(callSuper = false)
