@@ -1,9 +1,9 @@
-package thedivazo.messageoverhead.utils.text.element;
+package thedivazo.messageoverhead.util.text;
 
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
-import thedivazo.messageoverhead.utils.text.customize.TextColor;
-import thedivazo.messageoverhead.utils.text.customize.TextFormatting;
+import thedivazo.messageoverhead.util.text.decor.TextColor;
+import thedivazo.messageoverhead.util.text.decor.TextFormat;
 
 import java.util.Set;
 
@@ -19,8 +19,8 @@ public class Chunk implements CharSequence {
     @Builder.Default
     private final TextColor color = TextColor.WHITE;
 
-    @Singular("format")
-    private final Set<TextFormatting> textFormatting;
+    @Singular
+    private final Set<TextFormat> textFormats;
 
 
     @Override
@@ -36,15 +36,15 @@ public class Chunk implements CharSequence {
     @NotNull
     @Override
     public CharSequence subSequence(int start, int end) {
-        return new Chunk(text.substring(start, end), color, textFormatting);
+        return new Chunk(text.substring(start, end), color, textFormats);
     }
 
     public boolean equalsDecorate(Chunk chunk) {
-        return textFormatting.equals(chunk.textFormatting) && color.equals(chunk.color);
+        return textFormats.equals(chunk.textFormats) && color.equals(chunk.color);
     }
 
     public boolean equalsDecorate(DecoratedChar chunk) {
-        return textFormatting.equals(chunk.getTextFormatting()) && color.equals(chunk.getColor());
+        return textFormats.equals(chunk.getTextFormat()) && color.equals(chunk.getColor());
     }
 
     public int indexOf(int ch) {

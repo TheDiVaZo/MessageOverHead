@@ -1,5 +1,6 @@
 package thedivazo.messageoverhead.config;
 
+import lombok.Getter;
 import thedivazo.messageoverhead.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.bukkit.Particle;
@@ -9,17 +10,24 @@ import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
 import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.channel.ChannelFactory;
-import thedivazo.messageoverhead.utils.text.DecoratedString;
-import thedivazo.messageoverhead.utils.ConfigWrapper;
+import thedivazo.messageoverhead.util.text.DecoratedString;
+import thedivazo.messageoverhead.util.ConfigWrapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public class ConfigManager {
+    @Getter
     private boolean experimental_1_20 = false;
 
     LinkedHashSet<BubbleModel> bubbleModelSetInConfig = new LinkedHashSet<>();
+
+    Map<String, CommandMessage> commandMessageMap = new HashMap<>();
+
+    public Map<String, CommandMessage> getCommandMessageMap() {
+        return Collections.unmodifiableMap(commandMessageMap);
+    }
 
     BubbleManager bubbleManagerInConfig;
 
@@ -113,7 +121,20 @@ public class ConfigManager {
         Logger.info("Settings loading...");
         ConfigWrapper settings = currentConfig.getRequiredConfigurationSection("settings");
         experimental_1_20 = settings.getBoolean("1_20_experimental", false);
+        loadCommandMessage(settings);
         Logger.info("Setting loaded");
+    }
+
+    private void loadCommandMessage(ConfigWrapper settings) throws InvalidConfigurationException {
+        Logger.info("Command message loading...");
+        commandMessageMap.clear();
+        ConfigWrapper commandMessages = settings.getRequiredConfigurationSection("messages.command");
+        for (String name : commandMessages.getKeys(false)) {
+            DecoratedString access = DecoratedString.valueOf(commandMessages.getString("access", ""));
+            CommandMessage commandMessage = new CommandMessage(access);
+            commandMessageMap.put(name, commandMessage);
+        }
+        Logger.info("Command message loaded");
     }
 
     private BubbleManager generateBubbleManager() {

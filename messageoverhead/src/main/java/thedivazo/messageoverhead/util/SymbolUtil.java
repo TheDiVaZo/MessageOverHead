@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.utils;
+package thedivazo.messageoverhead.util;
 
 import java.util.*;
 import java.util.regex.Matcher;

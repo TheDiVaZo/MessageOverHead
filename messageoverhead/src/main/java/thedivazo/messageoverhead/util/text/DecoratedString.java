@@ -1,13 +1,10 @@
-package thedivazo.messageoverhead.utils.text;
+package thedivazo.messageoverhead.util.text;
 
 import lombok.*;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.jetbrains.annotations.NotNull;
-import thedivazo.messageoverhead.utils.text.element.Chunk;
-import thedivazo.messageoverhead.utils.text.customize.TextColor;
-import thedivazo.messageoverhead.utils.text.customize.TextFormatting;
-import thedivazo.messageoverhead.utils.text.customize.TextOperator;
-import thedivazo.messageoverhead.utils.text.element.DecoratedChar;
+import thedivazo.messageoverhead.util.text.decor.TextColor;
+import thedivazo.messageoverhead.util.text.decor.TextFormat;
 
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -17,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"minecraftColoredString"})
 public class DecoratedString implements CharSequence {
 
     private final List<Chunk> chunks;
@@ -50,22 +47,21 @@ public class DecoratedString implements CharSequence {
             Chunk chunk = chunkListIterator.next();
             if(!Objects.isNull(previousChunk)) {
                 Chunk finalPreviousChunk = previousChunk;
-                if(new HashSet<>(chunk.getTextFormatting()).containsAll(previousChunk.getTextFormatting())) {
-                    List<TextFormatting> uniqueTextFormatting = Stream.concat(chunk.getTextFormatting().stream(), previousChunk.getTextFormatting().stream())
+                if(chunk.getTextFormats().containsAll(previousChunk.getTextFormats())) {
+                    List<TextFormat> uniqueTextFormat = Stream.concat(chunk.getTextFormats().stream(), previousChunk.getTextFormats().stream())
                             .distinct()
-                            .filter(f -> !chunk.getTextFormatting().contains(f) || !finalPreviousChunk.getTextFormatting().contains(f))
+                            .filter(f -> !chunk.getTextFormats().contains(f) || !finalPreviousChunk.getTextFormats().contains(f))
                             .collect(Collectors.toList());
-                    chunkString.append(uniqueTextFormatting.stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
+                    chunkString.append(uniqueTextFormat.stream().map(TextFormat::getStringDecorator).collect(Collectors.joining("")));
                 }
                 else {
-                    chunkString.append(TextOperator.RESET.getStringDecorator()).append(chunk.getTextFormatting().stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
+                    chunkString.append(TextFormat.RESET.getStringDecorator()).append(chunk.getTextFormats().stream().map(TextFormat::getStringDecorator).collect(Collectors.joining("")));
                 }
                 if (!chunk.getColor().equals(previousChunk.getColor())) chunkString.append(chunk.getColor().getStringDecorator());
             }
             else {
                 chunkString.append(chunk.getColor().getStringDecorator());
-                chunkString.append(chunk.getTextFormatting().stream().map(TextFormatting::getStringDecorator).collect(Collectors.joining("")));
-
+                chunkString.append(chunk.getTextFormats().stream().map(TextFormat::getStringDecorator).collect(Collectors.joining("")));
             }
             chunkString.append(chunk.getText());
             result.append(chunkString);
@@ -112,33 +108,17 @@ public class DecoratedString implements CharSequence {
     }
 
     public static DecoratedString valueOf(String minecraftColoredString) {
-        char colorChar = '&';
+        Matcher colorMatcher = TextColor.getPattern().matcher(minecraftColoredString);
+        Matcher formatMatcher = TextFormat.getPattern().matcher(minecraftColoredString);
 
-        Matcher colorHexMatcher = TextColor.getColorHexPattern(colorChar).matcher(minecraftColoredString);
-        Matcher colorDepMatcher = TextColor.getColorDepPattern(colorChar).matcher(minecraftColoredString);
+        List<TypeMatchResult> matchResults = Stream.concat(
+                colorMatcher.results().map(matchResult -> new TypeMatchResult(matchResult, Type.COLOR)),
+                formatMatcher.results().map(matchResult -> new TypeMatchResult(matchResult, Type.FORMAT))
+        ).sorted(Comparator.comparingInt(TypeMatchResult::start)).collect(Collectors.toList());
 
-        Matcher formatMatcher = TextFormatting.getFormatPattern(colorChar).matcher(minecraftColoredString);
-
-        Matcher operatorMatcher = TextOperator.getOperatorPattern(colorChar).matcher(minecraftColoredString);
-
-        List<TypeMatchResult> matchResults = new ArrayList<>();
-
-        while (true) {
-            if (colorHexMatcher.find())
-                matchResults.add(new TypeMatchResult(colorHexMatcher.toMatchResult(), Type.COLOR));
-            else if (colorDepMatcher.find())
-                matchResults.add(new TypeMatchResult(colorDepMatcher.toMatchResult(), Type.COLOR));
-            else if (formatMatcher.find())
-                matchResults.add(new TypeMatchResult(formatMatcher.toMatchResult(), Type.FORMAT));
-            else if (operatorMatcher.find())
-                matchResults.add(new TypeMatchResult(operatorMatcher.toMatchResult(), Type.OPERATOR));
-            else break;
-        }
-        matchResults.sort(Comparator.comparingInt(TypeMatchResult::start));
 
         List<Chunk> newChunks = new ArrayList<>();
-
-        Set<TextFormatting> prevTextFormatting = new HashSet<>();
+        Set<TextFormat> prevTextFormat = new HashSet<>();
         TextColor prevTextColor = TextColor.WHITE;
         int prevStart = 0;
 
@@ -146,34 +126,29 @@ public class DecoratedString implements CharSequence {
             Type type = matchResult.type;
             if(matchResult.start() != prevStart) {
                 newChunks.add(Chunk.builder()
-                        .setTextFormatting(prevTextFormatting)
+                        .setTextFormats(prevTextFormat)
                         .setColor(prevTextColor)
                         .setText(minecraftColoredString.substring(prevStart, matchResult.start()))
                         .build());
             }
-            switch (type) {
-                case COLOR: {
-                    prevStart = matchResult.end();
-                    prevTextColor = TextColor.of(matchResult.group(1));
-                    break;
-                }
-                case FORMAT: {
-                    prevStart = matchResult.end();
-                    prevTextFormatting.add(TextFormatting.of(matchResult.group(1)));
-                    break;
-                }
-                case OPERATOR: {
-                    prevTextFormatting.clear();
+            if (type == Type.COLOR) {
+                prevStart = matchResult.end();
+                prevTextColor = TextColor.of(matchResult.group());
+            } else if (type == Type.FORMAT) {
+                TextFormat format = TextFormat.of(matchResult.group());
+                if (format.equals(TextFormat.RESET)) {
+                    prevTextFormat.clear();
                     prevTextColor = TextColor.WHITE;
-                    prevStart = matchResult.end();
-                    break;
+                } else {
+                    prevTextFormat.add(format);
                 }
+                prevStart = matchResult.end();
             }
         }
 
         if (prevStart < minecraftColoredString.length()) newChunks.add(Chunk.builder()
                 .setColor(prevTextColor)
-                .setTextFormatting(prevTextFormatting)
+                .setTextFormats(prevTextFormat)
                 .setText(minecraftColoredString.substring(prevStart))
                 .build());
         return new DecoratedString(newChunks);
@@ -182,8 +157,7 @@ public class DecoratedString implements CharSequence {
     @ToString
     enum Type {
         COLOR,
-        FORMAT,
-        OPERATOR,
+        FORMAT
     }
 
     @ToString
@@ -439,7 +413,7 @@ public class DecoratedString implements CharSequence {
             MatchResult matchResult = matcher.toMatchResult();
             if (lastIndex != matchResult.start())
                 result.add(chunk.toBuilder().setText(chunk.getText().substring(lastIndex, matchResult.start())).build());
-            result.add(Chunk.builder().setText(String.valueOf(newChar.getCharWrapped())).setColor(newChar.getColor()).setTextFormatting(newChar.getTextFormatting()).build());
+            result.add(Chunk.builder().setText(String.valueOf(newChar.getCharWrapped())).setColor(newChar.getColor()).setTextFormats(newChar.getTextFormat()).build());
             lastIndex = matchResult.end();
         }
         if (lastIndex != chunk.getText().length() - 1)

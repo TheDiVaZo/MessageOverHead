@@ -1,6 +1,5 @@
 package thedivazo.messageoverhead.bubble;
 
-import com.comphenix.protocol.PacketType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -9,9 +8,8 @@ import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.api.event.BubbleSendEvent;
 import thedivazo.messageoverhead.config.BubbleModel;
 import thedivazo.messageoverhead.channel.Channel;
-import thedivazo.messageoverhead.channel.Type;
-import thedivazo.messageoverhead.utils.text.DecoratedString;
-import thedivazo.messageoverhead.utils.text.DecoratedStringUtils;
+import thedivazo.messageoverhead.util.text.DecoratedString;
+import thedivazo.messageoverhead.util.text.DecoratedStringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +66,6 @@ public class BubbleGenerator {
     }
 
     public boolean isChannel(Channel channel) {
-        return bubbleModel.getChannels().stream().anyMatch(otherChannel->otherChannel.getType().equals(Type.ALL) || otherChannel.equals(channel));
+        return bubbleModel.getChannels().stream().anyMatch(channel::compatibilityChannel);
     }
 }

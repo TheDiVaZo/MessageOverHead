@@ -1,9 +1,6 @@
-package thedivazo.messageoverhead.utils.text;
+package thedivazo.messageoverhead.util.text;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class DecoratedStringUtilsTest {
 

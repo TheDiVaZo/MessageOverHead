@@ -1,11 +1,10 @@
-package thedivazo.messageoverhead.utils.text;
+package thedivazo.messageoverhead.util.text;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import thedivazo.messageoverhead.utils.text.element.Chunk;
 
 import java.util.ArrayList;
 import java.util.List;

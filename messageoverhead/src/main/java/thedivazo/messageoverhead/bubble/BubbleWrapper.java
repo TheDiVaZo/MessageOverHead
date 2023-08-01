@@ -5,8 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import thedivazo.messageoverhead.config.BubbleModel;
-import thedivazo.messageoverhead.utils.text.DecoratedString;
+import thedivazo.messageoverhead.util.text.DecoratedString;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

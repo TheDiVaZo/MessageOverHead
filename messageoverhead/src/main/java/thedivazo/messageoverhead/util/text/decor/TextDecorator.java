@@ -1,8 +1,9 @@
-package thedivazo.messageoverhead.utils.text.customize;
+package thedivazo.messageoverhead.util.text.decor;
 
-import lombok.EqualsAndHashCode;
 import net.md_5.bungee.api.ChatColor;
 
 public interface TextDecorator {
+    ChatColor getChatColor();
+
     String getStringDecorator();
 }

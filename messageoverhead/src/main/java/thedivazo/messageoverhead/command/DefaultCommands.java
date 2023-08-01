@@ -23,6 +23,7 @@ public class DefaultCommands extends BaseCommand {
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         if (BubbleManager.getVisiblePredicate().test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
+        MessageOverHead.getConfigManager().getCommandMessageMap().get("enable").getAccess().ifPresent(player::sendMessage);
     }
 
     @Subcommand("disable")
@@ -31,11 +32,13 @@ public class DefaultCommands extends BaseCommand {
         BubbleActiveStatus.setStatus(player, BubbleActiveStatus.Status.DISABLED);
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
         bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
+        MessageOverHead.getConfigManager().getCommandMessageMap().get("disable").getAccess().ifPresent(player::sendMessage);
     }
 
     @Subcommand("send")
     @CommandPermission("moh.command.send")
     public static void onSend(Player player, String message) {
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("all"), player, new HashSet<>(Bukkit.getOnlinePlayers()));
+        MessageOverHead.getConfigManager().getCommandMessageMap().get("send").getAccess().ifPresent(player::sendMessage);
     }
 }

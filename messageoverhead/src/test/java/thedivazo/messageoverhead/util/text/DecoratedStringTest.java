@@ -1,12 +1,8 @@
-package thedivazo.messageoverhead.utils.text;
+package thedivazo.messageoverhead.util.text;
 
-import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Test;
-import thedivazo.messageoverhead.logging.Logger;
-import thedivazo.messageoverhead.logging.handlers.JULHandler;
-import thedivazo.messageoverhead.utils.text.element.Chunk;
-import thedivazo.messageoverhead.utils.text.customize.TextColor;
-import thedivazo.messageoverhead.utils.text.customize.TextFormatting;
+import thedivazo.messageoverhead.util.text.decor.TextColor;
+import thedivazo.messageoverhead.util.text.decor.TextFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,13 +17,13 @@ class DecoratedStringTest {
                         .setText("Hello everyone, ")
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#55FFFF"))
+                        .setColor(TextColor.AQUA)
                         .setText("my name is ")
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.YELLOW)
                         .setText("TheDiVaZo")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .build();
         assertEquals(result, decoratedString);
@@ -42,13 +38,13 @@ class DecoratedStringTest {
                         .setText("Hello everyone, ")
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#55FFFF"))
+                        .setColor(TextColor.AQUA)
                         .setText("my name is ")
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.YELLOW)
                         .setText("TheDiVaZo")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .build();
         assertEquals(result, decoratedString);
@@ -63,13 +59,13 @@ class DecoratedStringTest {
                         .setText("Hello everyone, ")
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#55FFFF"))
+                        .setColor(TextColor.AQUA)
                         .setText("my name is ")
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.YELLOW)
                         .setText("TheDiVaZo")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .build();
         assertEquals(result, decoratedString);
@@ -84,22 +80,23 @@ class DecoratedStringTest {
                         .setText("Hello everyone, ")
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#55FFFF"))
+                        .setColor(TextColor.AQUA)
                         .setText("my ")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.RED)
                         .setText("name is ")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.YELLOW)
                         .setText("TheDiVaZo")
-                        .setFormat(TextFormatting.BOLD)
-                        .setFormat(TextFormatting.UNDERLINE)
+                        .setTextFormat(TextFormat.BOLD)
+                        .setTextFormat(TextFormat.UNDERLINE)
                         .build())
                 .build();
+        System.out.println(result.equals(decoratedString));
         assertEquals(result, decoratedString);
     }
 
@@ -112,26 +109,32 @@ class DecoratedStringTest {
                         .setText("Hello everyone, ")
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#55FFFF"))
+                        .setColor(TextColor.AQUA)
                         .setText("my ")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.RED)
                         .setText("name is ")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.YELLOW)
                         .setText("TheDiVaZo")
-                        .setFormat(TextFormatting.BOLD)
-                        .setFormat(TextFormatting.UNDERLINE)
-                        .setFormat(TextFormatting.MAGIC)
-                        .setFormat(TextFormatting.ITALIC)
-                        .setFormat(TextFormatting.UNDERLINE)
-                        .setFormat(TextFormatting.STRIKETHROUGH)
+                        .setTextFormat(TextFormat.BOLD)
+                        .setTextFormat(TextFormat.UNDERLINE)
+                        .setTextFormat(TextFormat.MAGIC)
+                        .setTextFormat(TextFormat.ITALIC)
+                        .setTextFormat(TextFormat.STRIKETHROUGH)
                         .build())
                 .build();
+        decoratedString.toChunksList().forEach(System.out::println);
+        System.out.println(decoratedString.getNoColorString());
+        System.out.println("----------");
+        result.toChunksList().forEach(System.out::println);
+        System.out.println(result.getNoColorString());
+        System.out.println(decoratedString.getNoColorString().equals(result.getNoColorString()));
+        System.out.println(decoratedString.toChunksList().equals(result.toChunksList()));
         assertEquals(result, decoratedString);
     }
 
@@ -140,23 +143,23 @@ class DecoratedStringTest {
         DecoratedString decoratedString = DecoratedString.valueOf("&#1a2b3cHello everyone, &#abcdef&lmy &cname is &#123456TheDiVaZo");
         DecoratedString expected = DecoratedString.builder()
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#1a2b3c"))
+                        .setColor(TextColor.of("&#1a2b3c"))
                         .setText("Hello everyone, ")
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#abcdef"))
+                        .setColor(TextColor.of("&#abcdef"))
                         .setText("my ")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .chunk(Chunk.builder()
                         .setColor(TextColor.RED)
                         .setText("name is ")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#123456"))
+                        .setColor(TextColor.of("&#123456"))
                         .setText("TheDiVaZo")
-                        .setFormat(TextFormatting.BOLD)
+                        .setTextFormat(TextFormat.BOLD)
                         .build())
                 .build();
         assertEquals(expected, decoratedString);
@@ -186,7 +189,7 @@ class DecoratedStringTest {
                 .build();
         DecoratedString expectedSub3 = DecoratedString.builder()
                 .chunk(Chunk.builder()
-                        .setColor(TextColor.of("#55ffff"))
+                        .setColor(TextColor.AQUA)
                         .setText("love programming")
                         .build())
                 .build();

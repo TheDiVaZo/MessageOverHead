@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.utils;
+package thedivazo.messageoverhead.util;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

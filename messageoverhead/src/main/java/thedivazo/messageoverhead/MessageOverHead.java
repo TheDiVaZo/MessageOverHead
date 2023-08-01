@@ -3,11 +3,8 @@ package thedivazo.messageoverhead;
 import co.aikar.commands.BukkitCommandExecutionContext;
 import co.aikar.commands.CommandContexts;
 import lombok.Getter;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
-import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.command.AdminCommands;
 import thedivazo.messageoverhead.command.DefaultCommands;
 import thedivazo.messageoverhead.integration.IntegrationManager;
@@ -25,19 +22,15 @@ import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import org.bukkit.scheduler.BukkitRunnable;
 import thedivazo.messageoverhead.config.ConfigManager;
-import thedivazo.messageoverhead.listener.chat.DefaultChatListener;
-import thedivazo.messageoverhead.utils.VersionWrapper;
-import thedivazo.messageoverhead.vanish.VanishManager;
+import thedivazo.messageoverhead.util.VersionWrapper;
 import thedivazo.messageoverhead.metrics.MetricsManager;
-import thedivazo.messageoverhead.utils.ConfigWrapper;
+import thedivazo.messageoverhead.util.ConfigWrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 @Plugin(name = MessageOverHead.NAME, version = "4.0.0")

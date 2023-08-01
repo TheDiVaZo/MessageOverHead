@@ -1,4 +1,4 @@
-package thedivazo.messageoverhead.utils;
+package thedivazo.messageoverhead.util;
 
 import io.th0rgal.oraxen.shaded.jetbrains.annotations.NotNull;
 import org.bukkit.configuration.ConfigurationSection;

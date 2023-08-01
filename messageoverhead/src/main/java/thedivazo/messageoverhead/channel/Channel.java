@@ -1,18 +1,22 @@
 package thedivazo.messageoverhead.channel;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
-
-@Builder
-@EqualsAndHashCode
-@AllArgsConstructor
-@Getter
-public class Channel {
-    private @Nullable String name;
-    private Type type;
+import thedivazo.messageoverhead.channel.special.SpecialChannel;
+import thedivazo.messageoverhead.channel.special.TypeSpecialChannel;
 
 
+public abstract class Channel {
+
+    @Getter
+    protected String name;
+
+    protected Channel(String name) {
+        this.name = name;
+    }
+
+    public boolean compatibilityChannel(Channel channel) {
+        return channel instanceof SpecialChannel && ((SpecialChannel) channel).getTypeSpecialChannelChannel().equals(TypeSpecialChannel.ALL) || additionalEquals(channel);
+    }
+
+    protected abstract boolean additionalEquals(Channel channel);
 }

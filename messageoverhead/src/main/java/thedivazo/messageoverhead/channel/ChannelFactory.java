@@ -1,19 +1,21 @@
 package thedivazo.messageoverhead.channel;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import thedivazo.messageoverhead.channel.special.SpecialChannel;
+import thedivazo.messageoverhead.channel.special.TypeSpecialChannel;
 
+import java.util.Map;
+
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChannelFactory {
-    private static Pattern pattern = Pattern.compile("#(.+)");
+
+    private static final Map<String, TypeSpecialChannel> nameMap = Map.of(
+            "#private", TypeSpecialChannel.PRIVATE,
+            "#command", TypeSpecialChannel.COMMAND,
+            "#all", TypeSpecialChannel.ALL);
 
     public static Channel create(String name) {
-        Matcher matcher = pattern.matcher(name);
-        if (matcher.matches()) return new Channel(matcher.group(), Type.CUSTOM_CHANNEL);
-        switch (name.toLowerCase()) {
-            case "all": return new Channel(null, Type.ALL);
-            case "private": return new Channel(null, Type.PRIVATE);
-            case "command": return new Channel(null, Type.COMMAND);
-            default: throw new IllegalArgumentException("The channel name '"+name+"' is incorrect.");
-        }
+        return nameMap.containsKey(name) ? SpecialChannel.getSpecialChannel(nameMap.get(name)) : new CustomChannel(name);
     }
 }

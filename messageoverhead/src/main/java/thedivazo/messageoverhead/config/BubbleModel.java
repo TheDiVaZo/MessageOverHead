@@ -6,7 +6,7 @@ import lombok.*;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import thedivazo.messageoverhead.channel.Channel;
-import thedivazo.messageoverhead.utils.text.DecoratedString;
+import thedivazo.messageoverhead.util.text.DecoratedString;
 
 import java.util.List;
 

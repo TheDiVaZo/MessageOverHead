@@ -10,13 +10,11 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import lombok.Data;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.MessageOverHead;
-import thedivazo.messageoverhead.utils.VersionWrapper;
-import thedivazo.messageoverhead.utils.text.DecoratedString;
+import thedivazo.messageoverhead.util.VersionWrapper;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;

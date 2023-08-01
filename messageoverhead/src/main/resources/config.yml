@@ -6,7 +6,16 @@ version: 1.4 #DONT TOUCH!
 
 settings: #plugin settings
   1_20_experimental: false #enable experimental possibilities from 1.20
-
+  messages:
+    command:
+      enable:
+        access: ""
+      disable:
+        access: ""
+      send:
+        access: ""
+      create:
+        access: ""
 #The priority of a bubble model is determined by its position in the config. The higher, the more priority the model.
 models:
   test-model-bubble: #Some message configuration
