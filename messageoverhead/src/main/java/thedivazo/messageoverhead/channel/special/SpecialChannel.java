@@ -8,6 +8,7 @@ import thedivazo.messageoverhead.channel.Channel;
 public class SpecialChannel extends Channel {
     private static final SpecialChannel CommandChannel = new SpecialChannel(TypeSpecialChannel.COMMAND);
     private static final SpecialChannel PrivateChannel = new SpecialChannel(TypeSpecialChannel.PRIVATE);
+    private static final SpecialChannel SpyChannel = new SpecialChannel(TypeSpecialChannel.SPY);
     private static final SpecialChannel AllChannel = new SpecialChannel(TypeSpecialChannel.ALL);
 
     @Getter
@@ -28,6 +29,7 @@ public class SpecialChannel extends Channel {
             case ALL: return AllChannel;
             case COMMAND: return CommandChannel;
             case PRIVATE: return PrivateChannel;
+            case SPY: return PrivateChannel;
             default: return new SpecialChannel(typeSpecialChannel);
         }
     }

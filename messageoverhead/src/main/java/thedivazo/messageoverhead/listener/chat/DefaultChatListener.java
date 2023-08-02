@@ -27,7 +27,7 @@ public class DefaultChatListener implements Listener {
         String message = chatEvent.getMessage();
         Player sender = chatEvent.getPlayer();
         Set<Player> recipients = chatEvent.getRecipients();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("all"), sender, recipients);
+        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("global"), sender, recipients);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -37,6 +37,6 @@ public class DefaultChatListener implements Listener {
         Player player = Bukkit.getPlayer(matcher.group(2));
         String message = matcher.group(3);
         if(Objects.isNull(player)) return;
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("private"), event.getPlayer(), Set.of(player));
+        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), event.getPlayer(), Set.of(player));
     }
 }

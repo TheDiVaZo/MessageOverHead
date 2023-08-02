@@ -87,6 +87,11 @@ public class MessageOverHead extends JavaPlugin {
     public void onEnable() {
         Logger.init(new JULHandler(getLogger()));
         Logger.info("Starting...");
+        if (!IntegrationManager.isProtocolLib()) {
+            Logger.error("Download ProtocolLib!");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         saveDefaultConfig();
         try {
@@ -151,6 +156,9 @@ public class MessageOverHead extends JavaPlugin {
         configManager.loadConfig(new ConfigWrapper(MessageOverHead.getInstance().getConfig()));
     }
 
-
+    @Override
+    public void onDisable() {
+        configManager.getBubbleManager().removeAllBubbles();
+    }
 }
 

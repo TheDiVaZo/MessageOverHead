@@ -29,7 +29,7 @@ public class ConfigManager {
         return Collections.unmodifiableMap(commandMessageMap);
     }
 
-    BubbleManager bubbleManagerInConfig;
+    BubbleManager bubbleManagerInConfig = new BubbleManager(new BubbleGeneratorManager(new HashSet<>()));
 
     public Set<BubbleModel> getBubbleModelSet() {
         return Collections.unmodifiableSet(bubbleModelSetInConfig);

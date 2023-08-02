@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import thedivazo.messageoverhead.integration.IntegrationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class DecoratedStringUtils {
     }
 
     public static DecoratedString insertPlaceholders(DecoratedString text, OfflinePlayer player) {
-        if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) return text;
+        if (IntegrationManager.isPlaceholderAPI()) return text;
         return DecoratedString.builder().chunks(text.toChunksList().stream().map(chunk -> chunk.toBuilder().setText(PlaceholderAPI.setPlaceholders(player,chunk.getText())).build()).collect(Collectors.toList())).build();
     }
 

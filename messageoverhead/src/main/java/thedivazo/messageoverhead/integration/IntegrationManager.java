@@ -73,6 +73,7 @@ public class IntegrationManager {
         if (isChatControlRed()) listenerSet.add(new ChatControlRedListener());
         if (isChatty()) listenerSet.add(new ChattyListener());
         if (isVentureChat()) listenerSet.add(new VentureChatListener());
+        if (isEssentialsX()) listenerSet.add(new EssentialsXChatListener());
         if (listenerSet.isEmpty())
             listenerSet.add(new DefaultChatListener());
         return listenerSet;

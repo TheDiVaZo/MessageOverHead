@@ -23,7 +23,7 @@ public class AdminCommands extends BaseCommand {
     @CommandPermission("amoh.command.create")
     public static void onCreate(Player player, BubbleGenerator bubbleGenerator, String message) {
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, bubbleGenerator, player, new HashSet<>(Bukkit.getOnlinePlayers()));
-        MessageOverHead.getConfigManager().getCommandMessageMap().get("create").getAccess().ifPresent(player::sendMessage);
+        MessageOverHead.getConfigManager().getCommandMessageMap().get("create").getAccess(player).ifPresent(player::sendMessage);
     }
 
     @Subcommand("reload")
