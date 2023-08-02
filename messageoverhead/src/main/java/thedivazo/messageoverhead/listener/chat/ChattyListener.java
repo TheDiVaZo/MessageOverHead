@@ -13,7 +13,7 @@ import thedivazo.messageoverhead.channel.ChannelFactory;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = false)
-public class ChattyListener extends AbstractChatListener {
+public class ChattyListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(ChattyMessageEvent chatEvent) {

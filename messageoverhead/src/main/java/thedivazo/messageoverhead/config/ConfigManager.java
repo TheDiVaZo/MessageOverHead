@@ -40,12 +40,14 @@ public class ConfigManager {
     public void loadConfig(ConfigWrapper currentConfig) throws InvalidConfigurationException {
         Logger.info("Start config loading...");
         this.currentConfig = currentConfig;
-        loadBubbleModel();
+        loadBubbleModels();
         loadSettings();
         Logger.info("Config loaded");
     }
 
-    private void loadBubbleModel() throws InvalidConfigurationException {
+
+
+    private void loadBubbleModels() throws InvalidConfigurationException {
         ConfigWrapper bubbleModels = currentConfig.getRequiredConfigurationSection("models");
         bubbleModelSetInConfig.clear();
         Logger.info("Start models loading...");
@@ -113,6 +115,7 @@ public class ConfigManager {
             Logger.info("Model '"+bubbleModelName+"' loaded");
         }
         Logger.info("Models loaded");
+        if (bubbleManagerInConfig != null) bubbleManagerInConfig.removeAllBubbles();
         bubbleManagerInConfig = generateBubbleManager();
         Logger.info("BubbleManager generated");
     }
@@ -130,7 +133,7 @@ public class ConfigManager {
         commandMessageMap.clear();
         ConfigWrapper commandMessages = settings.getRequiredConfigurationSection("messages.command");
         for (String name : commandMessages.getKeys(false)) {
-            DecoratedString access = DecoratedString.valueOf(commandMessages.getString("access", ""));
+            DecoratedString access = DecoratedString.valueOf(commandMessages.getString(name, ""));
             CommandMessage commandMessage = new CommandMessage(access);
             commandMessageMap.put(name, commandMessage);
         }
@@ -138,7 +141,7 @@ public class ConfigManager {
     }
 
     private BubbleManager generateBubbleManager() {
-        Set<BubbleGenerator> bubbleGeneratorSet = getBubbleModelSet().stream().map(BubbleGenerator::new).collect(Collectors.toSet());
+        LinkedHashSet<BubbleGenerator> bubbleGeneratorSet = getBubbleModelSet().stream().map(BubbleGenerator::new).collect(Collectors.toCollection(LinkedHashSet::new));
         return new BubbleManager(new BubbleGeneratorManager(bubbleGeneratorSet));
     }
 

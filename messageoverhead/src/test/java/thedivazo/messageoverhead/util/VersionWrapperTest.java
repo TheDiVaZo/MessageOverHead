@@ -58,25 +58,4 @@ class VersionWrapperTest {
         assertTrue(MC_1_12_1.equalsMajor(MC_1_16));
         assertTrue(MC_1_13.equalsMajor(MC_1_14_3));
     }
-
-    @Test
-    void fff() {
-        assertEquals(Chunk.builder()
-                .setColor(TextColor.YELLOW)
-                .setText("TheDiVaZo")
-                .setTextFormat(TextFormat.MAGIC)
-                .setTextFormat(TextFormat.BOLD)
-                .setTextFormat(TextFormat.STRIKETHROUGH)
-                .setTextFormat(TextFormat.UNDERLINE)
-                .setTextFormat(TextFormat.ITALIC)
-                .build(), Chunk.builder()
-                .setColor(TextColor.YELLOW)
-                .setText("TheDiVaZo")
-                .setTextFormat(TextFormat.BOLD)
-                .setTextFormat(TextFormat.UNDERLINE)
-                .setTextFormat(TextFormat.MAGIC)
-                .setTextFormat(TextFormat.ITALIC)
-                .setTextFormat(TextFormat.STRIKETHROUGH)
-                .build());
-    }
 }

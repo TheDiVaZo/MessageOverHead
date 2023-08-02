@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @EqualsAndHashCode(callSuper = false)
-public class DefaultChatListener extends AbstractChatListener {
+public class DefaultChatListener implements Listener {
 
     Pattern privateCommandPattern = Pattern.compile("^/(w|tell|msg) (\\S+) (.+)");
 

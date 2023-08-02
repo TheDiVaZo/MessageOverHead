@@ -30,7 +30,7 @@ public class BubbleGenerator {
         return allFormatMessage.get(allFormatMessage.size()-1).getLines();
     }
 
-    private List<DecoratedString> processText(DecoratedString playerText, Player player) {
+    private List<DecoratedString> processText(String playerText, Player player) {
         List<DecoratedString> format = getPlayerFormat(player);
         List<DecoratedString> result = new ArrayList<>();
         for (DecoratedString line : format) {
@@ -41,12 +41,12 @@ public class BubbleGenerator {
         return result;
     }
 
-    private BubbleWrapper generateBubble(DecoratedString playerText, Player ownerBubble) {
+    private BubbleWrapper generateBubble(String playerText, Player ownerBubble) {
         return new BubbleWrapper(ownerBubble.getLocation(), processText(playerText, ownerBubble));
     }
 
     public BubbleSpawned spawnBubble(String playerText, Player sender, Set<Player> showers) {
-        BubbleWrapper bubbleWrapper = generateBubble(DecoratedStringUtils.wrapString(playerText), sender);
+        BubbleWrapper bubbleWrapper = generateBubble(playerText, sender);
         BubbleSpawned bubbleSpawned = new BubbleSpawned(bubbleModel, bubbleWrapper, sender, showers);
         callEvent(bubbleSpawned, sender);
         return bubbleSpawned;

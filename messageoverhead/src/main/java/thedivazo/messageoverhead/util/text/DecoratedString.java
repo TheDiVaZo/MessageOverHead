@@ -461,6 +461,10 @@ public class DecoratedString implements CharSequence {
         return new DecoratedString(newChunks);
     }
 
+    public DecoratedString replace(String target, String replacement) {
+        return new DecoratedString(chunks.stream().map(chunk -> chunk.replace(target, replacement)).collect(Collectors.toList()));
+    }
+
     public List<Chunk> toChunksList() {
         return new ArrayList<>(chunks);
     }

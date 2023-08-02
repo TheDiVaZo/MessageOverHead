@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigWrapper {
-    private ConfigurationSection configurationSection;
+    private final ConfigurationSection configurationSection;
 
     public ConfigWrapper(ConfigurationSection configurationSection) {
         this.configurationSection = configurationSection;

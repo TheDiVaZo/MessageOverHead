@@ -30,7 +30,7 @@ public class BubbleSpawned {
     private Set<Player> filterShowers(Player sender, Set<Player> showers) {
         return showers.stream().filter(player ->
                 sender.getWorld().equals(player.getWorld())
-                && getLocationPlusBiasY(sender).distance(player.getLocation()) <= bubbleModel.getDistance()
+                && sender.getLocation().distance(player.getLocation()) <= bubbleModel.getDistance()
                 ).collect(Collectors.toSet());
     }
     

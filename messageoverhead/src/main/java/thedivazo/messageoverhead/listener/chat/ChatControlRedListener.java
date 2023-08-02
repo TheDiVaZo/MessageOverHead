@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = false)
-public class ChatControlListener extends AbstractChatListener {
+public class ChatControlRedListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(ChatChannelEvent chatEvent) {
@@ -35,6 +35,6 @@ public class ChatControlListener extends AbstractChatListener {
         Player receiver = event.getReceiver();
         if(Objects.isNull(receiver)) return;
         String message = event.getMessage();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("private"), (Player) sender, Set.of(receiver));
+        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), (Player) sender, Set.of(receiver));
     }
 }

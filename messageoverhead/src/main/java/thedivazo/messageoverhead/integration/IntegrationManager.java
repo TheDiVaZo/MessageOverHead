@@ -1,14 +1,12 @@
 package thedivazo.messageoverhead.integration;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import thedivazo.messageoverhead.listener.chat.*;
 import thedivazo.messageoverhead.listener.vanish.*;
+import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.vanish.*;
 
 import java.util.HashMap;
@@ -21,9 +19,8 @@ public class IntegrationManager {
     private static final Map<String, Boolean> cashPluginEnabled = new HashMap<>();
 
     public static boolean isPlugin(String name) {
-        if (cashPluginEnabled.containsKey(name)) return cashPluginEnabled.get(name);
-        boolean pluginEnabled = Bukkit.getPluginManager().isPluginEnabled(name);
-        cashPluginEnabled.put(name, pluginEnabled);
+        boolean pluginEnabled = Bukkit.getPluginManager().getPlugin(name) != null;
+        if (pluginEnabled) Logger.info(name + " plugin has been connect");
         return pluginEnabled;
     }
 
@@ -51,8 +48,8 @@ public class IntegrationManager {
         return isPlugin("Chatty");
     }
 
-    public static boolean isChatControl() {
-        return isPlugin("ChatControl");
+    public static boolean isChatControlRed() {
+        return isPlugin("ChatControlRed");
     }
 
     public static boolean isVentureChat() {
@@ -73,10 +70,11 @@ public class IntegrationManager {
 
     public static Set<Listener> getChatListeners() {
         Set<Listener> listenerSet = new HashSet<>();
-        if (isChatControl()) listenerSet.add(new ChatControlListener());
+        if (isChatControlRed()) listenerSet.add(new ChatControlRedListener());
         if (isChatty()) listenerSet.add(new ChattyListener());
         if (isVentureChat()) listenerSet.add(new VentureChatListener());
-        listenerSet.add(new DefaultChatListener());
+        if (listenerSet.isEmpty())
+            listenerSet.add(new DefaultChatListener());
         return listenerSet;
     }
 

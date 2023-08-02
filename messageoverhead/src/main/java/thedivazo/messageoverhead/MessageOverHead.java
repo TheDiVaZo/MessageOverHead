@@ -92,6 +92,7 @@ public class MessageOverHead extends JavaPlugin {
         try {
             configManager.loadConfig(new ConfigWrapper(getConfig()));
         } catch (InvalidConfigurationException e) {
+            Logger.error("Check the configuration for errors or typos");
             Logger.error(e.getMessage(), e);
             Bukkit.getPluginManager().disablePlugin(MessageOverHead.getInstance());
             return;
@@ -142,6 +143,12 @@ public class MessageOverHead extends JavaPlugin {
     private void registerListeners() {
         IntegrationManager.getChatListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
         IntegrationManager.getVanishListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
+    }
+
+    public static void reloadConfigManager() throws InvalidConfigurationException {
+        MessageOverHead.getInstance().reloadConfig();
+        MessageOverHead.getInstance().saveConfig();
+        configManager.loadConfig(new ConfigWrapper(MessageOverHead.getInstance().getConfig()));
     }
 
 

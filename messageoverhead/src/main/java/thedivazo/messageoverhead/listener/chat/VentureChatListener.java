@@ -14,7 +14,7 @@ import thedivazo.messageoverhead.channel.ChannelFactory;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = false)
-public class VentureChatListener extends AbstractChatListener {
+public class VentureChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(VentureChatEvent eventChat) {

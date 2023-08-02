@@ -8,19 +8,15 @@ settings: #plugin settings
   1_20_experimental: false #enable experimental possibilities from 1.20
   messages:
     command:
-      enable:
-        access: ""
-      disable:
-        access: ""
-      send:
-        access: ""
-      create:
-        access: ""
+      enable: "bubble enabled"
+      disable: "bubble disabled"
+      send: "bubble send"
+      create: "bubble create"
 #The priority of a bubble model is determined by its position in the config. The higher, the more priority the model.
 models:
   test-model-bubble: #Some message configuration
     #channels are used only to adjust the visibility of the message to certain players
-    channel: "#local" #the channel to which the BubbleArmorStand Model belongs. By default, "all". All channels start with the sign "#". Supports custom channels from plugins to chat channels ("#global", "#local", "#custom-channel")
+    channel: "local" #the channel to which the BubbleArmorStand Model belongs. By default, "all". All channels start with the sign "#". Supports custom channels from plugins to chat channels ("#global", "#local", "#custom-channel")
     settings:
       format: '&7{message}'
   test-private-model:
@@ -29,9 +25,9 @@ models:
       format: '&7{message}'
       #There are no other fields specified in this config, so the other fields have a default value.
   test-more-channel-model:
-    channel: ["#global", "#local", "private", "command"] #You can specify multiple channels. private - showing bubble model for private messages. command - showing bubble model for bubble called with the command.
+    channel: ["#all", "#private", "#command", "custom_channel"] #You can specify multiple channels. private - showing bubble model for private messages. command - showing bubble model for bubble called with the command.
   test-all-model: #defaul
-    channel: "all" #When it is "all", then this model will be available for all channels
+    channel: "#all" #When it is "all", then this model will be available for all channels
     permission: "moh.global-message"
     particle:
       enable: true
