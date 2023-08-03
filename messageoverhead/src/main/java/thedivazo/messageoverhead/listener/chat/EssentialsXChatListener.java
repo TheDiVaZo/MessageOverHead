@@ -1,6 +1,5 @@
 package thedivazo.messageoverhead.listener.chat;
 
-import net.ess3.api.events.LocalChatSpyEvent;
 import net.essentialsx.api.v2.events.chat.GlobalChatEvent;
 import net.essentialsx.api.v2.events.chat.LocalChatEvent;
 import org.bukkit.entity.Player;
@@ -10,7 +9,6 @@ import org.bukkit.event.Listener;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.channel.ChannelFactory;
 
-import java.util.Collections;
 import java.util.Set;
 
 public class EssentialsXChatListener implements Listener {
@@ -30,12 +28,12 @@ public class EssentialsXChatListener implements Listener {
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("local"), sender, recipients);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onLocalChatSpy(LocalChatSpyEvent globalChatEvent) {
-        String message = globalChatEvent.getMessage();
-        Set<Player> recipients = globalChatEvent.getRecipients();
-        for (Player recipient : recipients) {
-            MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#spy"), recipient, Collections.emptySet());
-        }
-    }
+//    @EventHandler(priority = EventPriority.LOWEST)
+//    public void onLocalChatSpy(LocalChatSpyEvent globalChatEvent) {
+//        String message = globalChatEvent.getMessage();
+//        Set<Player> recipients = globalChatEvent.getRecipients();
+//        for (Player recipient : recipients) {
+//            MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#spy"), recipient, Collections.emptySet());
+//        }
+//    }
 }

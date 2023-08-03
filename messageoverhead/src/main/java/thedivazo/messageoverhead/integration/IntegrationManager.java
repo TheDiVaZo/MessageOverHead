@@ -40,10 +40,6 @@ public class IntegrationManager {
         return isPlugin("ItemsAdder");
     }
 
-    public static boolean isOraxen() {
-        return isPlugin("Oraxen");
-    }
-
     public static boolean isChatty() {
         return isPlugin("Chatty");
     }

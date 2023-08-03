@@ -8,13 +8,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.mineacademy.chatcontrol.api.ChatChannelEvent;
 import org.mineacademy.chatcontrol.api.PrePrivateMessageEvent;
-import org.mineacademy.chatcontrol.api.SpyEvent;
 import org.mineacademy.chatcontrol.model.Channel;
-import org.mineacademy.chatcontrol.model.Spy;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.channel.ChannelFactory;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
@@ -41,13 +38,13 @@ public class ChatControlRedListener implements Listener {
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), (Player) sender, Set.of(receiver));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onSpy(SpyEvent event) {
-        if (event.getType() != Spy.Type.CHAT && event.getType() != Spy.Type.PRIVATE_MESSAGE) return;
-        CommandSender sender = event.getSender();
-        if (sender == null || !(event.getSender() instanceof Player)) return;
-        for (Player recipient : event.getRecipients()) {
-            MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(event.getMessage(), ChannelFactory.create("#spy"), recipient, Collections.emptySet());
-        }
-    }
+//    @EventHandler(priority = EventPriority.LOWEST)
+//    public void onSpy(SpyEvent event) {
+//        if (event.getType() != Spy.Type.CHAT && event.getType() != Spy.Type.PRIVATE_MESSAGE) return;
+//        CommandSender sender = event.getSender();
+//        if (sender == null || !(event.getSender() instanceof Player)) return;
+//        for (Player recipient : event.getRecipients()) {
+//            MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(event.getMessage(), ChannelFactory.create("#spy"), recipient, Collections.emptySet());
+//        }
+//    }
 }

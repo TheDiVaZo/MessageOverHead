@@ -1,10 +1,16 @@
 package thedivazo.messageoverhead.util.text;
 
+import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
+import dev.lone.itemsadder.api.ItemsAdder;
+import io.th0rgal.oraxen.OraxenPlugin;
+import io.th0rgal.oraxen.compatibilities.provided.placeholderapi.OraxenExpansion;
+import io.th0rgal.oraxen.font.Glyph;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 
 import java.util.ArrayList;
@@ -39,9 +45,20 @@ public class DecoratedStringUtils {
         return result;
     }
 
-    public static DecoratedString insertPlaceholders(DecoratedString text, OfflinePlayer player) {
-        if (IntegrationManager.isPlaceholderAPI()) return text;
-        return DecoratedString.builder().chunks(text.toChunksList().stream().map(chunk -> chunk.toBuilder().setText(PlaceholderAPI.setPlaceholders(player,chunk.getText())).build()).collect(Collectors.toList())).build();
+    public static DecoratedString insertPlaceholders(DecoratedString text, Player player) {
+        if (!IntegrationManager.isPlaceholderAPI()) return text;
+        return DecoratedString.builder()
+                .chunks(
+                        text.toChunksList()
+                                .stream()
+                                .map(chunk ->
+                                        chunk.toBuilder().setText(PlaceholderAPI.setPlaceholders(player,insertItemsAdderPlaceholders(chunk.getText(), player))).build()).collect(Collectors.toList()))
+                .build();
+    }
+
+    private static String insertItemsAdderPlaceholders(String text, Player player) {
+        if (!IntegrationManager.isItemsAdder()) return text;
+        return FontImageWrapper.replaceFontImages(player, text);
     }
 
     public static DecoratedString wrapString(String str) {

@@ -2,6 +2,7 @@ package thedivazo.messageoverhead.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 public class AdminCommands extends BaseCommand {
     @Subcommand("create")
     @CommandPermission("amoh.command.create")
+    @CommandCompletion("@bubble-generators")
     public static void onCreate(Player player, BubbleGenerator bubbleGenerator, String message) {
         MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, bubbleGenerator, player, new HashSet<>(Bukkit.getOnlinePlayers()));
         MessageOverHead.getConfigManager().getCommandMessageMap().get("create").getAccess(player).ifPresent(player::sendMessage);

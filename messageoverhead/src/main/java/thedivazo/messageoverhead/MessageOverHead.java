@@ -2,11 +2,13 @@ package thedivazo.messageoverhead;
 
 import co.aikar.commands.BukkitCommandExecutionContext;
 import co.aikar.commands.CommandContexts;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
 import thedivazo.messageoverhead.command.AdminCommands;
 import thedivazo.messageoverhead.command.DefaultCommands;
+import thedivazo.messageoverhead.config.BubbleModel;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.logging.handlers.JULHandler;
@@ -31,7 +33,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Plugin(name = MessageOverHead.NAME, version = "4.0.0")
 @Dependency(value = "ProtocolLib")
@@ -138,6 +142,8 @@ public class MessageOverHead extends JavaPlugin {
 
         manager.registerCommand(new DefaultCommands());
         manager.registerCommand(new AdminCommands());
+
+        manager.getCommandCompletions().registerCompletion("bubble-generators", c -> configManager.getBubbleModelSet().stream().map(BubbleModel::getName).collect(Collectors.toList()));
 
         manager.setDefaultExceptionHandler((command, registeredCommand, sender, args, t)-> {
             getLogger().warning("Error occurred while executing command "+command.getName());
