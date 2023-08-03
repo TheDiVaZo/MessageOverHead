@@ -1,6 +1,7 @@
 package thedivazo.messageoverhead.config;
 
 import lombok.Getter;
+import thedivazo.messageoverhead.bubble.BubbleModel;
 import thedivazo.messageoverhead.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.bukkit.Particle;

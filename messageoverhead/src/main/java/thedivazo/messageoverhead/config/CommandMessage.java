@@ -19,7 +19,7 @@ public class CommandMessage {
         else return Optional.of(access.getMinecraftColoredString());
     }
 
-    public Optional<String> getAccess(OfflinePlayer player) {
+    public Optional<String> getAccess(Player player) {
         if (access == null || access.isEmpty()) return Optional.empty();
         else return Optional.of(DecoratedStringUtils.insertPlaceholders(access, player).getMinecraftColoredString());
     }

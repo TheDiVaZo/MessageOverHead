@@ -5,14 +5,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import thedivazo.messageoverhead.BubbleActiveStatus;
 import thedivazo.messageoverhead.MessageOverHead;
-import thedivazo.messageoverhead.config.BubbleModel;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class BubbleSpawned {
@@ -22,7 +18,7 @@ public class BubbleSpawned {
     @Getter
     private final BubbleModel bubbleModel;
     private BukkitTask positionTask;
-    private final BukkitTask removeTask;
+    private BukkitTask removeTask;
 
     @Getter
     private final Player sender;

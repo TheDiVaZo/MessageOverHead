@@ -1,15 +1,9 @@
 package thedivazo.messageoverhead.util.text;
 
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
-import dev.lone.itemsadder.api.ItemsAdder;
-import io.th0rgal.oraxen.OraxenPlugin;
-import io.th0rgal.oraxen.compatibilities.provided.placeholderapi.OraxenExpansion;
-import io.th0rgal.oraxen.font.Glyph;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 

@@ -2,13 +2,12 @@ package thedivazo.messageoverhead;
 
 import co.aikar.commands.BukkitCommandExecutionContext;
 import co.aikar.commands.CommandContexts;
-import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
 import thedivazo.messageoverhead.command.AdminCommands;
 import thedivazo.messageoverhead.command.DefaultCommands;
-import thedivazo.messageoverhead.config.BubbleModel;
+import thedivazo.messageoverhead.bubble.BubbleModel;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.logging.handlers.JULHandler;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 

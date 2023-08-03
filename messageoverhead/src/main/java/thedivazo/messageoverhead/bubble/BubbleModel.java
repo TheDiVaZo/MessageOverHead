@@ -1,10 +1,10 @@
-package thedivazo.messageoverhead.config;
+package thedivazo.messageoverhead.bubble;
 
-import io.th0rgal.oraxen.shaded.jetbrains.annotations.Nullable;
-import io.th0rgal.oraxen.shaded.jetbrains.annotations.Unmodifiable;
 import lombok.*;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import thedivazo.messageoverhead.channel.Channel;
 import thedivazo.messageoverhead.util.text.DecoratedString;
 
@@ -27,7 +27,8 @@ public class BubbleModel {
     private final double biasY;
     private final boolean visibleTextForOwner;
     private final int maxSizeLine;
-    @Nullable private final String permission;
+    @Nullable
+    private final String permission;
 
 
     @EqualsAndHashCode

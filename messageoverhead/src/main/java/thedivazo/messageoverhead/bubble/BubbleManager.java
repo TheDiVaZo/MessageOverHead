@@ -13,12 +13,14 @@ import thedivazo.messageoverhead.vanish.VanishManager;
 import java.util.*;
 import java.util.function.Predicate;
 
+@AllArgsConstructor
 public class BubbleManager {
     private final Map<Player, BubbleSpawned> bubbles = new HashMap<>();
 
     @Getter
-    private static VanishManagerSet vanishManagers = new VanishManagerSet(IntegrationManager.getVanishManagers());@Getter
-    private static Predicate<Player> visiblePredicate = player -> vanishManagers.visibleForAll().test(player);
+    protected VanishManagerSet vanishManagers;
+    @Getter
+    protected Predicate<Player> visiblePredicate;
 
     public Optional<BubbleSpawned> getBubbleSpawned(Player player) {
         return Optional.ofNullable(bubbles.get(player));
@@ -27,9 +29,16 @@ public class BubbleManager {
     @Getter
     private final BubbleGeneratorManager bubbleGeneratorManager;
 
+    public static VanishManagerSet getDefaultVanishManagerSer() {
+        return new VanishManagerSet(IntegrationManager.getVanishManagers());
+    }
+
     public BubbleManager(BubbleGeneratorManager bubbleGeneratorManager) {
         this.bubbleGeneratorManager = bubbleGeneratorManager;
+        this.vanishManagers = getDefaultVanishManagerSer();
+        this.visiblePredicate = player -> vanishManagers.visibleForAll().test(player);
     }
+
 
     public void spawnBubble(String playerText, BubbleGenerator bubbleGenerator, Player sender, Set<Player> showers) {
         if (bubbles.containsKey(sender)) bubbles.get(sender).remove();

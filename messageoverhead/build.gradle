@@ -51,7 +51,6 @@ dependencies {
 
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "5.0.0";
     compileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
-    compileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
     compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.10'
     compileOnly 'com.github.LeonMangler:SuperVanish:6.2.6-4'
@@ -73,7 +72,6 @@ dependencies {
     testAnnotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
 
     testCompileOnly 'com.github.LoneDev6:api-itemsadder:3.0.0'
-    testCompileOnly 'com.github.oraxen:oraxen:-SNAPSHOT'
     testCompileOnly 'me.clip:placeholderapi:2.10.10'
     testCompileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'

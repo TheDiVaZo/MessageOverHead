@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.api.event.BubbleSendEvent;
-import thedivazo.messageoverhead.config.BubbleModel;
 import thedivazo.messageoverhead.channel.Channel;
 import thedivazo.messageoverhead.util.text.DecoratedString;
 import thedivazo.messageoverhead.util.text.DecoratedStringUtils;

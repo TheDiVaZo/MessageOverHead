@@ -1,8 +1,8 @@
 package thedivazo.messageoverhead.util;
 
-import io.th0rgal.oraxen.shaded.jetbrains.annotations.NotNull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
