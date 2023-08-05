@@ -1,7 +1,6 @@
 package thedivazo.messageoverhead.bubble;
 
 import lombok.AllArgsConstructor;
-import org.bukkit.GameMode;
 import thedivazo.messageoverhead.BubbleActiveStatus;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 import thedivazo.messageoverhead.logging.Logger;
@@ -18,7 +17,7 @@ public class BubbleManager {
     private final Map<Player, BubbleSpawned> bubbles = new HashMap<>();
 
     @Getter
-    protected VanishManagerSet vanishManagers;
+    protected VanishManagerSet vanishManagerSet;
     @Getter
     protected Predicate<Player> visiblePredicate;
 
@@ -29,14 +28,15 @@ public class BubbleManager {
     @Getter
     private final BubbleGeneratorManager bubbleGeneratorManager;
 
-    public static VanishManagerSet getDefaultVanishManagerSer() {
-        return new VanishManagerSet(IntegrationManager.getVanishManagers());
-    }
+    @Getter
+    private static final VanishManagerSet defaultVanishManagerSet = new VanishManagerSet(IntegrationManager.getVanishManagers());
+    @Getter
+    private static final Predicate<Player> defaultVisiblePredicate = player -> defaultVanishManagerSet.visibleForAll().test(player);
 
     public BubbleManager(BubbleGeneratorManager bubbleGeneratorManager) {
         this.bubbleGeneratorManager = bubbleGeneratorManager;
-        this.vanishManagers = getDefaultVanishManagerSer();
-        this.visiblePredicate = player -> vanishManagers.visibleForAll().test(player);
+        this.vanishManagerSet = defaultVanishManagerSet;
+        this.visiblePredicate = defaultVisiblePredicate;
     }
 
 

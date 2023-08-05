@@ -21,7 +21,7 @@ public class DefaultCommands extends BaseCommand {
     public static void onEnable(Player player) {
         BubbleActiveStatus.setStatus(player, BubbleActiveStatus.Status.ENABLED);
         BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
-        if (BubbleManager.getVisiblePredicate().test(player))
+        if (BubbleManager.getDefaultVisiblePredicate().test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
         MessageOverHead.getConfigManager().getCommandMessageMap().get("enable").getAccess(player).ifPresent(player::sendMessage);
     }

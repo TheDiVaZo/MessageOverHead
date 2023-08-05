@@ -35,7 +35,7 @@ import java.net.URL;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Plugin(name = MessageOverHead.NAME, version = "4.0.0")
+@Plugin(name = MessageOverHead.NAME, version = "4.0.0-b1")
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
         @SoftDependency(value = "PlaceholderAPI"),
@@ -48,8 +48,6 @@ import java.util.stream.Collectors;
 @Author(value = "TheDiVaZo")
 @ApiVersion(value = ApiVersion.Target.v1_13)
 public class MessageOverHead extends JavaPlugin {
-
-    public static final VersionWrapper PLUGIN_VERSION = VersionWrapper.valueOf("4.0.0");
     public static final VersionWrapper MINECRAFT_VERSION = VersionWrapper.valueOf(Bukkit.getVersion(), Pattern.compile("\\(MC: ([0-9]+)\\.([0-9]+)\\.([0-9]+)"), 1, 2, 3);
 
     @Getter
@@ -112,18 +110,7 @@ public class MessageOverHead extends JavaPlugin {
     }
 
     private void checkPluginVersion() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!MessageOverHead.PLUGIN_VERSION.equals(getLastVersionOfPlugin())) {
-                    for (int i = 0; i < 5; i++) {
-                        Logger.warn("PLEASE, UPDATE MESSAGE OVER HEAR! LINK: https://www.spigotmc.org/resources/messageoverhead-pop-up-messages-above-your-head-1-13-1-18.100051/");
-                    }
-                } else {
-                    Logger.info("Plugin have last version");
-                }
-            }
-        }.runTaskAsynchronously(this);
+        return;
     }
 
     private void registerCommands() {

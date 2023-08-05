@@ -58,7 +58,7 @@ public class BubbleSpawned {
         if (bubbleModel.isVisibleTextForOwner()) bubbleWrapper.addShower(sender);
         Set<Player> filteredShowers = filterShowers(sender, showers);
         bubbleWrapper.addShowers(filteredShowers);
-        if (BubbleManager.getVisiblePredicate().test(sender)) {
+        if (BubbleManager.getDefaultVisiblePredicate().test(sender)) {
             show();
             playParticle();
             playSound();

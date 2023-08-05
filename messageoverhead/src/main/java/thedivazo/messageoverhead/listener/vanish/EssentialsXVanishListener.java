@@ -4,12 +4,10 @@ import lombok.EqualsAndHashCode;
 import net.ess3.api.events.VanishStatusChangeEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.bubble.BubbleSpawned;
 import thedivazo.messageoverhead.vanish.EssentialsXVanishManager;
-import thedivazo.messageoverhead.vanish.SuperVanishManager;
 import thedivazo.messageoverhead.vanish.VanishManager;
 
 import java.util.List;
@@ -19,7 +17,7 @@ import java.util.function.Predicate;
 public class EssentialsXVanishListener implements VanishListener {
 
     private static VanishManager vanishManager = new EssentialsXVanishManager();
-    private static Predicate<Player> showable = BubbleManager.getVanishManagers().visibleForAll(List.of(vanishManager), false);
+    private static Predicate<Player> showable = BubbleManager.getDefaultVanishManagerSet().visibleForAll(List.of(vanishManager), false);
 
     @EventHandler
     public void onVanish(VanishStatusChangeEvent event) {

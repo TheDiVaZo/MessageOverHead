@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class CMIVanishListener implements VanishListener {
 
     VanishManager vanishManager = new CMIVanishManager();
-    Predicate<Player> showable = BubbleManager.getVanishManagers().visibleForAll(List.of(vanishManager), false);
+    Predicate<Player> showable = BubbleManager.getDefaultVanishManagerSet().visibleForAll(List.of(vanishManager), false);
 
 
     @EventHandler

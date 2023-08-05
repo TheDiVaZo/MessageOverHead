@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class SuperVanishListener implements VanishListener {
 
     private static VanishManager vanishManager = new SuperVanishManager();
-    private static Predicate<Player> showable = BubbleManager.getVanishManagers().visibleForAll(List.of(vanishManager), false);
+    private static Predicate<Player> showable = BubbleManager.getDefaultVanishManagerSet().visibleForAll(List.of(vanishManager), false);
 
     @EventHandler
     public void onVanishStateChange(PlayerVanishStateChangeEvent event) {

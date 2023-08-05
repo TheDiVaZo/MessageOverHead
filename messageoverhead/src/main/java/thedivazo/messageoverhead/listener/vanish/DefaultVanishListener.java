@@ -31,9 +31,9 @@ public class DefaultVanishListener implements VanishListener {
     private static VanishManager gameModeVanishManager = new GameModeVanishManager();
     private static VanishManager potionVanishManager = new PotionVanishManager();
 
-    private static Predicate<Player> showableIgnoreGameMode = BubbleManager.getVanishManagers().visibleForAll(List.of(gameModeVanishManager), false);
+    private static Predicate<Player> showableIgnoreGameMode = BubbleManager.getDefaultVanishManagerSet().visibleForAll(List.of(gameModeVanishManager), false);
 
-    private static Predicate<Player> showableIgnorePotion = BubbleManager.getVanishManagers().visibleForAll(List.of(potionVanishManager), false);
+    private static Predicate<Player> showableIgnorePotion = BubbleManager.getDefaultVanishManagerSet().visibleForAll(List.of(potionVanishManager), false);
 
     private static final Map<Player, BukkitTask> invisiblePlayers = new HashMap<>();
 
