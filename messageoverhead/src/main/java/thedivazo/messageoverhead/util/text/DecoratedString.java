@@ -3,6 +3,7 @@ package thedivazo.messageoverhead.util.text;
 import lombok.*;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import thedivazo.messageoverhead.util.text.decor.TextColor;
 import thedivazo.messageoverhead.util.text.decor.TextFormat;
 
@@ -152,6 +153,36 @@ public class DecoratedString implements CharSequence {
                 .setText(minecraftColoredString.substring(prevStart))
                 .build());
         return new DecoratedString(newChunks);
+    }
+
+    public static DecoratedString valueOf(@Unmodifiable List<DecoratedChar> decoratedChars) {
+        List<Chunk> chunks = new ArrayList<>();
+        Chunk.ChunkBuilder chunkBuilderBuffer = Chunk.builder();
+        TextColor textColorBuffer = TextColor.WHITE;
+        Set<TextFormat> textFormatsBuffer = new HashSet<>();
+        StringBuilder textBuffer = new StringBuilder();
+        for (DecoratedChar decoratedChar : decoratedChars) {
+            TextColor charColor = decoratedChar.getColor();
+            Set<TextFormat> charFormats = decoratedChar.getTextFormats();
+            if (!charColor.equals(textColorBuffer) || !charFormats.equals(textFormatsBuffer)) {
+                Chunk chunk = chunkBuilderBuffer.build();
+                if (!chunk.isEmpty())
+                    chunks.add(chunk);
+                textBuffer.setLength(0);
+                textColorBuffer = charColor;
+                textFormatsBuffer = charFormats;
+                chunkBuilderBuffer = Chunk.builder()
+                    .setColor(textColorBuffer)
+                    .setTextFormats(textFormatsBuffer);
+            }
+            textBuffer.append(decoratedChar.getCharWrapped());
+            chunkBuilderBuffer.setText(textBuffer.toString());
+        }
+
+        Chunk lastChunk = chunkBuilderBuffer.build();
+        if (!lastChunk.isEmpty())
+            chunks.add(lastChunk);
+        return new DecoratedString(chunks);
     }
 
     @ToString
@@ -413,7 +444,7 @@ public class DecoratedString implements CharSequence {
             MatchResult matchResult = matcher.toMatchResult();
             if (lastIndex != matchResult.start())
                 result.add(chunk.toBuilder().setText(chunk.getText().substring(lastIndex, matchResult.start())).build());
-            result.add(Chunk.builder().setText(String.valueOf(newChar.getCharWrapped())).setColor(newChar.getColor()).setTextFormats(newChar.getTextFormat()).build());
+            result.add(Chunk.builder().setText(String.valueOf(newChar.getCharWrapped())).setColor(newChar.getColor()).setTextFormats(newChar.getTextFormats()).build());
             lastIndex = matchResult.end();
         }
         if (lastIndex != chunk.getText().length() - 1)

@@ -15,5 +15,5 @@ public class DecoratedChar {
 
     private final TextColor color;
 
-    private final Set<TextFormat> textFormat;
+    private final Set<TextFormat> textFormats;
 }

@@ -44,7 +44,7 @@ public class Chunk implements CharSequence {
     }
 
     public boolean equalsDecorate(DecoratedChar chunk) {
-        return textFormats.equals(chunk.getTextFormat()) && color.equals(chunk.getColor());
+        return textFormats.equals(chunk.getTextFormats()) && color.equals(chunk.getColor());
     }
 
     public int indexOf(int ch) {
