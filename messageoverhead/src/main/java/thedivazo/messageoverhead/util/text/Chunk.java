@@ -1,10 +1,15 @@
 package thedivazo.messageoverhead.util.text;
 
 import lombok.*;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.jetbrains.annotations.NotNull;
 import thedivazo.messageoverhead.util.text.decor.TextColor;
 import thedivazo.messageoverhead.util.text.decor.TextFormat;
+import thedivazo.messageoverhead.util.text.handler.TextComponent;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @ToString
@@ -21,6 +26,32 @@ public class Chunk implements CharSequence {
 
     @Singular
     private final Set<TextFormat> textFormats;
+
+    public static List<Chunk> from(List<DecoratedChar> decoratedChars) {
+        List<Chunk> chunks = new ArrayList<>();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        TextColor prevTextColor = TextColor.WHITE;
+        Set<TextFormat> prevTextFormats = new HashSet<>();
+        for (DecoratedChar decoratedChar : decoratedChars) {
+            if (stringBuilder.length() == 0) {
+                stringBuilder.append(decoratedChar.getCharWrapped());
+                prevTextColor = decoratedChar.getColor();
+                prevTextFormats = decoratedChar.getTextFormats();
+            } else if (prevTextColor.equals(decoratedChar.getColor()) && prevTextFormats.equals(decoratedChar.getTextFormats()))
+                stringBuilder.append(decoratedChar.getCharWrapped());
+            else {
+                chunks.add(new Chunk(stringBuilder.toString(), prevTextColor, prevTextFormats));
+                stringBuilder.setLength(0);
+                stringBuilder.append(decoratedChar.getCharWrapped());
+                prevTextColor = decoratedChar.getColor();
+                prevTextFormats = decoratedChar.getTextFormats();
+            }
+        }
+        if (stringBuilder.length() != 0)
+            chunks.add(new Chunk(stringBuilder.toString(), prevTextColor, prevTextFormats));
+        return chunks;
+    }
 
 
     @Override
@@ -168,6 +199,6 @@ public class Chunk implements CharSequence {
     }
 
     public Chunk trimEnd() {
-        return toBuilder().setText(getText().replaceAll(" +$","")).build();
+        return toBuilder().setText(getText().replaceAll(" +$", "")).build();
     }
 }

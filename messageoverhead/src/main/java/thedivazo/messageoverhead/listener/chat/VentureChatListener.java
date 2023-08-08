@@ -22,6 +22,6 @@ public class VentureChatListener implements Listener {
         String message = eventChat.getChat();
         Set<Player> recipients = eventChat.getRecipients();
         ChatChannel channel = eventChat.getChannel();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create(channel.getName()), chatPlayer.getPlayer(), recipients);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create(channel.getName()), chatPlayer.getPlayer(), recipients);
     }
 }

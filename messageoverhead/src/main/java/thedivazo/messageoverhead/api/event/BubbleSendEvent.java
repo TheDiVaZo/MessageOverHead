@@ -1,6 +1,5 @@
 package thedivazo.messageoverhead.api.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -12,7 +11,7 @@ import thedivazo.messageoverhead.bubble.BubbleSpawned;
 
 @RequiredArgsConstructor
 public class BubbleSendEvent extends Event implements Cancellable {
-    private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList HANDLES = new HandlerList();
     private boolean canceled;
 
     @Getter
@@ -32,8 +31,7 @@ public class BubbleSendEvent extends Event implements Cancellable {
     }
 
     @NotNull
-    @Override
     public HandlerList getHandlers() {
-        return handlers;
+        return HANDLES;
     }
 }

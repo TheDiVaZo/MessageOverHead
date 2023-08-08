@@ -3,7 +3,6 @@ package thedivazo.messageoverhead.bubble;
 import lombok.Builder;
 import lombok.Singular;
 import org.bukkit.entity.Player;
-import thedivazo.messageoverhead.bubble.exception.BubbleModelNotFoundException;
 import thedivazo.messageoverhead.channel.Channel;
 
 import java.util.*;
@@ -17,10 +16,14 @@ public class BubbleGeneratorManager {
     }
 
     public Optional<BubbleGenerator> getBubbleGenerator(Player sender, Channel channel) {
-        return bubbles.stream().filter(bubbleGenerator->bubbleGenerator.isPermission(sender) && bubbleGenerator.isChannel(channel)).findFirst();
+        return bubbles.stream()
+                .filter(bubbleGenerator->bubbleGenerator.hasPlayerBubbleModelPermission(sender) && bubbleGenerator.isChannel(channel))
+                .findFirst();
     }
 
     public Optional<BubbleGenerator> getBubbleGenerator(String name) {
-        return bubbles.stream().filter(bubbleGenerator -> bubbleGenerator.getName().equals(name)).findFirst();
+        return bubbles.stream()
+                .filter(bubbleGenerator -> bubbleGenerator.getName().equals(name))
+                .findFirst();
     }
 }

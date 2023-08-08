@@ -24,7 +24,8 @@ public class BubbleGenerator {
         List<BubbleModel.FormatMessageModel> allFormatMessage = bubbleModel.getFormatMessageModels();
 
         for (BubbleModel.FormatMessageModel formatMessage : allFormatMessage) {
-            if(Objects.isNull(formatMessage.getPermission()) || player.hasPermission(formatMessage.getPermission())) return formatMessage.getLines();
+            if(Objects.isNull(formatMessage.getPermission()) || player.hasPermission(formatMessage.getPermission()))
+                return formatMessage.getLines();
         }
         return allFormatMessage.get(allFormatMessage.size()-1).getLines();
     }
@@ -52,15 +53,15 @@ public class BubbleGenerator {
     }
 
     private void callEvent(BubbleSpawned bubbleSpawned, Player sender) {
-        Bukkit.getScheduler()
-                .runTask(MessageOverHead.getInstance(), ()-> Bukkit.getPluginManager().callEvent(new BubbleSendEvent(bubbleSpawned, sender)));
+        Bukkit.getScheduler().runTask(MessageOverHead.getInstance(),
+                ()-> Bukkit.getPluginManager().callEvent(new BubbleSendEvent(bubbleSpawned, sender)));
     }
 
     public String getName() {
         return bubbleModel.getName();
     }
 
-    public boolean isPermission(Player player) {
+    public boolean hasPlayerBubbleModelPermission(Player player) {
         return Objects.isNull(bubbleModel.getPermission()) || player.hasPermission(bubbleModel.getPermission());
     }
 

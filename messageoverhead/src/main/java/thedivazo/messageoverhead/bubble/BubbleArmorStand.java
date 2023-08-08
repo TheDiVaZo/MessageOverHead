@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.MessageOverHead;
+import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.util.VersionWrapper;
 
 import java.util.*;
@@ -62,7 +63,7 @@ public final class BubbleArmorStand extends AbstractBubble {
 
     private final WrappedDataWatcher metadata = new WrappedDataWatcher();
 
-    private volatile Location loc;
+    private Location loc;
     private final int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private final UUID uuid = UUID.randomUUID();
 
@@ -93,21 +94,21 @@ public final class BubbleArmorStand extends AbstractBubble {
     }
 
     private PacketContainer getFakeStandPacket() {
-        return new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY) {{
-            getModifier().writeDefaults();
-            getIntegers().write(0, id);
+        PacketContainer packetContainer = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY);
+        packetContainer.getModifier().writeDefaults();
+        packetContainer.getIntegers().write(0, id);
 
-            if(MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
-                getIntegers().write(6, 78);
-            } else {
-                getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
-            }
-            // Set location
-            getDoubles().write(0, loc.getX());
-            getDoubles().write(1, loc.getY());
-            getDoubles().write(2, loc.getZ());
-            getUUIDs().write(0, uuid);
-        }};
+        if(MC_VERSION.lessMinor(MC_1_13) || MC_VERSION.equalsMinor(MC_1_13)) {
+            packetContainer.getIntegers().write(6, 78);
+        } else {
+            packetContainer.getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
+        }
+        // Set location
+        packetContainer.getDoubles().write(0, loc.getX());
+        packetContainer.getDoubles().write(1, loc.getY());
+        packetContainer.getDoubles().write(2, loc.getZ());
+        packetContainer.getUUIDs().write(0, uuid);
+        return packetContainer;
     }
 
     private PacketContainer getMetaPacket() {
@@ -115,37 +116,34 @@ public final class BubbleArmorStand extends AbstractBubble {
         metaPacket.getIntegers().write(0, id);
         try {
             final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
-
             for (final WrappedWatchableObject entry : metadata.getWatchableObjects()) {
                 if (entry == null) continue;
-
                 final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
-                wrappedDataValueList.add(
-                        new WrappedDataValue(
-                                watcherObject.getIndex(),
-                                watcherObject.getSerializer(),
-                                entry.getRawValue()
-                        )
+                WrappedDataValue wrappedDataValue = new WrappedDataValue(
+                        watcherObject.getIndex(),
+                        watcherObject.getSerializer(),
+                        entry.getRawValue()
                 );
+                wrappedDataValueList.add(wrappedDataValue);
             }
 
             metaPacket.getDataValueCollectionModifier().write(0, wrappedDataValueList);
         }
-        catch (Throwable e) {
+        catch (Exception e) {
             metaPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
         }
         return metaPacket;
     }
 
     private PacketContainer getTeleportPositionPacket() {
-        return new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT) {{
-            getModifier().writeDefaults();
-            getIntegers().write(0, id);
-            getDoubles().write(0, loc.getX());
-            getDoubles().write(1, loc.getY());
-            getDoubles().write(2, loc.getZ());
-            getBooleans().write(0, false);
-        }};
+        PacketContainer packetContainer = new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT);
+        packetContainer.getModifier().writeDefaults();
+        packetContainer.getIntegers().write(0, id);
+        packetContainer.getDoubles().write(0, loc.getX());
+        packetContainer.getDoubles().write(1, loc.getY());
+        packetContainer.getDoubles().write(2, loc.getZ());
+        packetContainer.getBooleans().write(0, false);
+        return packetContainer;
     }
 
     private void updatePosition(Set<Player> players) {
@@ -163,7 +161,7 @@ public final class BubbleArmorStand extends AbstractBubble {
                 pm.sendServerPacket(player, fakeStandPacket);
                 pm.sendServerPacket(player, metaPacket);
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.error("bubbleArmorMessage show error",e);
             }
         }
     }
@@ -189,11 +187,5 @@ public final class BubbleArmorStand extends AbstractBubble {
             removeStandPacket.getModifier().write(0, new int[]{id});
         }
         players.forEach(player-> pm.sendServerPacket(player ,removeStandPacket));
-    }
-
-    public void changeMessage(Set<Player> players, String message) {
-        this.message = message;
-        hide(players);
-        show(players);
     }
 }

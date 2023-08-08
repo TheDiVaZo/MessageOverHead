@@ -26,16 +26,16 @@ public class DefaultChatListener implements Listener {
         String message = chatEvent.getMessage();
         Player sender = chatEvent.getPlayer();
         Set<Player> recipients = chatEvent.getRecipients();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("global"), sender, recipients);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create("global"), sender, recipients);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPrivateCommand(PlayerCommandPreprocessEvent event) {
         Matcher matcher = privateCommandPattern.matcher(event.getMessage());
-        if(!matcher.matches()) return;
+        if (!matcher.matches()) return;
         Player player = Bukkit.getPlayer(matcher.group(2));
         String message = matcher.group(3);
-        if(Objects.isNull(player)) return;
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), event.getPlayer(), Set.of(player));
+        if (Objects.isNull(player)) return;
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), event.getPlayer(), Set.of(player));
     }
 }

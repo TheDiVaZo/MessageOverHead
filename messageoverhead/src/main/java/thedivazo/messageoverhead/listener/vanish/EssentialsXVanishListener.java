@@ -22,7 +22,7 @@ public class EssentialsXVanishListener implements VanishListener {
     @EventHandler
     public void onVanish(VanishStatusChangeEvent event) {
         Player player = event.getAffected().getBase();
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         if (event.getValue())
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
         else if (showable.test(player))

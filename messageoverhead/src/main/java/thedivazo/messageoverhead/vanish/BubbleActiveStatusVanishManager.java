@@ -6,6 +6,7 @@ import thedivazo.messageoverhead.BubbleActiveStatus;
 
 @EqualsAndHashCode(callSuper = false)
 public class BubbleActiveStatusVanishManager implements VanishManager {
+
     @Override
     public boolean isInvisible(Player viewer) {
         return BubbleActiveStatus.getStatus(viewer).equals(BubbleActiveStatus.Status.DISABLED);

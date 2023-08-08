@@ -47,15 +47,15 @@ public class ConfigManager {
     }
 
 
-
     private void loadBubbleModels() throws InvalidConfigurationException {
         ConfigWrapper bubbleModels = currentConfig.getRequiredConfigurationSection("models");
         bubbleModelSetInConfig.clear();
         Logger.info("Start models loading...");
         for (String bubbleModelName : bubbleModels.getKeys(false)) {
-            Logger.info("Model '"+bubbleModelName+"' loading...");
+            Logger.info("Model '" + bubbleModelName + "' loading...");
 
-            if(bubbleModelSetInConfig.stream().anyMatch(bubbleModel -> bubbleModel.getName().equals(bubbleModelName))) throw new InvalidConfigurationException("The model '"+bubbleModelName+"' has duplicate in config!");
+            if (bubbleModelSetInConfig.stream().anyMatch(bubbleModel -> bubbleModel.getName().equals(bubbleModelName)))
+                throw new InvalidConfigurationException("The model '" + bubbleModelName + "' has duplicate in config!");
 
             ConfigWrapper bubbleModel = bubbleModels.getRequiredConfigurationSection(bubbleModelName);
             BubbleModel.BubbleModelBuilder bubbleModelBuilder = BubbleModel.builder();
@@ -72,28 +72,30 @@ public class ConfigManager {
                     .visibleTextForOwner(bubbleModel.getBoolean("visible-text-for-owner", true))
                     .maxSizeLine(bubbleModel.getInt("max-size-line", 24));
             if (bubbleModel.isString("channel") || bubbleModel.isList("channel"))
-                bubbleModel.getWrappedStringInListOrGetStringList("channel", new ArrayList<>(){{add("all");}}).forEach(channelName->bubbleModelBuilder.channel(ChannelFactory.create(channelName)));
+                bubbleModel.getWrappedStringInListOrGetStringList("channel", List.of("{message}"))
+                        .forEach(channelName -> bubbleModelBuilder.channel(ChannelFactory.create(channelName)));
             else bubbleModelBuilder.channel(ChannelFactory.create("all"));
-            if(bubbleModel.isConfigurationSection("settings.format")) {
+            if (bubbleModel.isConfigurationSection("settings.format")) {
                 ConfigWrapper formatMessageModels = bubbleModel.getRequiredConfigurationSection("settings.format");
                 for (String formatMessageModelName : formatMessageModels.getKeys(false)) {
                     ConfigWrapper formatMessageModel = formatMessageModels.getRequiredConfigurationSection(formatMessageModelName);
                     BubbleModel.FormatMessageModel.FormatMessageModelBuilder formatMessageModelBuilder = BubbleModel.FormatMessageModel.builder();
                     formatMessageModelBuilder
-                            .lines(formatMessageModel.getWrappedStringInListOrGetStringList("format", new ArrayList<>(){{add("{message}");}}).stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
+                            .lines(formatMessageModel.getWrappedStringInListOrGetStringList("format", List.of("{message}")).stream()
+                                    .map(DecoratedString::valueOf).collect(Collectors.toList()))
                             .permission(formatMessageModel.getString("permission", null));
                     bubbleModelBuilder.formatMessageModel(formatMessageModelBuilder.build());
                 }
-            }
-            else bubbleModelBuilder.formatMessageModel(BubbleModel.FormatMessageModel.builder()
-                    .lines(bubbleModel.getWrappedStringInListOrGetStringList("settings.format", new ArrayList<>(){{add("{message}");}}).stream().map(DecoratedString::valueOf).collect(Collectors.toList()))
+            } else bubbleModelBuilder.formatMessageModel(BubbleModel.FormatMessageModel.builder()
+                    .lines(bubbleModel.getWrappedStringInListOrGetStringList("settings.format", List.of("{message}")).stream()
+                            .map(DecoratedString::valueOf).collect(Collectors.toList()))
                     .permission(null)
                     .build()
             );
             particleModelBuilder
                     .enable(bubbleModel.getBoolean("particle.enable", true))
                     .particle(Particle.valueOf(
-                                    bubbleModel.getString("particle.type", Particle.CLOUD.name())))
+                            bubbleModel.getString("particle.type", Particle.CLOUD.name())))
                     .count(bubbleModels.getInt("particle.count", 4))
                     .offsetX(bubbleModel.getDouble("particle.offset-x", 0.2d))
                     .offsetY(bubbleModel.getDouble("particle.offset-y", 0.2d))
@@ -113,7 +115,7 @@ public class ConfigManager {
                     .lifeTimeModel(lifeTimeModelBuilder.build());
             bubbleModelSetInConfig.add(bubbleModelBuilder.build());
 
-            Logger.info("Model '"+bubbleModelName+"' loaded");
+            Logger.info("Model '" + bubbleModelName + "' loaded");
         }
         Logger.info("Models loaded");
         if (bubbleManagerInConfig != null) bubbleManagerInConfig.removeAllBubbles();
@@ -142,7 +144,9 @@ public class ConfigManager {
     }
 
     private BubbleManager generateBubbleManager() {
-        LinkedHashSet<BubbleGenerator> bubbleGeneratorSet = getBubbleModelSet().stream().map(BubbleGenerator::new).collect(Collectors.toCollection(LinkedHashSet::new));
+        LinkedHashSet<BubbleGenerator> bubbleGeneratorSet = getBubbleModelSet().stream()
+                .map(BubbleGenerator::new)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         return new BubbleManager(new BubbleGeneratorManager(bubbleGeneratorSet));
     }
 

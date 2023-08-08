@@ -34,15 +34,21 @@ public class TextFormat implements TextDecorator {
         if (matcher.matches()) {
             char formatChat = matcher.group().charAt(1);
             switch (formatChat) {
-                case 'l': return BOLD;
-                case 'o': return ITALIC;
-                case 'n': return UNDERLINE;
-                case 'm': return STRIKETHROUGH;
-                case 'k': return MAGIC;
-                case 'r': return RESET;
+                case 'l':
+                    return BOLD;
+                case 'o':
+                    return ITALIC;
+                case 'n':
+                    return UNDERLINE;
+                case 'm':
+                    return STRIKETHROUGH;
+                case 'k':
+                    return MAGIC;
+                case 'r':
+                    return RESET;
             }
         }
-        throw new IllegalArgumentException("The string '"+format+"' does not match the pattern '"+pattern.pattern()+"'");
+        throw new IllegalArgumentException("The string '" + format + "' does not match the pattern '" + pattern.pattern() + "'");
     }
 
     private final ChatColor format;

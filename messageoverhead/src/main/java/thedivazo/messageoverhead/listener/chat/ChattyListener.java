@@ -21,6 +21,6 @@ public class ChattyListener implements Listener {
         String message = chatEvent.getMessage();
         Chat channel = chatEvent.getChat();
         Set<Player> recipients = Set.copyOf(channel.getRecipients(sender));
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create(channel.getName()), sender, recipients);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create(channel.getName()), sender, recipients);
     }
 }

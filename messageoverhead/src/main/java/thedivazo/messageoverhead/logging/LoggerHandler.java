@@ -10,7 +10,7 @@ public interface LoggerHandler {
 
     void error(Object message, Throwable throwable, Object... placeholders);
 
-    default String replace(Object message, Object values){
+    default String replace(Object message, Object values) {
         return String.format(message.toString(), values);
     }
 }

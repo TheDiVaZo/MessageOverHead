@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VersionWrapperTest {
 
+    private VersionWrapper MC_1_20 = VersionWrapper.valueOf("1.20");
+
     private VersionWrapper MC_1_18 = VersionWrapper.valueOf("1.18");
     private VersionWrapper MC_1_17_1 = VersionWrapper.valueOf("1.17.1");
     private VersionWrapper MC_1_16 = VersionWrapper.valueOf("1.16");
@@ -57,5 +59,10 @@ class VersionWrapperTest {
         assertTrue(MC_1_14_3.equalsMajor(MC_1_15_2));
         assertTrue(MC_1_12_1.equalsMajor(MC_1_16));
         assertTrue(MC_1_13.equalsMajor(MC_1_14_3));
+    }
+
+    @Test
+    void parseVersion() {
+        assertEquals(VersionWrapper.valueOf("+git-Paper-17 (MC: 1.20)+"), MC_1_20);
     }
 }

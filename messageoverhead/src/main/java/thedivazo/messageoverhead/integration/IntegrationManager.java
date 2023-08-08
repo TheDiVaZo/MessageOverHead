@@ -16,16 +16,11 @@ import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class IntegrationManager {
-    private static final Map<String, Boolean> cashPluginEnabled = new HashMap<>();
 
     public static boolean isPlugin(String name) {
         boolean pluginEnabled = Bukkit.getPluginManager().getPlugin(name) != null;
         if (pluginEnabled) Logger.info(name + " plugin has been connect");
         return pluginEnabled;
-    }
-
-    public static void clearCash() {
-        cashPluginEnabled.clear();
     }
 
     public static boolean isPlaceholderAPI() {

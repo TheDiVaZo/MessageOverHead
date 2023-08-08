@@ -20,25 +20,25 @@ public class DefaultCommands extends BaseCommand {
     @CommandPermission("moh.command.enable")
     public static void onEnable(Player player) {
         BubbleActiveStatus.setStatus(player, BubbleActiveStatus.Status.ENABLED);
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         if (BubbleManager.getDefaultVisiblePredicate().test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
-        MessageOverHead.getConfigManager().getCommandMessageMap().get("enable").getAccess(player).ifPresent(player::sendMessage);
+        MessageOverHead.CONFIG_MANAGER.getCommandMessageMap().get("enable").getAccess(player).ifPresent(player::sendMessage);
     }
 
     @Subcommand("disable")
     @CommandPermission("moh.command.disable")
     public static void onDisable(Player player) {
         BubbleActiveStatus.setStatus(player, BubbleActiveStatus.Status.DISABLED);
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
-        MessageOverHead.getConfigManager().getCommandMessageMap().get("disable").getAccess(player).ifPresent(player::sendMessage);
+        MessageOverHead.CONFIG_MANAGER.getCommandMessageMap().get("disable").getAccess(player).ifPresent(player::sendMessage);
     }
 
     @Subcommand("send")
     @CommandPermission("moh.command.send")
     public static void onSend(Player player, String message) {
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#command"), player, new HashSet<>(Bukkit.getOnlinePlayers()));
-        MessageOverHead.getConfigManager().getCommandMessageMap().get("send").getAccess(player).ifPresent(player::sendMessage);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create("#command"), player, new HashSet<>(Bukkit.getOnlinePlayers()));
+        MessageOverHead.CONFIG_MANAGER.getCommandMessageMap().get("send").getAccess(player).ifPresent(player::sendMessage);
     }
 }

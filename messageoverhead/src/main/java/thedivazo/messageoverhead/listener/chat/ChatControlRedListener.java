@@ -25,7 +25,7 @@ public class ChatControlRedListener implements Listener {
         if (!(sender instanceof Player)) return;
         Set<Player> recipients = chatEvent.getRecipients();
         Channel channel = chatEvent.getChannel();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create(channel.getName()), (Player) sender, recipients);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create(channel.getName()), (Player) sender, recipients);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -33,9 +33,9 @@ public class ChatControlRedListener implements Listener {
         CommandSender sender = event.getSender();
         if (!(sender instanceof Player)) return;
         Player receiver = event.getReceiver();
-        if(Objects.isNull(receiver)) return;
+        if (Objects.isNull(receiver)) return;
         String message = event.getMessage();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), (Player) sender, Set.of(receiver));
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create("#private"), (Player) sender, Set.of(receiver));
     }
 
 //    @EventHandler(priority = EventPriority.LOWEST)

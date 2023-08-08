@@ -46,7 +46,7 @@ public class DecoratedStringUtils {
                         text.toChunksList()
                                 .stream()
                                 .map(chunk ->
-                                        chunk.toBuilder().setText(PlaceholderAPI.setPlaceholders(player,insertItemsAdderPlaceholders(chunk.getText(), player))).build()).collect(Collectors.toList()))
+                                        chunk.toBuilder().setText(PlaceholderAPI.setPlaceholders(player, insertItemsAdderPlaceholders(chunk.getText(), player))).build()).collect(Collectors.toList()))
                 .build();
     }
 
@@ -56,6 +56,8 @@ public class DecoratedStringUtils {
     }
 
     public static DecoratedString wrapString(String str) {
-        return DecoratedString.builder().chunks(new ArrayList<>(){{add(Chunk.builder().setText(str).build());}}).build();
+        return DecoratedString.builder().chunks(new ArrayList<>() {{
+            add(Chunk.builder().setText(str).build());
+        }}).build();
     }
 }

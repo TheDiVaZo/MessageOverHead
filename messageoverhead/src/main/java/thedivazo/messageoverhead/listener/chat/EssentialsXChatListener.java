@@ -17,7 +17,7 @@ public class EssentialsXChatListener implements Listener {
         String message = globalChatEvent.getMessage();
         Player sender = globalChatEvent.getPlayer();
         Set<Player> recipients = globalChatEvent.getRecipients();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("global"), sender, recipients);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create("global"), sender, recipients);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -25,7 +25,7 @@ public class EssentialsXChatListener implements Listener {
         String message = globalChatEvent.getMessage();
         Player sender = globalChatEvent.getPlayer();
         Set<Player> recipients = globalChatEvent.getRecipients();
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, ChannelFactory.create("local"), sender, recipients);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, ChannelFactory.create("local"), sender, recipients);
     }
 
 //    @EventHandler(priority = EventPriority.LOWEST)

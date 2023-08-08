@@ -24,7 +24,7 @@ public class SuperVanishListener implements VanishListener {
     public void onVanishStateChange(PlayerVanishStateChangeEvent event) {
         Player player = Bukkit.getPlayer(event.getUUID());
         if (player == null) return;
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         if (event.isVanishing())
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
         else if(showable.test(player))

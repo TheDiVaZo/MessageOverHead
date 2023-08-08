@@ -234,4 +234,10 @@ class DecoratedStringTest {
         DecoratedString decoratedString = DecoratedString.valueOf("&cEe Ee {message}");
         System.out.println(decoratedString.replace("{message}", DecoratedString.valueOf("&cHh")));
     }
+
+    @Test
+    void gradientTest() {
+        DecoratedString decoratedString = DecoratedString.valueOf("{GRADIENT:&eэто&b}");
+        System.out.println(decoratedString);
+    }
 }

@@ -41,7 +41,7 @@ public class DefaultVanishListener implements VanishListener {
     public void onGameModeChangeEvent(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         GameMode newGameMode = event.getNewGameMode();
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         if (newGameMode.equals(GameMode.SPECTATOR))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
         else if (showableIgnoreGameMode.test(player))
@@ -55,7 +55,7 @@ public class DefaultVanishListener implements VanishListener {
         Player player = (Player) event.getEntity();
         PotionEffect potionEffect = event.getNewEffect();
         if (potionEffect == null) return;
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         if (potionEffect.getType().equals(PotionEffectType.INVISIBILITY)) {
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
             BukkitTask currentBukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(

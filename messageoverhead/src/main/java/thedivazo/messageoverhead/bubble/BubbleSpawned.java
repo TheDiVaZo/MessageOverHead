@@ -26,13 +26,13 @@ public class BubbleSpawned {
     private Set<Player> filterShowers(Player sender, Set<Player> showers) {
         return showers.stream().filter(player ->
                 sender.getWorld().equals(player.getWorld())
-                && sender.getLocation().distance(player.getLocation()) <= bubbleModel.getDistance()
-                ).collect(Collectors.toSet());
+                        && sender.getLocation().distance(player.getLocation()) <= bubbleModel.getDistance()
+        ).collect(Collectors.toSet());
     }
-    
+
     private Location getLocationPlusBiasY(Player sender) {
         Location location = sender.getLocation();
-        location.setY(location.getY()+bubbleModel.getBiasY());
+        location.setY(location.getY() + bubbleModel.getBiasY());
         return location;
     }
 
@@ -63,13 +63,13 @@ public class BubbleSpawned {
             playParticle();
             playSound();
         }
-        positionTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MessageOverHead.getInstance(), ()-> {
+        positionTask = Bukkit.getScheduler().runTaskTimerAsynchronously(MessageOverHead.getInstance(), () -> {
             bubbleWrapper.setPosition(getLocationPlusBiasY(sender));
         }, 0, 1);
-        removeTask = Bukkit.getScheduler().runTaskLaterAsynchronously(MessageOverHead.getInstance(), ()-> {
+        removeTask = Bukkit.getScheduler().runTaskLaterAsynchronously(MessageOverHead.getInstance(), () -> {
             positionTask.cancel();
             bubbleWrapper.remove();
-        }, Math.round(getLifeTimeBubble()*20));
+        }, Math.round(getLifeTimeBubble() * 20));
     }
 
     public void remove() {

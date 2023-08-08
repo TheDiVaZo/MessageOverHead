@@ -24,14 +24,14 @@ public class CMIVanishListener implements VanishListener {
     @EventHandler
     public void onVanish(CMIPlayerVanishEvent event) {
         Player player = event.getPlayer();
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::hide);
     }
 
     @EventHandler
     public void onUnVanish(CMIPlayerUnVanishEvent event) {
         Player player = event.getPlayer();
-        BubbleManager bubbleManager = MessageOverHead.getConfigManager().getBubbleManager();
+        BubbleManager bubbleManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager();
         if (showable.test(player))
             bubbleManager.getBubbleSpawned(player).ifPresent(BubbleSpawned::show);
     }

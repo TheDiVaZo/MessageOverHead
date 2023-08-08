@@ -36,7 +36,7 @@ public class VersionWrapper implements Comparable<VersionWrapper> {
 
     public static VersionWrapper valueOf(String version, Pattern pattern, int majorGroup,int minorGroup,int patchGroup) {
         Matcher matcher = pattern.matcher(version);
-        if (!matcher.find()) throw new IllegalArgumentException("The value is not version");
+        if (!matcher.find()) throw new IllegalArgumentException("The value '+"+version+"+' is not version");
         String wMajor = matcher.group(majorGroup);
         String wMinor = matcher.group(minorGroup);
         String wPatch = matcher.group(patchGroup);

@@ -57,7 +57,8 @@ public class BubbleModel {
     @Getter
     @Builder(access = AccessLevel.PUBLIC)
     public static class FormatMessageModel {
-        @Nullable private final String permission;
+        @Nullable
+        private final String permission;
         @Singular
         @Unmodifiable
         private final List<DecoratedString> lines;

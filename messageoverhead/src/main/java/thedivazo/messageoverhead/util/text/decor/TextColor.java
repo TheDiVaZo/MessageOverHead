@@ -29,7 +29,7 @@ public class TextColor implements TextDecorator {
 
     private static final Pattern hexPatten = Pattern.compile("(&#[0-9a-fA-F]{6})");
     private static final Pattern usualPattern = Pattern.compile("(&[0-9a-f])");
-    private static final Pattern pattern = Pattern.compile(hexPatten.pattern()+"|"+usualPattern.pattern());
+    private static final Pattern pattern = Pattern.compile(hexPatten.pattern() + "|" + usualPattern.pattern());
 
     public static TextColor of(Color color) {
         return new TextColor(color);
@@ -41,11 +41,10 @@ public class TextColor implements TextDecorator {
         Matcher usualMatcher = usualPattern.matcher(color);
         if (hexMatcher.matches()) {
             return new TextColor(Color.decode(hexMatcher.group().substring(1)));
-        }
-        else if (usualMatcher.matches()) {
+        } else if (usualMatcher.matches()) {
             return new TextColor(ChatColor.getByChar(usualMatcher.group().charAt(1)));
-        }
-        else throw new IllegalArgumentException("The string '"+color+"' does not match the pattern '"+pattern.pattern()+"'");
+        } else
+            throw new IllegalArgumentException("The string '" + color + "' does not match the pattern '" + pattern.pattern() + "'");
     }
 
     private final ChatColor color;
@@ -55,7 +54,8 @@ public class TextColor implements TextDecorator {
     }
 
     private TextColor(ChatColor chatColor) {
-        if (chatColor.getColor() == null) throw new IllegalArgumentException("ChatColor should be a color, not a format");
+        if (chatColor.getColor() == null)
+            throw new IllegalArgumentException("ChatColor should be a color, not a format");
         this.color = chatColor;
     }
 

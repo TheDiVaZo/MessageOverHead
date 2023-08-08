@@ -42,7 +42,7 @@ public class BubbleManager {
 
     public void spawnBubble(String playerText, BubbleGenerator bubbleGenerator, Player sender, Set<Player> showers) {
         if (bubbles.containsKey(sender)) bubbles.get(sender).remove();
-        bubbles.put(sender,bubbleGenerator.spawnBubble(playerText, sender, showers));
+        bubbles.put(sender, bubbleGenerator.spawnBubble(playerText, sender, showers));
     }
 
     public void spawnBubble(String playerText, Channel channel, Player sender, Set<Player> showers) {
@@ -51,7 +51,7 @@ public class BubbleManager {
                 .getBubbleGenerator(sender, channel)
                 .ifPresentOrElse(
                         bubbleGenerator -> spawnBubble(playerText, bubbleGenerator, sender, showers),
-                        ()->Logger.debug("no bubble model found for player '{0}' (UUID: '{1}' )", sender.getName(), sender.getUniqueId().toString()));
+                        () -> Logger.debug("no bubble model found for player '{0}' (UUID: '{1}' )", sender.getName(), sender.getUniqueId().toString()));
     }
 
     public void removeAllBubbles() {

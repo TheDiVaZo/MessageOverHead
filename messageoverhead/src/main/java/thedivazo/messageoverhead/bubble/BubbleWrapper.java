@@ -45,7 +45,7 @@ public class BubbleWrapper {
 
     public void show(Player... players) {
         if (isRemoved() || !isHided()) return;
-        Set<Player> playerSet = Stream.of(players).filter(player->!showers.contains(player)).collect(Collectors.toSet());
+        Set<Player> playerSet = Stream.of(players).filter(player -> !showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(playerSet);
         bubbleMessages.forEach(bubble -> bubble.show(playerSet));
         hided = false;
@@ -59,7 +59,7 @@ public class BubbleWrapper {
 
     public void show(Set<Player> players) {
         if (isRemoved() || !isHided()) return;
-        Set<Player> filteredPlayers = players.stream().filter(player->!showers.contains(player)).collect(Collectors.toSet());
+        Set<Player> filteredPlayers = players.stream().filter(player -> !showers.contains(player)).collect(Collectors.toSet());
         showers.addAll(filteredPlayers);
         bubbleMessages.forEach(bubble -> bubble.show(filteredPlayers));
         hided = false;
@@ -81,7 +81,7 @@ public class BubbleWrapper {
     }
 
     public void remove() {
-        if(isRemoved()) return;
+        if (isRemoved()) return;
         hide();
         clearShowers();
         removed = true;

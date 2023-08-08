@@ -11,7 +11,7 @@ public class BubbleActiveStatus {
         DISABLED
     }
 
-    private static Map<OfflinePlayer, Status> statusMap = new HashMap<>();
+    private static final Map<OfflinePlayer, Status> statusMap = new HashMap<>();
 
     public static Status getStatus(OfflinePlayer player) {
         if (statusMap.containsKey(player)) return statusMap.get(player);

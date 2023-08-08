@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 @EqualsAndHashCode(callSuper = false)
 public class GameModeVanishManager implements VanishManager {
+
     @Override
     public boolean isInvisible(Player viewer) {
         return viewer.getGameMode().equals(GameMode.SPECTATOR);

@@ -12,9 +12,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import thedivazo.messageoverhead.MessageOverHead;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
-import thedivazo.messageoverhead.config.ConfigManager;
 import thedivazo.messageoverhead.logging.Logger;
-import thedivazo.messageoverhead.util.ConfigWrapper;
 
 import java.util.HashSet;
 
@@ -24,8 +22,8 @@ public class AdminCommands extends BaseCommand {
     @CommandPermission("amoh.command.create")
     @CommandCompletion("@bubble-generators")
     public static void onCreate(Player player, BubbleGenerator bubbleGenerator, String message) {
-        MessageOverHead.getConfigManager().getBubbleManager().spawnBubble(message, bubbleGenerator, player, new HashSet<>(Bukkit.getOnlinePlayers()));
-        MessageOverHead.getConfigManager().getCommandMessageMap().get("create").getAccess(player).ifPresent(player::sendMessage);
+        MessageOverHead.CONFIG_MANAGER.getBubbleManager().spawnBubble(message, bubbleGenerator, player, new HashSet<>(Bukkit.getOnlinePlayers()));
+        MessageOverHead.CONFIG_MANAGER.getCommandMessageMap().get("create").getAccess(player).ifPresent(player::sendMessage);
     }
 
     @Subcommand("reload")

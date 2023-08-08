@@ -20,10 +20,10 @@ public class GradientChunk {
         this.startColor = startColor;
         this.endColor = endColor;
         this.texts = texts;
-        this.length = texts.stream().mapToInt(t->t.getText().length()).reduce(Integer::sum).orElse(0);
+        this.length = texts.stream().mapToInt(t -> t.getText().length()).reduce(Integer::sum).orElse(0);
     }
 
-    public List<DecoratedChar> toChunkList() {
+    public List<DecoratedChar> toDecoratedCharList() {
         List<DecoratedChar> result = new ArrayList<>();
 
         int prevPosition = 0;
@@ -53,9 +53,9 @@ public class GradientChunk {
         double endColorGreen = endColor.getChatColor().getColor().getGreen();
         double endColorBlue = endColor.getChatColor().getColor().getBlue();
 
-        double differenceRed = (endColorRed - startColorRed) / length-1;
-        double differenceGreen = (endColorGreen - startColorGreen) / length-1;
-        double differenceBlue = (endColorBlue - startColorBlue) / length-1;
+        double differenceRed = (endColorRed - startColorRed) / length - 1;
+        double differenceGreen = (endColorGreen - startColorGreen) / length - 1;
+        double differenceBlue = (endColorBlue - startColorBlue) / length - 1;
 
         Color calculatedColor = new Color(
                 Math.round(startColorRed + differenceRed * position),

@@ -16,6 +16,9 @@ public class ChannelFactory {
             "#all", TypeSpecialChannel.ALL);
 
     public static Channel create(String name) {
-        return nameMap.containsKey(name) ? SpecialChannel.getSpecialChannel(nameMap.get(name)) : new CustomChannel(name);
+        SpecialChannel specialChannel = SpecialChannel.getSpecialChannel(nameMap.get(name));
+        if (nameMap.containsKey(name))
+            return specialChannel;
+        else return new CustomChannel(name);
     }
 }
