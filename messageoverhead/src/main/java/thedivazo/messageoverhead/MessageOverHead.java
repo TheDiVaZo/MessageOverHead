@@ -33,7 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.stream.Collectors;
 
-@Plugin(name = MessageOverHead.NAME, version = "4.0.0-b1")
+@Plugin(name = MessageOverHead.NAME, version = "4.0.0")
 @Dependency(value = "ProtocolLib")
 @SoftDependsOn(value = {
         @SoftDependency(value = "PlaceholderAPI"),

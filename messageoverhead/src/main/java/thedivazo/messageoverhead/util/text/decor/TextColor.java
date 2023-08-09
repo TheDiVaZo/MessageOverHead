@@ -2,6 +2,8 @@ package thedivazo.messageoverhead.util.text.decor;
 
 import lombok.ToString;
 import net.md_5.bungee.api.ChatColor;
+import thedivazo.messageoverhead.MessageOverHead;
+import thedivazo.messageoverhead.util.VersionWrapper;
 
 import java.awt.*;
 import java.util.Objects;
@@ -65,7 +67,8 @@ public class TextColor implements TextDecorator {
     }
 
     public static Pattern getPattern() {
-        return pattern;
+        if (MessageOverHead.MINECRAFT_VERSION.greater(VersionWrapper.v1_16)) return pattern;
+        else return usualPattern;
     }
 
     @Override
