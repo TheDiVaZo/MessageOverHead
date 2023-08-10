@@ -3,10 +3,8 @@ package thedivazo.messageoverhead.util.text.handler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import thedivazo.messageoverhead.util.text.Chunk;
-import thedivazo.messageoverhead.util.text.DecoratedString;
 import thedivazo.messageoverhead.util.text.decor.TextColor;
 import thedivazo.messageoverhead.util.text.decor.TextFormat;
-import thedivazo.messageoverhead.util.text.decor.colorutil.GradientText;
 
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -57,7 +55,7 @@ public class TextHandler {
     }
 
     public static List<BaseComponent> from(String minecraftColoredString) {
-        Matcher colorMatcher = TextColor.getPattern().matcher(minecraftColoredString);
+        Matcher colorMatcher = TextColor.getPATTERN().matcher(minecraftColoredString);
         Matcher formatMatcher = TextFormat.getPattern().matcher(minecraftColoredString);
 
         List<TypedMatchResult> matchResults = Stream.concat(

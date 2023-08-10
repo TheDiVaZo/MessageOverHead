@@ -29,9 +29,11 @@ public class TextColor implements TextDecorator {
     public static final TextColor YELLOW = new TextColor(ChatColor.YELLOW);
     public static final TextColor WHITE = new TextColor(ChatColor.WHITE);
 
-    private static final Pattern hexPatten = Pattern.compile("(&#[0-9a-fA-F]{6})");
-    private static final Pattern usualPattern = Pattern.compile("(&[0-9a-f])");
-    private static final Pattern pattern = Pattern.compile(hexPatten.pattern() + "|" + usualPattern.pattern());
+    private static final Pattern HEX_PATTERN = Pattern.compile("(&#[0-9a-fA-F]{6})");
+    private static final Pattern USUAL_PATTERN = Pattern.compile("(&[0-9a-f])");
+    private static final Pattern PATTERN = Pattern.compile(HEX_PATTERN.pattern() + "|" + USUAL_PATTERN.pattern());
+
+    private static final VersionWrapper MC_1_16 = VersionWrapper.valueOf("1.16");
 
     public static TextColor of(Color color) {
         return new TextColor(color);
@@ -39,14 +41,14 @@ public class TextColor implements TextDecorator {
 
 
     public static TextColor of(String color) {
-        Matcher hexMatcher = hexPatten.matcher(color);
-        Matcher usualMatcher = usualPattern.matcher(color);
+        Matcher hexMatcher = HEX_PATTERN.matcher(color);
+        Matcher usualMatcher = USUAL_PATTERN.matcher(color);
         if (hexMatcher.matches()) {
             return new TextColor(Color.decode(hexMatcher.group().substring(1)));
         } else if (usualMatcher.matches()) {
             return new TextColor(ChatColor.getByChar(usualMatcher.group().charAt(1)));
         } else
-            throw new IllegalArgumentException("The string '" + color + "' does not match the pattern '" + pattern.pattern() + "'");
+            throw new IllegalArgumentException("The string '" + color + "' does not match the pattern '" + PATTERN.pattern() + "'");
     }
 
     private final ChatColor color;
@@ -66,9 +68,9 @@ public class TextColor implements TextDecorator {
         return color;
     }
 
-    public static Pattern getPattern() {
-        if (MessageOverHead.MINECRAFT_VERSION.greater(VersionWrapper.v1_16)) return pattern;
-        else return usualPattern;
+    public static Pattern getPATTERN() {
+        if (MessageOverHead.MINECRAFT_VERSION.greater(MC_1_16)) return PATTERN;
+        else return USUAL_PATTERN;
     }
 
     @Override

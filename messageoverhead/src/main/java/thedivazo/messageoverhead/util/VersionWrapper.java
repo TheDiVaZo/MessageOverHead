@@ -13,39 +13,7 @@ import java.util.regex.Pattern;
 @Getter
 public class VersionWrapper implements Comparable<VersionWrapper> {
 
-    private static final Pattern versionPattern = Pattern.compile("([0-9]+)\\.([0-9]+)(\\.([0-9]+))?");
-
-    public static final VersionWrapper v1_12 = VersionWrapper.valueOf("1.12");
-    public static final VersionWrapper v1_12_1 = VersionWrapper.valueOf("1.12.1");
-    public static final VersionWrapper v1_12_2 = VersionWrapper.valueOf("1.12.2");
-
-    public static final VersionWrapper v1_13 = VersionWrapper.valueOf("1.13");
-    public static final VersionWrapper v1_13_1 = VersionWrapper.valueOf("1.13.1");
-    public static final VersionWrapper v1_13_2 = VersionWrapper.valueOf("1.13.2");
-
-    public static final VersionWrapper v1_14 = VersionWrapper.valueOf("1.14");
-    public static final VersionWrapper v1_14_1 = VersionWrapper.valueOf("1.14.1");
-    public static final VersionWrapper v1_14_2 = VersionWrapper.valueOf("1.14.2");
-    public static final VersionWrapper v1_14_3 = VersionWrapper.valueOf("1.14.3");
-
-    public static final VersionWrapper v1_15 = VersionWrapper.valueOf("1.15");
-    public static final VersionWrapper v1_15_1 = VersionWrapper.valueOf("1.15.1");
-    public static final VersionWrapper v1_15_2 = VersionWrapper.valueOf("1.15.2");
-    public static final VersionWrapper v1_15_3 = VersionWrapper.valueOf("1.15.3");
-
-    public static final VersionWrapper v1_16 = VersionWrapper.valueOf("1.16");
-    public static final VersionWrapper v1_16_1 = VersionWrapper.valueOf("1.16.1");
-    public static final VersionWrapper v1_16_2 = VersionWrapper.valueOf("1.16.2");
-    public static final VersionWrapper v1_16_3 = VersionWrapper.valueOf("1.16.3");
-    public static final VersionWrapper v1_16_4 = VersionWrapper.valueOf("1.16.4");
-    public static final VersionWrapper v1_16_5 = VersionWrapper.valueOf("1.16.5");
-
-    public static final VersionWrapper v1_17 = VersionWrapper.valueOf("1.17");
-    public static final VersionWrapper v1_17_1 = VersionWrapper.valueOf("1.17.1");
-
-    public static final VersionWrapper v1_18 = VersionWrapper.valueOf("1.18");
-    public static final VersionWrapper v1_18_1 = VersionWrapper.valueOf("1.18.1");
-    public static final VersionWrapper v1_18_2 = VersionWrapper.valueOf("1.18.2");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("([0-9]+)\\.([0-9]+)(\\.([0-9]+))?");
 
     private int major;
     private int minor;
@@ -63,7 +31,7 @@ public class VersionWrapper implements Comparable<VersionWrapper> {
     }
 
     public static VersionWrapper valueOf(String version) {
-        return valueOf(version, versionPattern, 1,2,4);
+        return valueOf(version, VERSION_PATTERN, 1,2,4);
     }
 
     public static VersionWrapper valueOf(String version, Pattern pattern, int majorGroup,int minorGroup,int patchGroup) {
