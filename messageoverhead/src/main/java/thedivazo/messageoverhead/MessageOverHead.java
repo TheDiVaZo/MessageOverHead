@@ -5,7 +5,10 @@ import co.aikar.commands.CommandContexts;
 import lombok.Getter;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
+import thedivazo.messageoverhead.channel.Channel;
+import thedivazo.messageoverhead.channel.ChannelFactory;
 import thedivazo.messageoverhead.command.AdminCommands;
+import thedivazo.messageoverhead.command.DebugCommands;
 import thedivazo.messageoverhead.command.DefaultCommands;
 import thedivazo.messageoverhead.bubble.BubbleModel;
 import thedivazo.messageoverhead.integration.IntegrationManager;
@@ -31,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Plugin(name = MessageOverHead.NAME, version = "4.0.0")
@@ -93,13 +97,19 @@ public class MessageOverHead extends JavaPlugin {
             return bubbleGeneratorManager.getBubbleGenerator(generatorName)
                     .orElseThrow(() -> new IllegalArgumentException("Bubble Model not found. Please check the correctness of the data"));
         });
+        manager.getCommandContexts().registerContext(Channel.class, c -> {
+            String channel = c.popFirstArg();
+            return ChannelFactory.create(channel);
+        });
 
         manager.registerCommand(new DefaultCommands());
         manager.registerCommand(new AdminCommands());
+        manager.registerCommand(new DebugCommands());
 
         manager.getCommandCompletions().registerCompletion("bubble-generators", context -> CONFIG_MANAGER.getBubbleModelSet().stream()
                 .map(BubbleModel::getName)
                 .collect(Collectors.toList()));
+        manager.getCommandCompletions().registerCompletion("channels", context -> List.of("#all", "#private", "#command"));
 
         manager.setDefaultExceptionHandler((command, registeredCommand, sender, args, t) -> {
             getLogger().warning("Error occurred while executing command " + command.getName());

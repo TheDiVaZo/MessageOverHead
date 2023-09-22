@@ -1,7 +1,7 @@
 # MessageOverHead
 
 <p align="center">
- <a href="https://www.spigotmc.org/resources/100051/"><img src="https://www.spigotmc.org/data/resource_icons/100/100051.jpg?1645008410" alt="Spigot downloads"></a>
+ <a href="https://www.spigotmc.org/resources/100051/"><img style="border-radius:20px" src="https://www.spigotmc.org/data/resource_icons/100/100051.jpg?1645008410" alt="Spigot downloads"></a>
 </br>
 <a href="https://www.spigotmc.org/resources/100051/"><img src="https://img.shields.io/spiget/downloads/100051?label=Spigot%20downloads" alt="Spigot downloads"></a>
 <a href="https://www.spigotmc.org/resources/100051/"><img src="https://img.shields.io/spiget/rating/100051?label=Spigot%20rating" alt="Spigot rating"></a>
