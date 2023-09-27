@@ -5,12 +5,14 @@ import co.aikar.commands.CommandContexts;
 import lombok.Getter;
 import thedivazo.messageoverhead.bubble.BubbleGenerator;
 import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
+import thedivazo.messageoverhead.bubble.BubbleManager;
 import thedivazo.messageoverhead.channel.Channel;
 import thedivazo.messageoverhead.channel.ChannelFactory;
 import thedivazo.messageoverhead.command.AdminCommands;
 import thedivazo.messageoverhead.command.DebugCommands;
 import thedivazo.messageoverhead.command.DefaultCommands;
 import thedivazo.messageoverhead.bubble.BubbleModel;
+import thedivazo.messageoverhead.config.ConfigAdapter;
 import thedivazo.messageoverhead.integration.IntegrationManager;
 import thedivazo.messageoverhead.logging.Logger;
 import thedivazo.messageoverhead.logging.handlers.JULHandler;
@@ -24,17 +26,13 @@ import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
-import thedivazo.messageoverhead.config.ConfigManager;
 import thedivazo.messageoverhead.util.VersionWrapper;
 import thedivazo.messageoverhead.metrics.MetricsManager;
-import thedivazo.messageoverhead.util.ConfigWrapper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Plugin(name = MessageOverHead.NAME, version = "4.0.0")
@@ -55,7 +53,11 @@ public class MessageOverHead extends JavaPlugin {
 
     public static final String NAME = "MessageOverHead";
 
-    public static final ConfigManager CONFIG_MANAGER = new ConfigManager();
+    @Getter
+    private static ConfigAdapter configAdapter;
+
+    @Getter
+    private static BubbleManager bubbleManager;
 
     public static MessageOverHead getInstance() {
         return JavaPlugin.getPlugin(MessageOverHead.class);
@@ -73,7 +75,8 @@ public class MessageOverHead extends JavaPlugin {
 
         saveDefaultConfig();
         try {
-            CONFIG_MANAGER.loadConfig(new ConfigWrapper(getConfig()));
+            reloadConfigManager(false);
+            updateBubbleManager();
         } catch (InvalidConfigurationException e) {
             Logger.error("Check the configuration for errors or typos");
             Logger.error(e.getMessage(), e);
@@ -86,6 +89,13 @@ public class MessageOverHead extends JavaPlugin {
         registerCommands();
     }
 
+    private static void updateBubbleManager() {
+        LinkedHashSet<BubbleGenerator> bubbleGeneratorSet = getConfigAdapter().getBubbleModels().stream()
+                .map(BubbleGenerator::new).collect(Collectors.toCollection(LinkedHashSet::new));
+        BubbleGeneratorManager bubbleGeneratorManager = new BubbleGeneratorManager(bubbleGeneratorSet);
+        bubbleManager = new BubbleManager(bubbleGeneratorManager);
+    }
+
     private void registerCommands() {
         PaperCommandManager manager = new PaperCommandManager(this);
 
@@ -93,7 +103,7 @@ public class MessageOverHead extends JavaPlugin {
 
         commandContexts.registerContext(BubbleGenerator.class, command -> {
             String generatorName = command.popFirstArg();
-            BubbleGeneratorManager bubbleGeneratorManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager().getBubbleGeneratorManager();
+            BubbleGeneratorManager bubbleGeneratorManager = bubbleManager.getBubbleGeneratorManager();
             return bubbleGeneratorManager.getBubbleGenerator(generatorName)
                     .orElseThrow(() -> new IllegalArgumentException("Bubble Model not found. Please check the correctness of the data"));
         });
@@ -106,7 +116,7 @@ public class MessageOverHead extends JavaPlugin {
         manager.registerCommand(new AdminCommands());
         manager.registerCommand(new DebugCommands());
 
-        manager.getCommandCompletions().registerCompletion("bubble-generators", context -> CONFIG_MANAGER.getBubbleModelSet().stream()
+        manager.getCommandCompletions().registerCompletion("bubble-generators", context -> configAdapter.getBubbleModels().stream()
                 .map(BubbleModel::getName)
                 .collect(Collectors.toList()));
         manager.getCommandCompletions().registerCompletion("channels", context -> List.of("#all", "#private", "#command"));
@@ -122,15 +132,18 @@ public class MessageOverHead extends JavaPlugin {
         IntegrationManager.getVanishListeners().forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
-    public static void reloadConfigManager() throws InvalidConfigurationException {
-        MessageOverHead.getInstance().reloadConfig();
-        MessageOverHead.getInstance().saveConfig();
-        CONFIG_MANAGER.loadConfig(new ConfigWrapper(MessageOverHead.getInstance().getConfig()));
+    public static void reloadConfigManager(boolean isReloadConfigFromDisk) throws InvalidConfigurationException {
+        if (isReloadConfigFromDisk) {
+            MessageOverHead.getInstance().reloadConfig();
+            MessageOverHead.getInstance().saveConfig();
+        }
+        if (Objects.isNull(configAdapter)) configAdapter = new ConfigAdapter(MessageOverHead.getInstance().getConfig());
+        else getConfigAdapter().updateConfiguration(MessageOverHead.getInstance().getConfig());
     }
 
     @Override
     public void onDisable() {
-        CONFIG_MANAGER.getBubbleManager().removeAllBubbles();
+        bubbleManager.removeAllBubbles();
     }
 }
 

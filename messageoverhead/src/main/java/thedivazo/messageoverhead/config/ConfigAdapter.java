@@ -1,63 +1,62 @@
 package thedivazo.messageoverhead.config;
 
+import lombok.Builder;
 import lombok.Getter;
-import thedivazo.messageoverhead.bubble.BubbleModel;
-import thedivazo.messageoverhead.logging.Logger;
-import lombok.NoArgsConstructor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.configuration.InvalidConfigurationException;
-import thedivazo.messageoverhead.bubble.BubbleGenerator;
-import thedivazo.messageoverhead.bubble.BubbleGeneratorManager;
-import thedivazo.messageoverhead.bubble.BubbleManager;
+import org.bukkit.configuration.file.FileConfiguration;
+import thedivazo.messageoverhead.bubble.BubbleModel;
 import thedivazo.messageoverhead.channel.ChannelFactory;
+import thedivazo.messageoverhead.logging.Logger;
+import thedivazo.messageoverhead.util.ConfigSectionDecorator;
 import thedivazo.messageoverhead.util.text.DecoratedString;
-import thedivazo.messageoverhead.util.ConfigWrapper;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@NoArgsConstructor
-public class ConfigManager {
+public class ConfigAdapter {
+    private ConfigSectionDecorator configuration;
+
     @Getter
-    private boolean experimental_1_20 = false;
+    private LinkedHashSet<BubbleModel> bubbleModels = new LinkedHashSet<>();
 
-    LinkedHashSet<BubbleModel> bubbleModelSetInConfig = new LinkedHashSet<>();
+    @Getter
+    private Setting settings;
 
-    Map<String, CommandMessage> commandMessageMap = new HashMap<>();
-
-    public Map<String, CommandMessage> getCommandMessageMap() {
-        return Collections.unmodifiableMap(commandMessageMap);
+    @Getter
+    @Builder
+    public static class Setting {
+        private boolean isExperemental_1_20;
+        private boolean isDebugMode;
+        private String enableCommandMessage;
+        private String disableCommandMessage;
+        private String sendCommandMessage;
+        private String createCommandMessage;
     }
 
-    BubbleManager bubbleManagerInConfig = new BubbleManager(new BubbleGeneratorManager(new HashSet<>()));
-
-    public Set<BubbleModel> getBubbleModelSet() {
-        return Collections.unmodifiableSet(bubbleModelSetInConfig);
+    public ConfigAdapter(FileConfiguration configuration) throws InvalidConfigurationException {
+        updateConfiguration(configuration);
     }
 
-    private ConfigWrapper currentConfig;
-
-    public void loadConfig(ConfigWrapper currentConfig) throws InvalidConfigurationException {
-        Logger.info("Start config loading...");
-        this.currentConfig = currentConfig;
-        loadBubbleModels();
-        loadSettings();
-        Logger.info("Config loaded");
+    public void updateConfiguration(FileConfiguration fileConfiguration) throws InvalidConfigurationException {
+        this.configuration = new ConfigSectionDecorator(fileConfiguration);
+        updateBubbleModels();
+        updateSettings();
     }
 
-
-    private void loadBubbleModels() throws InvalidConfigurationException {
-        ConfigWrapper bubbleModels = currentConfig.getRequiredConfigurationSection("models");
-        bubbleModelSetInConfig.clear();
+    private void updateBubbleModels() throws InvalidConfigurationException {
+        ConfigSectionDecorator configBubbleModels = configuration.getRequiredConfigurationSection("models");
+        bubbleModels.clear();
         Logger.info("Start models loading...");
-        for (String bubbleModelName : bubbleModels.getKeys(false)) {
+        for (String bubbleModelName : configBubbleModels.getKeys(false)) {
             Logger.info("Model '" + bubbleModelName + "' loading...");
 
-            if (bubbleModelSetInConfig.stream().anyMatch(bubbleModel -> bubbleModel.getName().equals(bubbleModelName)))
+            if (bubbleModels.stream().anyMatch(bubbleModel -> bubbleModel.getName().equals(bubbleModelName)))
                 throw new InvalidConfigurationException("The model '" + bubbleModelName + "' has duplicate in config!");
 
-            ConfigWrapper bubbleModel = bubbleModels.getRequiredConfigurationSection(bubbleModelName);
+            ConfigSectionDecorator bubbleModel = configBubbleModels.getRequiredConfigurationSection(bubbleModelName);
             BubbleModel.BubbleModelBuilder bubbleModelBuilder = BubbleModel.builder();
 
             BubbleModel.ParticleModel.ParticleModelBuilder particleModelBuilder = BubbleModel.ParticleModel.builder();
@@ -76,9 +75,9 @@ public class ConfigManager {
                         .forEach(channelName -> bubbleModelBuilder.channel(ChannelFactory.create(channelName)));
             else bubbleModelBuilder.channel(ChannelFactory.create("all"));
             if (bubbleModel.isConfigurationSection("settings.format")) {
-                ConfigWrapper formatMessageModels = bubbleModel.getRequiredConfigurationSection("settings.format");
+                ConfigSectionDecorator formatMessageModels = bubbleModel.getRequiredConfigurationSection("settings.format");
                 for (String formatMessageModelName : formatMessageModels.getKeys(false)) {
-                    ConfigWrapper formatMessageModel = formatMessageModels.getRequiredConfigurationSection(formatMessageModelName);
+                    ConfigSectionDecorator formatMessageModel = formatMessageModels.getRequiredConfigurationSection(formatMessageModelName);
                     BubbleModel.FormatMessageModel.FormatMessageModelBuilder formatMessageModelBuilder = BubbleModel.FormatMessageModel.builder();
                     formatMessageModelBuilder
                             .lines(formatMessageModel.getWrappedStringInListOrGetStringList("format", List.of("{message}")).stream()
@@ -96,7 +95,7 @@ public class ConfigManager {
                     .enable(bubbleModel.getBoolean("particle.enable", true))
                     .particle(Particle.valueOf(
                             bubbleModel.getString("particle.type", Particle.CLOUD.name())))
-                    .count(bubbleModels.getInt("particle.count", 4))
+                    .count(configBubbleModels.getInt("particle.count", 4))
                     .offsetX(bubbleModel.getDouble("particle.offset-x", 0.2d))
                     .offsetY(bubbleModel.getDouble("particle.offset-y", 0.2d))
                     .offsetZ(bubbleModel.getDouble("particle.offset-z", 0.2d));
@@ -113,45 +112,26 @@ public class ConfigManager {
                     .particleModel(particleModelBuilder.build())
                     .soundModel(soundModelBuilder.build())
                     .lifeTimeModel(lifeTimeModelBuilder.build());
-            bubbleModelSetInConfig.add(bubbleModelBuilder.build());
+            bubbleModels.add(bubbleModelBuilder.build());
 
             Logger.info("Model '" + bubbleModelName + "' loaded");
         }
         Logger.info("Models loaded");
-        if (bubbleManagerInConfig != null) bubbleManagerInConfig.removeAllBubbles();
-        bubbleManagerInConfig = generateBubbleManager();
-        Logger.info("BubbleManager generated");
     }
 
-    private void loadSettings() throws InvalidConfigurationException {
+    private void updateSettings() throws InvalidConfigurationException {
         Logger.info("Settings loading...");
-        ConfigWrapper settings = currentConfig.getRequiredConfigurationSection("settings");
-        experimental_1_20 = settings.getBoolean("1_20_experimental", false);
-        loadCommandMessage(settings);
+        ConfigSectionDecorator configSettings = configuration.getRequiredConfigurationSection("settings");
+        ConfigSectionDecorator configCommandMessages = configSettings.getRequiredConfigurationSection("messages.command");
+        settings = Setting.builder()
+                .isExperemental_1_20(configSettings.getBoolean("1_20_experimental", false))
+                .isDebugMode(configuration.getBoolean("debug", false))
+                .enableCommandMessage(configCommandMessages.getString("enable", "bubble enabled"))
+                .disableCommandMessage(configCommandMessages.getString("disable", "bubble disabled"))
+                .sendCommandMessage(configCommandMessages.getString("send", "bubble send"))
+                .createCommandMessage(configCommandMessages.getString("create", "bubble create"))
+                .build();
         Logger.info("Setting loaded");
-    }
-
-    private void loadCommandMessage(ConfigWrapper settings) throws InvalidConfigurationException {
-        Logger.info("Command message loading...");
-        commandMessageMap.clear();
-        ConfigWrapper commandMessages = settings.getRequiredConfigurationSection("messages.command");
-        for (String name : commandMessages.getKeys(false)) {
-            DecoratedString access = DecoratedString.valueOf(commandMessages.getString(name, ""));
-            CommandMessage commandMessage = new CommandMessage(access);
-            commandMessageMap.put(name, commandMessage);
-        }
-        Logger.info("Command message loaded");
-    }
-
-    private BubbleManager generateBubbleManager() {
-        LinkedHashSet<BubbleGenerator> bubbleGeneratorSet = getBubbleModelSet().stream()
-                .map(BubbleGenerator::new)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        return new BubbleManager(new BubbleGeneratorManager(bubbleGeneratorSet));
-    }
-
-    public BubbleManager getBubbleManager() {
-        return bubbleManagerInConfig;
     }
 
 }

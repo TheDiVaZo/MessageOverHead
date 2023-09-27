@@ -31,7 +31,7 @@ public class DebugCommands extends BaseCommand {
     public static void onGetAccessBubbleModels(CommandSender commandSender, @Optional Player player, @Optional Channel channel) {
 
         if (Objects.nonNull(player)) {
-            java.util.Optional<BubbleGenerator> bubbleGeneratorManager = MessageOverHead.CONFIG_MANAGER.getBubbleManager()
+            java.util.Optional<BubbleGenerator> bubbleGeneratorManager = MessageOverHead.getBubbleManager()
                     .getBubbleGeneratorManager()
                     .getBubbleGenerator(player, channel == null ? ChannelFactory.create("#all") : channel);
             if (bubbleGeneratorManager.isPresent()) {
@@ -47,7 +47,7 @@ public class DebugCommands extends BaseCommand {
         }
         else  {
             StringBuilder stringBuilder = new StringBuilder(ChatColor.RED + "All Bubble Models:"+ChatColor.WHITE);
-            MessageOverHead.CONFIG_MANAGER.getBubbleModelSet().forEach(bubbleModel ->  stringBuilder.append("\n").append(bubbleModel.getName()));
+            MessageOverHead.getConfigAdapter().getBubbleModels().forEach(bubbleModel ->  stringBuilder.append("\n").append(bubbleModel.getName()));
             commandSender.sendMessage(stringBuilder.toString());
         }
     }

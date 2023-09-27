@@ -4,6 +4,8 @@
 
 version: 1.4 #DONT TOUCH!
 
+debug: false #debug mode.
+
 settings: #plugin settings
   1_20_experimental: false #enable experimental possibilities from 1.20
   messages:

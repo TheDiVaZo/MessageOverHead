@@ -7,10 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ConfigWrapper {
+public class ConfigSectionDecorator {
     private final ConfigurationSection configurationSection;
 
-    public ConfigWrapper(ConfigurationSection configurationSection) {
+    public ConfigSectionDecorator(ConfigurationSection configurationSection) {
         this.configurationSection = configurationSection;
     }
 
@@ -42,9 +42,9 @@ public class ConfigWrapper {
         return result;
     }
 
-    public ConfigWrapper getRequiredConfigurationSection(@NotNull String path) throws InvalidConfigurationException {
+    public ConfigSectionDecorator getRequiredConfigurationSection(@NotNull String path) throws InvalidConfigurationException {
         if (!configurationSection.isConfigurationSection(path)) throw new InvalidConfigurationException("There is no '"+path+"' section in the config.");
-        else return new ConfigWrapper(configurationSection.getConfigurationSection(path));
+        else return new ConfigSectionDecorator(configurationSection.getConfigurationSection(path));
     }
 
     public String getString(String path, String def) {
