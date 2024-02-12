@@ -1,5 +1,5 @@
 # MessageOverHead
-
+<h1>A new version of the plugin is in development. Currently, there is no support due to my academic workload</h1>
 <p align="center">
  <a href="https://www.spigotmc.org/resources/100051/"><img src="https://www.spigotmc.org/data/resource_icons/100/100051.jpg?1645008410" alt="Spigot downloads"></a>
 </br>
