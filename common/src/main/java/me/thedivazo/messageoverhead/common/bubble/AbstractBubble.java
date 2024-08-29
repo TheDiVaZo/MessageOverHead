@@ -1,19 +1,17 @@
 package me.thedivazo.messageoverhead.common.bubble;
 
-import lombok.experimental.SuperBuilder;
 import me.thedivazo.messageoverhead.common.message.Message;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-public abstract class AbstractBubble<T extends Message> implements Bubble<T> {
+public abstract class AbstractBubble<T extends Message<?>, K> implements Bubble<T, K> {
     protected final T message;
-    protected final UUID creatorUUID;
+    protected final K creator;
     protected final LocalDateTime createdAt;
 
-    protected AbstractBubble(T message, UUID creatorUUID, LocalDateTime createdAt) {
+    protected AbstractBubble(T message, K creator, LocalDateTime createdAt) {
         this.message = message;
-        this.creatorUUID = creatorUUID;
+        this.creator = creator;
         this.createdAt = createdAt;
     }
 
@@ -23,8 +21,8 @@ public abstract class AbstractBubble<T extends Message> implements Bubble<T> {
     }
 
     @Override
-    public UUID creatorUUID() {
-        return creatorUUID;
+    public K creator() {
+        return creator;
     }
 
     @Override
