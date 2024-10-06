@@ -5,7 +5,10 @@ import me.thedivazo.messageoverhead.common.message.Message;
 import java.time.LocalDateTime;
 
 /**
- * Interface representing a toast message object
+ * Интерфейс всплывающего сообщения.
+ * @param <K> Класс, представляющий собой создателя, вызвавший всплывающее сообщение.
+ * @param <T> Содержание сообщения. Может быть {@link String} или другой класс, представляющий текст
+ *
  */
 public interface Bubble<T extends Message<?>, K> {
     T message();

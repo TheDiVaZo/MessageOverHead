@@ -1,21 +1,27 @@
 plugins {
     id 'java'
+    id "org.checkerframework" version "0.6.45"
 }
 
 group = 'com.github.TheDiVaZo.MessageOverHead'
 version = '1.0.0'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     /*LOMBOK*/
-    compileOnly 'org.projectlombok:lombok:1.18.34'
+    implementation 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    /*CHECKER FRAMEWORK*/
+    implementation 'org.checkerframework:checker-qual:3.42.0'
+    implementation 'org.checkerframework:checker:3.42.0'
 
     /*JUNIT*/
     testImplementation platform('org.junit:junit-bom:5.10.0')

@@ -1,5 +1,7 @@
 package me.thedivazo.messageoverhead.common.message;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,6 @@ import java.util.List;
  * @param <T> Message type. Can be a {@link String} or other class representing the original message
  */
 public interface Message<T> {
-    List<T> text();
-    List<String> toStringText();
+    @NonNull List<T> text();
+    @NonNull List<String> toStringText();
 }

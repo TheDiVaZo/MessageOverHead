@@ -1,50 +1,58 @@
 package me.thedivazo.messageoverhead.common.controller;
 
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
-import me.thedivazo.messageoverhead.common.message.Message;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Отвечает за управлением отображения сообщения наблюдателям
+ * Класс, отвечает за управление отображением всплывающего сообщения
  * @param <B> тип всплывающего сообщения
  * @param <K> тип создателя всплывающего сообщения
  */
 public interface DisplayController<B extends Bubble<?, K>, K> {
     /**
+     * Отображает новое сообщение, если предыдущего сообщения нет или удалено
+     * @param newBubble новое сообщение
+     */
+    boolean showBubbleIfNotShowed(B newBubble);
+
+    /**
      * Отображает новое сообщение
      * @param newBubble новое сообщение
      */
-    void showBubble(B newBubble);
+    void showBubbleAnyway(B newBubble);
+
+    /**
+     * Отображает отображаемое сообщение новым вычисленным наблюдателям
+     * @param creator
+     */
+    boolean updateSpectators(K creator);
+    default boolean updateSpectators(B bubble) {
+        updateSpectators(bubble.creator());
+    }
+
+    /**
+     * Отображает новое сообщение старым наблюдателям.
+     * @param newBubble новое сообщение
+     * @return старое отображаемое сообщение или null, если такого сообщения не было
+     */
+    @Nullable B replaceBubble(B newBubble);
 
     /**
      * Удаляет сообщение, если оно было отображено
      * @param bubble
      */
-    void removeBubble(B bubble);
-
-    /**
-     * Показывает текущее отображаемое сообщение у создателя, которое было скрыто
-     * Если сообщения нет (или удалено), или оно не было скрыто, ничего не делает
-     * @param creator тип создателя
-     */
-    void showCurrentBubble(K creator);
-
-    /**
-     * Скрывает текущее отображаемое сообщение у создателя.
-     * Если сообщение уже скрыто, ничего не делает
-     * @param creator
-     */
-    void hideCurrentBubble(K creator);
+    default boolean removeBubble(B bubble) {
+        return removeBubble(bubble.creator());
+    }
 
     /**
      * Удаляет текущее отображаемое сообщение у создателя.
      * @param creator
      */
-    void removeCurrentBubble(K creator);
-
-    /**
-     * Возвращает текущее отображаемое сообщение у создателя
-     * @param creator создатель сообщения
-     * @return текущее отображаемое сообщение
-     */
-    B getCurrentBubble(K creator);
+    boolean removeBubble(K creator);
 }
