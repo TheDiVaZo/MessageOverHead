@@ -23,6 +23,9 @@ dependencies {
     implementation 'org.checkerframework:checker-qual:3.42.0'
     implementation 'org.checkerframework:checker:3.42.0'
 
+    /*GUAVA*/
+    implementation 'com.google.guava:guava:33.3.1-jre'
+
     /*JUNIT*/
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

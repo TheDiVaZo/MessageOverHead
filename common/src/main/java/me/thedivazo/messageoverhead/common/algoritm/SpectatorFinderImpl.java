@@ -1,4 +1,4 @@
-package me.thedivazo.messageoverhead.common.spectator;
+package me.thedivazo.messageoverhead.common.algoritm;
 
 import lombok.AllArgsConstructor;
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
@@ -20,7 +20,7 @@ public class SpectatorFinderImpl<S, B extends Bubble<?, ?>> implements Spectator
     private final Predicate<S> spectatorPredicate;
 
     @Override
-    public @NonNull Set<S> getSpectators(B bubble) {
+    public @NonNull Set<S> findSpectators(B bubble) {
         return IterableUtil.toStream(spectatorFinderFunction.apply(bubble)).filter(spectatorPredicate).collect(Collectors.toSet());
     }
 }

@@ -1,4 +1,4 @@
-package me.thedivazo.messageoverhead.common.controller;
+package me.thedivazo.messageoverhead.common.algoritm;
 
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -6,11 +6,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Set;
 
 /**
- * Класс, отвечающий за отображение всплывающего сообщения
+ * Класс, отвечающий за логику отображения всплывающего сообщения
  * @param <B> тип всплывающего сообщения
  * @param <S> тип наблюдателей
  */
-public interface VisualController<B extends Bubble<?, ?>, S> {
+public interface Visualizer<B extends Bubble<?, ?>, S> {
     void visualize(@NonNull B bubble, Set<S> spectators);
     void removeVisualization(@NonNull B bubble, Set<S> spectators);
 }

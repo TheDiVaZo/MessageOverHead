@@ -7,4 +7,5 @@
 
 rootProject.name = 'MessageOverHead'
 include 'common'
+include 'spigot'
 

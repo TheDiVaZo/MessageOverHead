@@ -1,4 +1,4 @@
-package me.thedivazo.messageoverhead.common.spectator;
+package me.thedivazo.messageoverhead.common.algoritm;
 
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -11,5 +11,5 @@ import java.util.Set;
  * @param <B> тип наблюдателя
  */
 public interface SpectatorFinder<S, B extends Bubble<?, ?>> {
-    @NonNull Set<S> getSpectators(B bubble);
+    @NonNull Set<S> findSpectators(B bubble);
 }

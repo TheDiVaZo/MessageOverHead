@@ -3,56 +3,62 @@ package me.thedivazo.messageoverhead.common.controller;
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
- * Класс, отвечает за управление отображением всплывающего сообщения
- * @param <B> тип всплывающего сообщения
- * @param <K> тип создателя всплывающего сообщения
+ * @author TheDiVaZo
+ * created on 07.10.2024
+ *
+ * Предоставляет методы отображения и его контроля
  */
-public interface DisplayController<B extends Bubble<?, K>, K> {
+public interface DisplayController<B extends Bubble<?, ?>, S> {
     /**
-     * Отображает новое сообщение, если предыдущего сообщения нет или удалено
-     * @param newBubble новое сообщение
+     * Заново отображает отображаемое сообщение
+     * @param bubble отображаемое сообщение
+     * @return текущее отображаемое сообщение, или null, если такового нет.
      */
-    boolean showBubbleIfNotShowed(B newBubble);
+    @Nullable B reloadBubble(B bubble);
 
     /**
-     * Отображает новое сообщение
-     * @param newBubble новое сообщение
+     * Метод, отображающий новое всплывающие сообщение.
+     * Заменяет предыдущее отображаемое сообщение и возвращает его
+     * @param bubble новое сообщение
+     * @return предыдущие наблюдатели. Null, если сообщение изначально не отображалось
      */
-    void showBubbleAnyway(B newBubble);
+    @Nullable Set<S> showBubble(B bubble, Set<S> spectators);
 
     /**
-     * Отображает отображаемое сообщение новым вычисленным наблюдателям
-     * @param creator
+     * Метод, добавляющий наблюдателей к отображаемому сообщению и отображает его новым наблюдателям
+     * @param bubble отображаемое сообщение
+     * @param newSpectators новые наблюдатели
+     * @return true, если наблюдатели успешно добавлены.
      */
-    boolean updateSpectators(K creator);
-    default boolean updateSpectators(B bubble) {
-        return updateSpectators(bubble.creator());
+    boolean addSpectatorAndShow(B bubble, Set<S> newSpectators);
+    default boolean addSpectatorAndShow(B bubble, S... newSpectators) {
+        return addSpectatorAndShow(bubble, Set.of(newSpectators));
     }
 
     /**
-     * Отображает новое сообщение старым наблюдателям.
-     * @param newBubble новое сообщение
-     * @return старое отображаемое сообщение или null, если такого сообщения не было
+     * Метод, удаляющий отображаемое сообщение
+     * @param bubble отображаемое сообщение
+     * @return сообщение, которое отображалось. Иначе null
      */
-    @Nullable B replaceBubble(B newBubble);
+    @Nullable Set<S> hideBubble(B bubble);
 
     /**
-     * Удаляет сообщение, если оно было отображено
-     * @param bubble
+     * Метод, удаляющий наблюдателей от отображаемого сообщения и скрывающий его удаленным наблюдателям
+     * @param bubble отображаемое сообщение
+     * @param spectators наблюдатели
+     * @return true, если наблюдатели успешно удалены.
      */
-    default B removeBubble(B bubble) {
-        return removeBubble(bubble.creator());
+    boolean removeSpectatorAndHide(B bubble, Set<S> spectators);
+    default boolean removeSpectatorAndHide(B bubble, S... spectators) {
+        return removeSpectatorAndHide(bubble, Set.of(spectators));
     }
 
     /**
-     * Удаляет текущее отображаемое сообщение у создателя.
-     * @param creator
+     * Метод, удаляющий dct отображаемое сообщения и скрывающий его от наблюдателей
      */
-    @Nullable B removeBubble(K creator);
+    void hideAll();
 }
