@@ -23,32 +23,54 @@ public class DisplayControllerImpl<B extends Bubble<?, K>, K, S> implements Disp
     private final Container<K, B> bubbleContainer;
     private final Container<B, Set<S>> spectatorContainer;
 
-    protected boolean showBubble(B newBubble) {
-        return false;
+    protected B showBubble(B newBubble, boolean isGenerateNewSpectators) {
+        B prevBubble = bubbleContainer.get(newBubble.creator());
+        Set<S> prevSpectators = null;
+        if (prevBubble != null) {
+            prevSpectators = spectatorContainer.remove(prevBubble);
+            if (prevSpectators != null) {
+                visualController.removeVisualization(prevBubble, prevSpectators);
+            }
+        }
+        Set<S> spectators = prevSpectators;
+        if (spectators == null || isGenerateNewSpectators) spectators = spectatorFinder.getSpectators(newBubble);
+        bubbleContainer.set(newBubble.creator(), newBubble);
+        spectatorContainer.set(newBubble, spectators);
+        visualController.visualize(newBubble, spectators);
+        return prevBubble;
     }
 
     @Override
     public boolean showBubbleIfNotShowed(B newBubble) {
-        return false;
+        if (bubbleContainer.has(newBubble.creator())) return false;
+        showBubbleAnyway(newBubble);
+        return true;
     }
 
     @Override
     public void showBubbleAnyway(B newBubble) {
-
+        showBubble(newBubble, true);
     }
 
     @Override
     public boolean updateSpectators(K creator) {
-        return false;
+        B bubble = bubbleContainer.get(creator);
+        if (bubble == null) return false;
+        showBubble(bubble, true);
+        return true;
     }
 
     @Override
     public @Nullable B replaceBubble(B newBubble) {
-        return null;
+        return showBubble(newBubble, false);
     }
 
     @Override
-    public boolean removeBubble(K creator) {
-        return false;
+    public B removeBubble(K creator) {
+        B bubble = bubbleContainer.remove(creator);
+        if (bubble == null) return null;
+        Set<S> spectators = spectatorContainer.remove(bubble);
+        if (spectators!= null) visualController.removeVisualization(bubble, spectators);
+        return bubble;
     }
 }

@@ -32,7 +32,7 @@ public interface DisplayController<B extends Bubble<?, K>, K> {
      */
     boolean updateSpectators(K creator);
     default boolean updateSpectators(B bubble) {
-        updateSpectators(bubble.creator());
+        return updateSpectators(bubble.creator());
     }
 
     /**
@@ -46,7 +46,7 @@ public interface DisplayController<B extends Bubble<?, K>, K> {
      * Удаляет сообщение, если оно было отображено
      * @param bubble
      */
-    default boolean removeBubble(B bubble) {
+    default B removeBubble(B bubble) {
         return removeBubble(bubble.creator());
     }
 
@@ -54,5 +54,5 @@ public interface DisplayController<B extends Bubble<?, K>, K> {
      * Удаляет текущее отображаемое сообщение у создателя.
      * @param creator
      */
-    boolean removeBubble(K creator);
+    @Nullable B removeBubble(K creator);
 }
