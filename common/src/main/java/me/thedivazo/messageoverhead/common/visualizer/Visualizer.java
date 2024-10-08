@@ -1,4 +1,4 @@
-package me.thedivazo.messageoverhead.common.algoritm;
+package me.thedivazo.messageoverhead.common.visualizer;
 
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
 import org.checkerframework.checker.nullness.qual.NonNull;

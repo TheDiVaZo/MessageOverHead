@@ -1,7 +1,7 @@
 package me.thedivazo.messageoverhead.common.controller;
 
 import com.google.common.collect.Sets;
-import me.thedivazo.messageoverhead.common.algoritm.Visualizer;
+import me.thedivazo.messageoverhead.common.visualizer.Visualizer;
 import me.thedivazo.messageoverhead.common.bubble.Bubble;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
