@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * @author TheDiVaZo
  * created on 07.10.2024
  *
- * Предоставляет методы отображения сообщения и контроля отображения
+ * Предоставляет методы отображения сообщения и его контроля
  */
 public interface DisplayController<B extends Bubble<?, ?>, S> {
     /**
