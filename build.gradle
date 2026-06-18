@@ -1,12 +1,14 @@
 plugins {
     id 'com.gradleup.shadow' version '9.4.2' apply false
     id 'org.jetbrains.kotlin.jvm' version '2.4.0' apply false
+    id 'io.papermc.paperweight.userdev' version '2.0.0-beta.21' apply false
 }
 
 project(':Core') {
     apply plugin: 'java'
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'com.gradleup.shadow'
+    apply plugin: 'io.papermc.paperweight.userdev'
 
     group = 'com.github.TheDiVaZo.MessageOverHead'
     version = '4.0.0-alpha'
@@ -53,7 +55,7 @@ project(':Core') {
     dependencies {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.4.0'
 
-        compileOnly 'io.papermc.paper:paper-api:1.19.1-R0.1-SNAPSHOT'
+        paperweight.paperDevBundle('1.19.1-R0.1-SNAPSHOT')
         implementation 'it.unimi.dsi:fastutil:8.5.18'
 
         compileOnly 'net.dmulloy2:ProtocolLib:5.4.0'
