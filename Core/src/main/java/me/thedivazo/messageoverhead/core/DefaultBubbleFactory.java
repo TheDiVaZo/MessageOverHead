@@ -14,7 +14,7 @@ public class DefaultBubbleFactory implements BubbleFactory {
     }
 
     @Override
-    public ActiveBubble createBubble(Message message, AuthorBubble author, Positionc positionc) {
+    public TickableActiveBubble createBubble(Message message, AuthorBubble author, Positionc positionc) {
         return new ActiveBubbleController(message, author, rendererFactory.create(message, positionc), componentRegistry);
     }
 }

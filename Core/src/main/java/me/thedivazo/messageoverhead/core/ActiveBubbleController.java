@@ -3,11 +3,13 @@ package me.thedivazo.messageoverhead.core;
 import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
-import me.thedivazo.messageoverhead.core.tick.StopReason;
-import me.thedivazo.messageoverhead.core.tick.TickableObject;
 import org.jetbrains.annotations.Nullable;
 
-public class ActiveBubbleController implements TickableObject, ActiveBubble, ComponentContext, CapabilityContainer {
+import java.util.UUID;
+
+public class ActiveBubbleController implements ActiveBubble, TickableActiveBubble, ComponentContext, CapabilityContainer {
+    private final UUID uuid = UUID.randomUUID();
+
     private final Message message;
     private long ageTicks = 0;
 
@@ -30,6 +32,11 @@ public class ActiveBubbleController implements TickableObject, ActiveBubble, Com
     }
 
     @Override
+    public UUID uuid() {
+        return uuid;
+    }
+
+    @Override
     public Message message() {
         return message;
     }
@@ -47,7 +54,7 @@ public class ActiveBubbleController implements TickableObject, ActiveBubble, Com
     @Override
     public void remove() {
         if (markRemoved) return;
-        onTickEnd(StopReason.BUBBLE_REMOVE);
+        onTickEnd();
         renderer.destroy();
         markRemoved = true;
     }
@@ -62,12 +69,6 @@ public class ActiveBubbleController implements TickableObject, ActiveBubble, Com
         if (markRemoved) return;
         ageTicks++;
         components.tick();
-    }
-
-    @Override
-    public void onTickEnd(StopReason stopReason) {
-        if (markRemoved) return;
-        components.detachAll();
     }
 
     @Override
