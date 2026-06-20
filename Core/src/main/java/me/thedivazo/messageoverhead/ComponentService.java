@@ -7,12 +7,16 @@ import me.thedivazo.messageoverhead.core.component.*;
 public final class ComponentService {
     private static final String PLUGIN_NAMESPACE = "messageoverhead";
 
-    private final ComponentRegistry registry = new ComponentRegistry();
+    private final ComponentRegistry registry;
 
     public final ComponentKey<ViewComponent> VIEW = registerPluginComponent("view", ViewComponent.class);
     public final ComponentKey<PositionComponent> POSITION = registerPluginComponent("position", PositionComponent.class);
 
     private final SetMultimap<String, ComponentKey<?>> otherNamespaceToKeys = MultimapBuilder.hashKeys().hashSetValues().build();
+
+    public ComponentService(ComponentRegistry registry) {
+        this.registry = registry;
+    }
 
     <T extends BubbleComponent> ComponentKey<T> registerPluginComponent(String value, Class<T> componentClass) {
         return registry.register(
@@ -37,11 +41,6 @@ public final class ComponentService {
         if (namespace.equals(PLUGIN_NAMESPACE)) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
 
         otherNamespaceToKeys.removeAll(namespace).forEach(registry::unregister);
-    }
-
-    public boolean isValid(ComponentKey<?> key) {
-        ComponentKey<?> existing = registry.find(key.id(), key.type());
-        return key.equals(existing);
     }
 
 }

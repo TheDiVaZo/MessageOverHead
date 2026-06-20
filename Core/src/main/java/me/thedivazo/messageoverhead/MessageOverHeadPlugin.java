@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead;
 
+import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,7 +14,8 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     public static final MinecraftVersion SERVER_VERSION = MinecraftVersion.parse(Bukkit.getMinecraftVersion());
 
-    private final ComponentService componentService = new ComponentService();
+    private final ComponentRegistry componentRegistry = new ComponentRegistry();
+    private final ComponentService componentService = new ComponentService(componentRegistry);
 
     @Override
     public void onEnable() {

@@ -101,6 +101,27 @@ public final class ComponentRegistry {
         return castExisting(key, expectedType);
     }
 
+    public boolean isValid(ComponentKey<?> key) {
+        Objects.requireNonNull(key, "key");
+
+        ComponentKey<?> existing = keys.get(key.id());
+
+        if (existing == null) {
+            return false;
+        }
+
+        if (!existing.type().equals(key.type())) {
+            throw new IllegalStateException(
+                    "Component " + key.id() + " has type "
+                            + existing.type().getName()
+                            + ", expected "
+                            + key.type().getName()
+            );
+        }
+
+        return key.equals(existing);
+    }
+
     public void freeze() {
         frozen = true;
     }

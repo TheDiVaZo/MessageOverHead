@@ -1,10 +1,8 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import me.thedivazo.messageoverhead.ComponentService;
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
-import me.thedivazo.messageoverhead.core.render.capability.RendererView;
 import me.thedivazo.messageoverhead.util.Position;
 import org.jetbrains.annotations.Nullable;
 

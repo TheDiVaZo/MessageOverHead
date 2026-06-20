@@ -14,10 +14,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -41,19 +44,22 @@ public final class FakeArmorStand {
     private final String message;
     private final int entityId;
     private final UUID entityUuid;
+    private final Set<Player> visiblePlayers;
 
-    private Location location;
+    private final Location location;
     private boolean small = true;
     private boolean noBasePlate = true;
     private boolean marker = true;
     private boolean invisible = true;
+    private boolean destroyed;
 
     public FakeArmorStand(String message, Location location) {
         this(
                 message,
                 location,
                 ProtocolLibrary.getProtocolManager(),
-                MessageOverHeadPlugin.SERVER_VERSION
+                MessageOverHeadPlugin.SERVER_VERSION,
+                Collections.newSetFromMap(new WeakHashMap<>())
         );
     }
 
@@ -61,12 +67,14 @@ public final class FakeArmorStand {
             String message,
             Location location,
             ProtocolManager protocolManager,
-            MinecraftVersion serverVersion
+            MinecraftVersion serverVersion,
+            Set<Player> visiblePlayers
     ) {
         this.message = Objects.requireNonNull(message, "message");
         this.location = Objects.requireNonNull(location, "location").clone();
         this.protocolManager = Objects.requireNonNull(protocolManager, "protocolManager");
         this.serverVersion = Objects.requireNonNull(serverVersion, "serverVersion");
+        this.visiblePlayers = Objects.requireNonNull(visiblePlayers, "visiblePlayers");
         this.protocolProfile = ProtocolProfile.forVersion(serverVersion);
         this.entityId = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
         this.entityUuid = UUID.randomUUID();
@@ -74,24 +82,65 @@ public final class FakeArmorStand {
 
     public void show(Player player) {
         Objects.requireNonNull(player, "player");
+        if (destroyed || !visiblePlayers.add(player)) {
+            return;
+        }
 
-        protocolManager.sendServerPacket(player, createSpawnPacket());
-        protocolManager.sendServerPacket(player, createMetadataPacket());
+        try {
+            protocolManager.sendServerPacket(player, createSpawnPacket());
+            protocolManager.sendServerPacket(player, createMetadataPacket());
+        } catch (RuntimeException | Error exception) {
+            visiblePlayers.remove(player);
+            throw exception;
+        }
     }
 
     public void updatePosition(Player player) {
         Objects.requireNonNull(player, "player");
+        if (destroyed || !visiblePlayers.contains(player)) {
+            return;
+        }
 
         protocolManager.sendServerPacket(player, createTeleportPacket());
     }
 
     public void hide(Player player) {
         Objects.requireNonNull(player, "player");
+        if (destroyed || !visiblePlayers.remove(player)) {
+            return;
+        }
 
-        protocolManager.sendServerPacket(player, createDestroyPacket());
+        try {
+            protocolManager.sendServerPacket(player, createDestroyPacket());
+        } catch (RuntimeException | Error exception) {
+            visiblePlayers.add(player);
+            throw exception;
+        }
+    }
+
+    public void destroy() {
+        if (destroyed) {
+            return;
+        }
+
+        visiblePlayers.stream().filter(visiblePlayers::remove).forEach(player -> {
+            try {
+                protocolManager.sendServerPacket(player, createDestroyPacket());
+            } catch (RuntimeException | Error exception) {
+                visiblePlayers.add(player);
+                throw exception;
+            }
+        });
+
+        destroyed = true;
+        visiblePlayers.clear();
     }
 
     public void setPosition(double x, double y, double z) {
+        if (destroyed) {
+            return;
+        }
+
         this.location.setX(x);
         this.location.setY(y);
         this.location.setZ(z);

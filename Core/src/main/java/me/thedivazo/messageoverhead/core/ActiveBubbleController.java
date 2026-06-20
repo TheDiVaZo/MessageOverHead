@@ -1,6 +1,5 @@
 package me.thedivazo.messageoverhead.core;
 
-import me.thedivazo.messageoverhead.ComponentService;
 import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
@@ -18,11 +17,11 @@ public class ActiveBubbleController implements TickableObject, ActiveBubble, Com
 
     private final DefaultComponentContainer components;
 
-    public ActiveBubbleController(Message message, AuthorBubble author, RendererBubble renderer, ComponentService service) {
+    public ActiveBubbleController(Message message, AuthorBubble author, RendererBubble renderer, ComponentRegistry registry) {
         this.message = message;
         this.author = author;
         this.renderer = renderer;
-        this.components = new DefaultComponentContainer(service, this);
+        this.components = new DefaultComponentContainer(registry, this);
     }
 
     @Override

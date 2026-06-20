@@ -1,19 +1,18 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import me.thedivazo.messageoverhead.ComponentService;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public final class DefaultComponentContainer implements ComponentContainer {
-    private final ComponentService registry;
+    private final ComponentRegistry registry;
     private final ComponentContext context;
 
     private final Map<ComponentKey<?>, Entry<?>> components =
             new LinkedHashMap<>();
 
-    public DefaultComponentContainer(ComponentService registry, ComponentContext context) {
-        this.registry = registry;
+    public DefaultComponentContainer(ComponentRegistry registry, ComponentContext context) {
+        this.registry = Objects.requireNonNull(registry, "registry");
         this.context = Objects.requireNonNull(context, "context");
     }
 
@@ -33,6 +32,11 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
         T component = createComponent(key, factory);
         Entry<T> entry = new Entry<>(key, component);
+        Entry<?> previousEntry = components.remove(key);
+
+        if (previousEntry != null) {
+            previousEntry.component().onDetached();
+        }
 
         components.put(key, entry);
 
@@ -55,8 +59,6 @@ public final class DefaultComponentContainer implements ComponentContainer {
         if (entry == null) {
             return null;
         }
-
-        if (!registry.isValid(key)) return null;
 
         components.remove(key);
 
