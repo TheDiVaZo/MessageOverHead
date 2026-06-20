@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public class ViewComponent implements BubbleComponent {
+public class ViewComponent extends BubbleComponent {
     private final Settings settings;
     private final double viewRadiusSquared;
 
