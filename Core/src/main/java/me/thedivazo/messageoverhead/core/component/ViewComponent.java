@@ -61,7 +61,7 @@ public class ViewComponent extends BubbleComponent {
     @Override
     public void onTick() {
         if (activeBubble.ageTicks() % settings.updateIntervalTicks() != 0) {
-            return;
+            visiblePlayers.forEach(rendererView::update);
         }
 
         List<Player> nextVisiblePlayers = new ArrayList<>();
