@@ -2,6 +2,7 @@ plugins {
     id 'com.gradleup.shadow' version '9.4.2' apply false
     id 'org.jetbrains.kotlin.jvm' version '2.4.0' apply false
     id 'io.papermc.paperweight.userdev' version '2.0.0-beta.21' apply false
+    id 'xyz.jpenilla.run-paper' version '3.0.2' apply false
 }
 
 project(':Core') {
@@ -9,6 +10,7 @@ project(':Core') {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'com.gradleup.shadow'
     apply plugin: 'io.papermc.paperweight.userdev'
+    apply plugin: 'xyz.jpenilla.run-paper'
 
     group = 'com.github.TheDiVaZo.MessageOverHead'
     version = '4.0.0-alpha'
@@ -45,7 +47,8 @@ project(':Core') {
 
     tasks.named('compileJava', JavaCompile) {
         options.compilerArgs += ['-parameters']
-        options.setDebug(false)
+        options.debug = true
+        options.debugOptions.debugLevel = 'source,lines,vars'
     }
 
     tasks.named('javadoc', Javadoc) {
@@ -57,6 +60,7 @@ project(':Core') {
 
         paperweight.paperDevBundle('1.19.1-R0.1-SNAPSHOT')
         implementation 'it.unimi.dsi:fastutil:8.5.18'
+        implementation 'org.incendo:cloud-paper:2.0.0-beta.16'
 
         compileOnly 'net.dmulloy2:ProtocolLib:5.4.0'
 
@@ -67,33 +71,26 @@ project(':Core') {
         testAnnotationProcessor 'org.projectlombok:lombok:1.18.46'
     }
 
-    tasks.named('jar') {
+    jar {
         archiveBaseName.set(rootProject.name)
     }
 
-    tasks.named('shadowJar') {
+    shadowJar {
         archiveBaseName.set(rootProject.name)
-        relocate 'org.bstats', 'thedivazo.bstats'
         minimize()
-        relocate 'co.aikar.commands', 'thedivazo.acf'
-        relocate 'co.aikar.locales', 'thedivazo.locales'
+        relocate("it.unimi.dsi", "me.thedivazo.messageoverhead.libs.it.unimi.dsi")
+        relocate 'org.incendo', 'me.thedivazo.messageoverhead.libs.org.incendo'
     }
 
-    def shadowJarTask = tasks.named('shadowJar')
+    runServer {
+        minecraftVersion('1.19.1')
 
-    tasks.register('buildAndCopyJar') {
-        dependsOn tasks.named('jar')
-        dependsOn shadowJarTask
-
-        doLast {
-            copy {
-                from shadowJarTask.get().archiveFile
-                into 'D:/testServer/plugins'
-            }
+        downloadPlugins {
+            url('https://github.com/dmulloy2/ProtocolLib/releases/download/5.4.0/ProtocolLib.jar')
         }
     }
 
-    tasks.named('test', Test) {
+    test {
         useJUnitPlatform()
     }
 }

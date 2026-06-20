@@ -9,13 +9,18 @@ public final class ComponentService {
 
     private final ComponentRegistry registry;
 
-    public final ComponentKey<ViewComponent> VIEW = registerPluginComponent("view", ViewComponent.class);
-    public final ComponentKey<PositionComponent> POSITION = registerPluginComponent("position", PositionComponent.class);
+    public final ComponentKey<ViewComponent> VIEW;
+    public final ComponentKey<PositionComponent> POSITION;
+    public final ComponentKey<LifetimeComponent> LIFETIME;
 
     private final SetMultimap<String, ComponentKey<?>> otherNamespaceToKeys = MultimapBuilder.hashKeys().hashSetValues().build();
 
     public ComponentService(ComponentRegistry registry) {
         this.registry = registry;
+        registerPluginComponent("view", ViewComponent.class);
+        VIEW = registerPluginComponent("view", ViewComponent.class);
+        POSITION = registerPluginComponent("position", PositionComponent.class);
+        LIFETIME = registerPluginComponent("lifetime", LifetimeComponent.class);
     }
 
     <T extends BubbleComponent> ComponentKey<T> registerPluginComponent(String value, Class<T> componentClass) {

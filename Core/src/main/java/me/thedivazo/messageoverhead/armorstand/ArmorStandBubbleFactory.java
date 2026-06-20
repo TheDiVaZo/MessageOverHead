@@ -11,7 +11,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.Objects;
 
-public class ArmoStandBubbleFactory implements RendererFactory {
+public class ArmorStandBubbleFactory implements RendererFactory {
     private static final LegacyComponentSerializer LEGACY_SERIALIZER =
             LegacyComponentSerializer.legacySection();
     private static final LegacyComponentSerializer RGB_LEGACY_SERIALIZER =
@@ -20,6 +20,9 @@ public class ArmoStandBubbleFactory implements RendererFactory {
                     .hexColors()
                     .useUnusualXRepeatedCharacterHexFormat()
                     .build();
+
+    public ArmorStandBubbleFactory() {
+    }
 
     @Override
     public RendererBubble create(Message message, Positionc positionc) {

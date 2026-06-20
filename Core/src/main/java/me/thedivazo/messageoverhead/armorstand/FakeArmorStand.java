@@ -6,7 +6,9 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.InternalStructure;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import org.bukkit.Location;
@@ -16,6 +18,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -123,7 +126,7 @@ public final class FakeArmorStand {
             return;
         }
 
-        visiblePlayers.stream().filter(visiblePlayers::remove).forEach(player -> {
+        visiblePlayers.forEach(player -> {
             try {
                 protocolManager.sendServerPacket(player, createDestroyPacket());
             } catch (RuntimeException | Error exception) {
@@ -167,63 +170,101 @@ public final class FakeArmorStand {
     }
 
     private PacketContainer createMetadataPacket() {
-        WrappedDataWatcher metadata = createMetadata();
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet.getIntegers().write(0, entityId);
 
         if (protocolProfile.usesDataValues()) {
-            packet.getDataValueCollectionModifier().write(0, metadata.toDataValueCollection());
+            packet.getDataValueCollectionModifier().write(0, createMetadataValues());
         } else {
-            packet.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
+            packet.getWatchableCollectionModifier().write(0, createWatchableMetadata());
         }
         return packet;
     }
 
     @SuppressWarnings("removal")
-    private WrappedDataWatcher createMetadata() {
-        WrappedDataWatcher metadata = new WrappedDataWatcher();
+    private List<WrappedDataValue> createMetadataValues() {
+        List<WrappedDataValue> values = new ArrayList<>(4);
         WrappedDataWatcher.Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
         WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
 
-        metadata.setObject(
-                new WrappedDataWatcher.WrappedDataWatcherObject(ENTITY_FLAGS_INDEX, byteSerializer),
+        values.add(new WrappedDataValue(
+                ENTITY_FLAGS_INDEX,
+                byteSerializer,
                 invisible ? ENTITY_FLAG_INVISIBLE : (byte) 0
-        );
-        writeCustomName(metadata);
-        metadata.setObject(
-                new WrappedDataWatcher.WrappedDataWatcherObject(
-                        CUSTOM_NAME_VISIBLE_INDEX,
-                        booleanSerializer
-                ),
+        ));
+        values.add(customNameDataValue());
+        values.add(new WrappedDataValue(
+                CUSTOM_NAME_VISIBLE_INDEX,
+                booleanSerializer,
                 true
-        );
-        metadata.setObject(
-                new WrappedDataWatcher.WrappedDataWatcherObject(
-                        armorStandFlagsIndex(),
-                        byteSerializer
-                ),
+        ));
+        values.add(new WrappedDataValue(
+                armorStandFlagsIndex(),
+                byteSerializer,
                 armorStandFlags()
-        );
-        return metadata;
+        ));
+        return values;
     }
 
     @SuppressWarnings("removal")
-    private void writeCustomName(WrappedDataWatcher metadata) {
+    private WrappedDataValue customNameDataValue() {
         if (protocolProfile.usesOptionalChatComponent()) {
             WrappedDataWatcher.Serializer serializer =
                     WrappedDataWatcher.Registry.getChatComponentSerializer(true);
             Optional<?> customName = Optional.of(
                     WrappedChatComponent.fromChatMessage(message)[0].getHandle()
             );
-            metadata.setObject(
-                    new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serializer),
-                    customName
-            );
-            return;
+            return new WrappedDataValue(CUSTOM_NAME_INDEX, serializer, customName);
         }
 
         WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(String.class);
-        metadata.setObject(
+        return new WrappedDataValue(CUSTOM_NAME_INDEX, serializer, message);
+    }
+
+    @SuppressWarnings("removal")
+    private List<WrappedWatchableObject> createWatchableMetadata() {
+        List<WrappedWatchableObject> values = new ArrayList<>(4);
+        WrappedDataWatcher.Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
+        WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
+
+        values.add(new WrappedWatchableObject(
+                new WrappedDataWatcher.WrappedDataWatcherObject(ENTITY_FLAGS_INDEX, byteSerializer),
+                invisible ? ENTITY_FLAG_INVISIBLE : (byte) 0
+        ));
+        values.add(customNameWatchableObject());
+        values.add(new WrappedWatchableObject(
+                new WrappedDataWatcher.WrappedDataWatcherObject(
+                        CUSTOM_NAME_VISIBLE_INDEX,
+                        booleanSerializer
+                ),
+                true
+        ));
+        values.add(new WrappedWatchableObject(
+                new WrappedDataWatcher.WrappedDataWatcherObject(
+                        armorStandFlagsIndex(),
+                        byteSerializer
+                ),
+                armorStandFlags()
+        ));
+        return values;
+    }
+
+    @SuppressWarnings("removal")
+    private WrappedWatchableObject customNameWatchableObject() {
+        if (protocolProfile.usesOptionalChatComponent()) {
+            WrappedDataWatcher.Serializer serializer =
+                    WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+            Optional<?> customName = Optional.of(
+                    WrappedChatComponent.fromChatMessage(message)[0].getHandle()
+            );
+            return new WrappedWatchableObject(
+                    new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serializer),
+                    customName
+            );
+        }
+
+        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(String.class);
+        return new WrappedWatchableObject(
                 new WrappedDataWatcher.WrappedDataWatcherObject(CUSTOM_NAME_INDEX, serializer),
                 message
         );
