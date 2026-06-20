@@ -17,9 +17,9 @@ public final class DefaultComponentContainer implements ComponentContainer {
     }
 
     @Override
-    public <T extends BubbleComponent> @Nullable T attach(
-            ComponentKey<T> key,
-            BubbleComponentFactory<T> factory
+    public @Nullable BubbleComponent attachUnchecked(
+            ComponentKey<?> key,
+            BubbleComponentFactory<?> factory
     ) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(factory, "factory");
@@ -30,8 +30,10 @@ public final class DefaultComponentContainer implements ComponentContainer {
             return null;
         }
 
-        T component = createComponent(key, factory);
-        Entry<T> entry = new Entry<>(key, component);
+        BubbleComponent component = createComponent(key, factory);
+        if (!key.type().isInstance(component)) throw new IllegalArgumentException(key + " is not of type " + component.getClass().getName() + ", key is type "+key.type().getName());
+
+        Entry<?> entry = new Entry<>(key, component);
         Entry<?> previousEntry = components.remove(key);
 
         if (previousEntry != null) {
@@ -47,7 +49,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
             throw exception;
         }
 
-        return component;
+        return key.type().cast(component);
     }
 
     @Override
@@ -117,12 +119,13 @@ public final class DefaultComponentContainer implements ComponentContainer {
         return components.isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends BubbleComponent> T createComponent(
-            ComponentKey<T> key,
-            BubbleComponentFactory<T> factory
+            ComponentKey<?> key,
+            BubbleComponentFactory<?> factory
     ) {
         try {
-            T component = factory.create(context);
+            T component = (T) factory.create(context);
 
             if (component == null) {
                 throw new IllegalStateException(
@@ -151,9 +154,46 @@ public final class DefaultComponentContainer implements ComponentContainer {
         }
     }
 
-    private record Entry<T extends BubbleComponent>(
-            ComponentKey<T> key,
-            T component
-    ) {
-    }
+    private static final class Entry<T extends BubbleComponent> {
+        private final ComponentKey<?> key;
+        private final BubbleComponent component;
+
+        private Entry(
+                ComponentKey<?> key,
+                BubbleComponent component
+        ) {
+            this.key = key;
+            this.component = component;
+        }
+
+        public ComponentKey<T> key() {
+            return (ComponentKey<T>) key;
+        }
+
+        public T component() {
+            return (T) component;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (Entry) obj;
+            return Objects.equals(this.key, that.key) &&
+                    Objects.equals(this.component, that.component);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, component);
+        }
+
+        @Override
+        public String toString() {
+            return "Entry[" +
+                    "key=" + key + ", " +
+                    "component=" + component + ']';
+        }
+
+        }
 }

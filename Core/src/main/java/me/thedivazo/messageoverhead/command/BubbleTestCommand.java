@@ -1,6 +1,6 @@
 package me.thedivazo.messageoverhead.command;
 
-import me.thedivazo.messageoverhead.core.BubbleManager;
+import me.thedivazo.messageoverhead.profile.BubbleManager;
 import me.thedivazo.messageoverhead.core.Message;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;

@@ -2,7 +2,8 @@ package me.thedivazo.messageoverhead;
 
 import me.thedivazo.messageoverhead.armorstand.ArmorStandBubbleFactory;
 import me.thedivazo.messageoverhead.command.BubbleTestCommand;
-import me.thedivazo.messageoverhead.core.BubbleManager;
+import me.thedivazo.messageoverhead.profile.BubbleManager;
+import me.thedivazo.messageoverhead.profile.ImmutableBubbleManager;
 import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.core.component.LifetimeComponent;
@@ -16,6 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 
+import java.util.Map;
+
 public class MessageOverHeadPlugin extends JavaPlugin {
     private static MessageOverHeadPlugin INSTANCE;
 
@@ -28,28 +31,25 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     private final ComponentRegistry componentRegistry = new ComponentRegistry();
     private final ComponentService componentService = new ComponentService(componentRegistry);
 
-    private final BubbleManager bubbleManager = new BubbleManager(new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory()), new BukkitBubbleScheduler(this, 0, 1));
+    private BubbleManager bubbleManager;
     private LegacyPaperCommandManager<CommandSender> commandManager;
 
     @Override
     public void onEnable() {
         if (INSTANCE != null) throw new IllegalStateException("Already initialized!");
         INSTANCE = this;
-
-        bubbleManager.addPreCreateCallback(
-                activeBubble -> PositionComponent.attach(activeBubble).add(pos -> {
-                    pos.y += 2.2;
-                })
-        );
-        bubbleManager.addPreCreateCallback(
-                bubble -> ViewComponent.attach(bubble,
-                        ViewComponent.factory(
-                                new ViewComponent.Settings(20, 5)
-                        )
+        this.bubbleManager = new ImmutableBubbleManager(
+                new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory()),
+                new BukkitBubbleScheduler(this, 0, 1),
+                Map.of(
+                        PositionComponent.key(), context -> {
+                            PositionComponent component = PositionComponent.Factory.INSTANCE.create(context);
+                            component.add(pos -> pos.y += 2.2);
+                            return component;
+                        },
+                        ViewComponent.key(), ViewComponent.factory(new ViewComponent.Settings(20, 5)),
+                        LifetimeComponent.key(), LifetimeComponent.factory(20*6)
                 )
-        );
-        bubbleManager.addPreCreateCallback(
-                bubble -> LifetimeComponent.attach(bubble, 20*6)
         );
 
         commandManager = LegacyPaperCommandManager.createNative(
