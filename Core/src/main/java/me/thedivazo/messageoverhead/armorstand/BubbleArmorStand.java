@@ -1,6 +1,6 @@
 package me.thedivazo.messageoverhead.armorstand;
 
-import me.thedivazo.messageoverhead.MOHPlugin;
+import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
@@ -20,28 +20,10 @@ import java.util.Objects;
  * Armor stand implementation of the bubble renderer contracts.
  */
 public final class BubbleArmorStand implements RendererBubble, RendererPosition, RendererView {
-
-    private static final LegacyComponentSerializer LEGACY_SERIALIZER =
-            LegacyComponentSerializer.legacySection();
-    private static final LegacyComponentSerializer RGB_LEGACY_SERIALIZER =
-            LegacyComponentSerializer.builder()
-                    .character(LegacyComponentSerializer.SECTION_CHAR)
-                    .hexColors()
-                    .useUnusualXRepeatedCharacterHexFormat()
-                    .build();
-
     private final FakeArmorStand armorStand;
     private final Position position;
 
     private boolean destroyed;
-
-    public BubbleArmorStand(Message message, Positionc positionc) {
-        this(message.component(), positionc);
-    }
-
-    public BubbleArmorStand(Component message, Positionc positionc) {
-        this(serializeMessage(message), positionc);
-    }
 
     public BubbleArmorStand(String message, Positionc positionc) {
         Objects.requireNonNull(positionc, "positionc");
@@ -111,14 +93,5 @@ public final class BubbleArmorStand implements RendererBubble, RendererPosition,
         if (destroyed) {
             throw new IllegalStateException("Bubble armor stand has already been destroyed");
         }
-    }
-
-    private static String serializeMessage(Component message) {
-        Objects.requireNonNull(message, "message");
-        LegacyComponentSerializer serializer =
-                MOHPlugin.SERVER_VERSION.isAtLeast(MinecraftVersion.VERSION_1_16)
-                        ? RGB_LEGACY_SERIALIZER
-                        : LEGACY_SERIALIZER;
-        return serializer.serialize(message);
     }
 }

@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MessageOverHeadPlugin extends JavaPlugin {
-    private static MessageOverHeadPlugin INSTANCE = new MessageOverHeadPlugin();
+    private static MessageOverHeadPlugin INSTANCE;
 
     public static MessageOverHeadPlugin getInstance() {
         return INSTANCE;

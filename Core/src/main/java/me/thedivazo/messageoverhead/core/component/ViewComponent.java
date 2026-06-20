@@ -190,7 +190,7 @@ public class ViewComponent implements BubbleComponent {
 
         @Override
         public boolean isAttachable(ComponentContext context) {
-            return context.capabilityContainer().capabilityOrNull(ViewComponent.class) != null;
+            return context.capabilityContainer().capabilityOrNull(RendererView.class) != null;
         }
 
         @Override
