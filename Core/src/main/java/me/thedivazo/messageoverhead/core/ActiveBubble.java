@@ -1,6 +1,6 @@
 package me.thedivazo.messageoverhead.core;
 
-import org.bukkit.entity.Player;
+import me.thedivazo.messageoverhead.core.component.ComponentContainer;
 
 public interface ActiveBubble {
     AuthorBubble author();
@@ -9,4 +9,6 @@ public interface ActiveBubble {
     long ageTicks();
     boolean isRemove();
     void remove();
+
+    ComponentContainer container();
 }

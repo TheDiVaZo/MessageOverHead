@@ -1,31 +1,33 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.render.capability.RendererView;
-import me.thedivazo.messageoverhead.core.tick.StopReason;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
-public class ScopeComponentView implements ScopeComponent<ScopeComponentView.ViewPredicate> {
+public class ViewComponent implements BubbleComponent {
     private final Settings settings;
     private final double viewRadiusSquared;
 
     private final ActiveBubble activeBubble;
     private final RendererView rendererView;
-    private final List<ComponentScoped<ViewPredicate>> components = new ArrayList<>();
+    private final List<BiConsumer<ViewState, ActiveBubble>> components = new ArrayList<>();
     private final List<Player> visiblePlayers = new ArrayList<>();
     private final List<Player> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
 
-    private final ViewPredicate cachedViewPredicate = new ViewPredicate();
+    private final ViewState cachedViewState = new ViewState();
 
-    public ScopeComponentView(ActiveBubble activeBubble, RendererView rendererView, Settings settings) {
+    private ViewComponent(ActiveBubble activeBubble, RendererView rendererView, Settings settings) {
         this.settings = Objects.requireNonNull(settings, "settings");
         this.viewRadiusSquared = settings.viewRadius() * settings.viewRadius();
         this.activeBubble = activeBubble;
@@ -52,13 +54,12 @@ public class ScopeComponentView implements ScopeComponent<ScopeComponentView.Vie
         return visiblePlayers.contains(player);
     }
 
-    @Override
-    public boolean add(ComponentScoped<ViewPredicate> componentScoped) {
+    public boolean add(BiConsumer<ViewState, ActiveBubble> componentScoped) {
         return components.add(componentScoped);
     }
 
     @Override
-    public void tick() {
+    public void onTick() {
         if (activeBubble.ageTicks() % settings.updateIntervalTicks() != 0) {
             return;
         }
@@ -90,7 +91,7 @@ public class ScopeComponentView implements ScopeComponent<ScopeComponentView.Vie
     }
 
     @Override
-    public void onTickEnd(StopReason stopReason) {
+    public void onDetached() {
         for (Player player : visiblePlayers) {
             rendererView.hide(player);
         }
@@ -107,48 +108,35 @@ public class ScopeComponentView implements ScopeComponent<ScopeComponentView.Vie
     }
 
     private boolean isAllowedByComponents(Player player) {
-        cachedViewPredicate.setPlayer(player);
-        cachedViewPredicate.setVisible(true);
+        cachedViewState.setPlayer(player);
+        cachedViewState.setVisible(true);
 
-        for (ComponentScoped<ViewPredicate> component : components) {
-            component.apply(cachedViewPredicate, activeBubble);
-            if (!cachedViewPredicate.isVisible()) {
+        for (BiConsumer<ViewState, ActiveBubble> component : components) {
+            component.accept(cachedViewState, activeBubble);
+            if (!cachedViewState.isVisible()) {
                 return false;
             }
         }
         return true;
     }
 
-    public static final class Settings {
-        private final double viewRadius;
-        private final int updateIntervalTicks;
-
-        public Settings(double viewRadius) {
-            this(viewRadius, 5);
-        }
-
-        public Settings(double viewRadius, int updateIntervalTicks) {
-            if (viewRadius < 0) {
-                throw new IllegalArgumentException("viewRadius must be non-negative");
-            }
-            if (updateIntervalTicks < 1) {
-                throw new IllegalArgumentException("updateIntervalTicks must be at least 1");
+    public record Settings(double viewRadius, int updateIntervalTicks) {
+            public Settings(double viewRadius) {
+                this(viewRadius, 5);
             }
 
-            this.viewRadius = viewRadius;
-            this.updateIntervalTicks = updateIntervalTicks;
+            public Settings {
+                if (viewRadius < 0) {
+                    throw new IllegalArgumentException("viewRadius must be non-negative");
+                }
+                if (updateIntervalTicks < 1) {
+                    throw new IllegalArgumentException("updateIntervalTicks must be at least 1");
+                }
+
+            }
         }
 
-        public double viewRadius() {
-            return viewRadius;
-        }
-
-        public int updateIntervalTicks() {
-            return updateIntervalTicks;
-        }
-    }
-
-    public static final class ViewPredicate {
+    public static final class ViewState {
         private Player player;
         private boolean visible = true;
 
@@ -166,6 +154,48 @@ public class ScopeComponentView implements ScopeComponent<ScopeComponentView.Vie
 
         public void setVisible(boolean visible) {
             this.visible = visible;
+        }
+    }
+
+    public static ComponentKey<ViewComponent> key() {
+        return MessageOverHeadPlugin.getInstance().getComponentService().VIEW;
+    }
+
+    public static Factory factory(Settings settings) {
+        return new Factory(settings);
+    }
+
+    public static @Nullable ViewComponent attach(ActiveBubble activeBubble, Factory factory) {
+        return activeBubble.container().attach(key(), factory);
+    }
+
+    public static @Nullable ViewComponent detach(ActiveBubble activeBubble) {
+        return activeBubble.container().detach(key());
+    }
+
+    public static @Nullable ViewComponent get(ActiveBubble activeBubble) {
+        return activeBubble.container().get(key());
+    }
+
+    public static boolean contains(ActiveBubble activeBubble) {
+        return activeBubble.container().contains(key());
+    }
+
+    public static final class Factory implements BubbleComponentFactory<ViewComponent> {
+        private final Settings settings;
+
+        private Factory(Settings settings) {
+            this.settings = settings;
+        }
+
+        @Override
+        public boolean isAttachable(ComponentContext context) {
+            return context.capabilityContainer().capabilityOrNull(ViewComponent.class) != null;
+        }
+
+        @Override
+        public ViewComponent create(ComponentContext context) throws Exception {
+            return new ViewComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererView.class), settings);
         }
     }
 }

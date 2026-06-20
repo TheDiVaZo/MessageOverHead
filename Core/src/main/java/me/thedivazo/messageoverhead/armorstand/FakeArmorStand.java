@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.InternalStructure;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import me.thedivazo.messageoverhead.MOHPlugin;
+import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -53,7 +53,7 @@ public final class FakeArmorStand {
                 message,
                 location,
                 ProtocolLibrary.getProtocolManager(),
-                MOHPlugin.SERVER_VERSION
+                MessageOverHeadPlugin.SERVER_VERSION
         );
     }
 

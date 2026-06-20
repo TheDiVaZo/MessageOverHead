@@ -1,42 +1,28 @@
 package me.thedivazo.messageoverhead.core;
 
-import me.thedivazo.messageoverhead.core.component.BubbleComponentsContainer;
-import me.thedivazo.messageoverhead.core.component.ComponentProvider;
-import me.thedivazo.messageoverhead.core.component.ScopeComponentPosition;
-import me.thedivazo.messageoverhead.core.component.ScopeComponentView;
+import me.thedivazo.messageoverhead.ComponentService;
+import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
-import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
-import me.thedivazo.messageoverhead.core.render.capability.RendererView;
+import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import me.thedivazo.messageoverhead.core.tick.StopReason;
 import me.thedivazo.messageoverhead.core.tick.TickableObject;
 import org.jetbrains.annotations.Nullable;
 
-public class ActiveBubbleController implements TickableObject, ActiveBubble, ComponentProvider {
+public class ActiveBubbleController implements TickableObject, ActiveBubble, ComponentContext, CapabilityContainer {
     private final Message message;
     private long ageTicks = 0;
 
     private final AuthorBubble author;
-    private RendererBubble renderer;
+    private final RendererBubble renderer;
     private boolean markRemoved;
 
-    private BubbleComponentsContainer components = new BubbleComponentsContainer(this);
+    private final DefaultComponentContainer components;
 
-    public ActiveBubbleController(AuthorBubble authorBubble, Message message, RendererBubble renderer) {
+    public ActiveBubbleController(Message message, AuthorBubble author, RendererBubble renderer, ComponentService service) {
         this.message = message;
+        this.author = author;
         this.renderer = renderer;
-        this.author = authorBubble;
-
-        if (renderer instanceof RendererPosition) {
-            components.setComponent(ScopeComponentPosition.class, new ScopeComponentPosition(this, (RendererPosition) renderer));
-        }
-    }
-
-    public boolean setViewComponent(ScopeComponentView.Settings settings) {
-        if (renderer instanceof RendererView) {
-            components.setComponent(ScopeComponentView.class, new ScopeComponentView(this, (RendererView) renderer, settings));
-            return true;
-        }
-        return false;
+        this.components = new DefaultComponentContainer(service, this);
     }
 
     @Override
@@ -63,22 +49,13 @@ public class ActiveBubbleController implements TickableObject, ActiveBubble, Com
     public void remove() {
         if (markRemoved) return;
         onTickEnd(StopReason.BUBBLE_REMOVE);
+        renderer.destroy();
         markRemoved = true;
     }
 
     @Override
-    public <T> @Nullable T getComponent(Class<T> type) {
-        return components.getComponent(type);
-    }
-
-    @Override
-    public <T> boolean hasComponent(Class<T> type) {
-        return components.hasComponent(type);
-    }
-
-    @Override
-    public <T extends TickableObject> void setComponent(Class<T> clazz, T object) {
-        components.setComponent(clazz, object);
+    public ComponentContainer container() {
+        return components;
     }
 
     @Override
@@ -89,14 +66,23 @@ public class ActiveBubbleController implements TickableObject, ActiveBubble, Com
     }
 
     @Override
-    public void onTickStart() {
+    public void onTickEnd(StopReason stopReason) {
         if (markRemoved) return;
-        components.onTickStart();
+        components.detachAll();
     }
 
     @Override
-    public void onTickEnd(StopReason stopReason) {
-        if (markRemoved) return;
-        components.onTickEnd(stopReason);
+    public ActiveBubble bubble() {
+        return this;
+    }
+
+    @Override
+    public CapabilityContainer capabilityContainer() {
+        return this;
+    }
+
+    @Override
+    public @Nullable <T> T capabilityOrNull(Class<T> type) {
+        return renderer.capabilityOrNull(type);
     }
 }

@@ -1,15 +1,8 @@
 package me.thedivazo.messageoverhead.core.render;
 
-import org.jetbrains.annotations.Nullable;
+import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 
-import java.util.Optional;
-
-public interface RendererBubble {
+public interface RendererBubble extends CapabilityContainer {
     void destroy();
     boolean isDestroyed();
-
-    <T> @Nullable T capabilityOrNull(Class<T> type);
-    default <T> Optional<T> capability(Class<T> type) {
-        return Optional.ofNullable(capabilityOrNull(type));
-    }
 }
