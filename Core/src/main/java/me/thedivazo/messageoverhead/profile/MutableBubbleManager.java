@@ -81,7 +81,22 @@ public final class MutableBubbleManager implements BubbleManager {
     }
 
     @Override
+    public @Nullable ActiveBubble removeBubble(UUID uid) {
+        return scheduler.remove(uid);
+    }
+
+    @Override
     public boolean containsBubble(UUID uid) {
         return scheduler.contains(uid);
+    }
+
+    @Override
+    public void clearBubbles() {
+        scheduler.clear();
+    }
+
+    @Override
+    public void close() {
+        scheduler.close();
     }
 }

@@ -17,7 +17,6 @@ public final class ComponentService {
 
     public ComponentService(ComponentRegistry registry) {
         this.registry = registry;
-        registerPluginComponent("view", ViewComponent.class);
         VIEW = registerPluginComponent("view", ViewComponent.class);
         POSITION = registerPluginComponent("position", PositionComponent.class);
         LIFETIME = registerPluginComponent("lifetime", LifetimeComponent.class);

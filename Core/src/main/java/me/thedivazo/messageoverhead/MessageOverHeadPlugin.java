@@ -61,8 +61,15 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        commandManager = null;
-        INSTANCE = null;
+        try {
+            if (bubbleManager != null) {
+                bubbleManager.close();
+            }
+        } finally {
+            commandManager = null;
+            bubbleManager = null;
+            INSTANCE = null;
+        }
     }
 
     public ComponentService getComponentService() {

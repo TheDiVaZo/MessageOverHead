@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public interface BubbleScheduler {
+public interface BubbleScheduler extends AutoCloseable {
     @Nullable ActiveBubble put(TickableActiveBubble tickable);
 
     @Nullable ActiveBubble get(UUID uid);
@@ -14,4 +14,9 @@ public interface BubbleScheduler {
     @Nullable ActiveBubble remove(UUID uid);
 
     boolean contains(UUID uid);
+
+    void clear();
+
+    @Override
+    void close();
 }

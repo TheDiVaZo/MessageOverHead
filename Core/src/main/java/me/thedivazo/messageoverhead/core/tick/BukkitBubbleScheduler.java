@@ -7,7 +7,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
     private final long delay;
     private final long period;
     private final Map<UUID, ScheduledBubble> bubbles = new LinkedHashMap<>();
+    private boolean closed;
 
     public BukkitBubbleScheduler(Plugin plugin) {
         this(plugin, 0L, 1L);
@@ -37,6 +40,10 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
     @Override
     public @Nullable ActiveBubble put(TickableActiveBubble tickable) {
         Objects.requireNonNull(tickable, "tickable");
+
+        if (closed) {
+            throw new IllegalStateException("Bubble scheduler is closed");
+        }
 
         if (tickable.bubble().isRemove()) {
             return null;
@@ -72,6 +79,10 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
 
     @Override
     public @Nullable ActiveBubble get(UUID uid) {
+        if (closed) {
+            return null;
+        }
+
         ScheduledBubble entry = getSynced(uid);
         if (entry == null) {
             return null;
@@ -82,6 +93,10 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
     @Override
     public @Nullable ActiveBubble remove(UUID uid) {
         Objects.requireNonNull(uid, "uid");
+
+        if (closed) {
+            return null;
+        }
 
         ScheduledBubble entry = bubbles.remove(uid);
         if (entry == null) {
@@ -101,7 +116,63 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
 
     @Override
     public boolean contains(UUID uid) {
+        if (closed) {
+            return false;
+        }
+
         return getSynced(uid) != null;
+    }
+
+    @Override
+    public void clear() {
+        clearEntries();
+    }
+
+    @Override
+    public void close() {
+        if (closed) {
+            return;
+        }
+
+        closed = true;
+        clearEntries();
+    }
+
+    private void clearEntries() {
+        List<ScheduledBubble> entries = new ArrayList<>(bubbles.values());
+        bubbles.clear();
+
+        RuntimeException runtimeFailure = null;
+        Error errorFailure = null;
+
+        for (ScheduledBubble entry : entries) {
+            try {
+                if (!entry.tickable().bubble().isRemove()) {
+                    entry.tickable().bubble().remove();
+                }
+            } catch (RuntimeException exception) {
+                if (runtimeFailure == null) {
+                    runtimeFailure = exception;
+                } else {
+                    runtimeFailure.addSuppressed(exception);
+                }
+            } catch (Error exception) {
+                if (errorFailure == null) {
+                    errorFailure = exception;
+                } else {
+                    errorFailure.addSuppressed(exception);
+                }
+            } finally {
+                stop(entry, false);
+            }
+        }
+
+        if (errorFailure != null) {
+            throw errorFailure;
+        }
+        if (runtimeFailure != null) {
+            throw runtimeFailure;
+        }
     }
 
     private @Nullable ScheduledBubble getSynced(UUID uid) {
