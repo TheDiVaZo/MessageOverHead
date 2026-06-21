@@ -2,7 +2,7 @@ package me.thedivazo.messageoverhead.core.render.capability;
 
 import me.thedivazo.messageoverhead.util.Positionc;
 
-public interface RendererPosition extends RendererCapability {
+public interface RendererPosition {
     void setPosition(double x, double y, double z);
     Positionc getPosition();
 }

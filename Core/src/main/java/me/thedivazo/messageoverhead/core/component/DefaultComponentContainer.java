@@ -1,5 +1,7 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import kotlin.collections.CollectionsKt;
+import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -8,7 +10,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
     private final ComponentRegistry registry;
     private final ComponentContext context;
 
-    private final Map<ComponentKey<?>, Entry<?>> components =
+    private final Map<ComponentId, Entry<?>> components =
             new LinkedHashMap<>();
 
     public DefaultComponentContainer(ComponentRegistry registry, ComponentContext context) {
@@ -26,7 +28,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
         if (!registry.isValid(key)) return null;
 
-        if (!factory.isAttachable(context)) {
+        if (!hasAttach(key, context)) {
             return null;
         }
 
@@ -34,18 +36,18 @@ public final class DefaultComponentContainer implements ComponentContainer {
         if (!key.type().isInstance(component)) throw new IllegalArgumentException(key + " is not of type " + component.getClass().getName() + ", key is type "+key.type().getName());
 
         Entry<?> entry = new Entry<>(key, component);
-        Entry<?> previousEntry = components.remove(key);
+        Entry<?> previousEntry = components.remove(key.id());
 
         if (previousEntry != null) {
             previousEntry.component().onDetached();
         }
 
-        components.put(key, entry);
+        components.put(key.id(), entry);
 
         try {
             component.onAttached();
         } catch (RuntimeException | Error exception) {
-            components.remove(key);
+            components.remove(key.id());
             throw exception;
         }
 
@@ -56,13 +58,13 @@ public final class DefaultComponentContainer implements ComponentContainer {
     public <T extends BubbleComponent> @Nullable T detach(ComponentKey<T> key) {
         Objects.requireNonNull(key, "key");
 
-        Entry<T> entry = (Entry<T>) components.get(key);
+        Entry<T> entry = (Entry<T>) components.get(key.id());
 
         if (entry == null) {
             return null;
         }
 
-        components.remove(key);
+        components.remove(key.id());
 
         entry.component().onDetached();
 
@@ -70,12 +72,12 @@ public final class DefaultComponentContainer implements ComponentContainer {
     }
 
     @Override
-    public <T extends BubbleComponent> @Nullable T get(ComponentKey<?> key) {
+    public <T extends BubbleComponent> @Nullable T get(ComponentKey<T> key) {
         Objects.requireNonNull(key, "key");
 
         if (!registry.isValid(key)) return null;
 
-        Entry<T> entry = (Entry<T>) components.get(key);
+        Entry<T> entry = (Entry<T>) components.get(key.id());
 
         if (entry == null) {
             return null;
@@ -90,7 +92,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
         if (!registry.isValid(key)) return false;
 
-        return components.containsKey(key);
+        return components.containsKey(key.id());
     }
 
     public void tick() {
@@ -195,5 +197,10 @@ public final class DefaultComponentContainer implements ComponentContainer {
                     "component=" + component + ']';
         }
 
-        }
+    }
+
+    private boolean hasAttach(ComponentKey<?> key, ComponentContext context) {
+        CapabilityContainer container = context.capabilityContainer();
+        return CollectionsKt.all(key.metadata().requiredCapabilities(), container::hasCapability);
+    }
 }

@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core.render.capability;
 
+import me.thedivazo.messageoverhead.core.component.ComponentKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -14,5 +15,9 @@ public interface CapabilityContainer {
 
     default <T>Optional<T> capability(Class<T> type) {
         return Optional.ofNullable(capabilityOrNull(type));
+    }
+
+    default <T> boolean hasCapability(Class<T> key) {
+        return capabilityOrNull(key) != null;
     }
 }

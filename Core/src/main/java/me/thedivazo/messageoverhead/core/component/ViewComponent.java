@@ -189,11 +189,6 @@ public class ViewComponent extends BubbleComponent {
         }
 
         @Override
-        public boolean isAttachable(ComponentContext context) {
-            return context.capabilityContainer().capabilityOrNull(RendererView.class) != null;
-        }
-
-        @Override
         public ViewComponent create(ComponentContext context) throws Exception {
             return new ViewComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererView.class), settings);
         }

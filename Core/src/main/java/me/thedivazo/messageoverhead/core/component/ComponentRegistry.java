@@ -2,10 +2,7 @@ package me.thedivazo.messageoverhead.core.component;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public final class ComponentRegistry {
     private final Map<ComponentId, ComponentKey<?>> keys =
@@ -17,8 +14,17 @@ public final class ComponentRegistry {
             ComponentId id,
             Class<T> type
     ) {
+        return register(id, type, ComponentMetadata.EMPTY);
+    }
+
+    public <T extends BubbleComponent> ComponentKey<T> register(
+            ComponentId id,
+            Class<T> type,
+            ComponentMetadata metadata
+    ) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(type, "type");
+        Objects.requireNonNull(metadata, "metadata");
 
         ComponentKey<?> existing = keys.get(id);
 
@@ -42,7 +48,7 @@ public final class ComponentRegistry {
             );
         }
 
-        ComponentKey<T> key = new ComponentKey<>(id, type);
+        ComponentKey<T> key = new ComponentKey<>(id, type, metadata);
         keys.put(id, key);
         return key;
     }

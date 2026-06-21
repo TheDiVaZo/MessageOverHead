@@ -74,10 +74,6 @@ public class PositionComponent extends BubbleComponent {
     public enum Factory implements BubbleComponentFactory<PositionComponent> {
         INSTANCE;
 
-        public boolean isAttachable(ComponentContext context) {
-            return context.capabilityContainer().capabilityOrNull(RendererPosition.class) != null;
-        }
-
         @Override
         public PositionComponent create(ComponentContext context) {
             return new PositionComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererPosition.class));

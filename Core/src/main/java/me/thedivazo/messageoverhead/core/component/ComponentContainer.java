@@ -11,7 +11,7 @@ public interface ComponentContainer {
 
     <T extends BubbleComponent> @Nullable T detach(ComponentKey<T> key);
 
-    <T extends BubbleComponent> @Nullable T get(ComponentKey<?> key);
+    <T extends BubbleComponent> @Nullable T get(ComponentKey<T> key);
 
     boolean contains(ComponentKey<?> key);
 }
