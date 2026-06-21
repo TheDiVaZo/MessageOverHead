@@ -2,6 +2,7 @@ package me.thedivazo.messageoverhead;
 
 import me.thedivazo.messageoverhead.armorstand.ArmorStandBubbleFactory;
 import me.thedivazo.messageoverhead.command.BubbleTestCommand;
+import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.profile.BubbleManager;
 import me.thedivazo.messageoverhead.profile.ImmutableBubbleManager;
 import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
@@ -29,7 +30,8 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     public static final MinecraftVersion SERVER_VERSION = MinecraftVersion.parse(Bukkit.getMinecraftVersion());
 
     private final ComponentRegistry componentRegistry = new ComponentRegistry();
-    private final ComponentService componentService = new ComponentService(componentRegistry);
+    private BubbleContainer bubbleContainer;
+    private ComponentService componentService;
 
     private BubbleManager bubbleManager;
     private LegacyPaperCommandManager<CommandSender> commandManager;
@@ -38,9 +40,13 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     public void onEnable() {
         if (INSTANCE != null) throw new IllegalStateException("Already initialized!");
         INSTANCE = this;
+
+        this.bubbleContainer = new BubbleContainer(new BukkitBubbleScheduler(this, 0, 1));
+        this.componentService = new ComponentService(componentRegistry, bubbleContainer);
+
         this.bubbleManager = new ImmutableBubbleManager(
                 new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory()),
-                new BukkitBubbleScheduler(this, 0, 1),
+                bubbleContainer,
                 Map.of(
                         PositionComponent.key(), context -> {
                             PositionComponent component = PositionComponent.Factory.INSTANCE.create(context);
@@ -68,6 +74,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         } finally {
             commandManager = null;
             bubbleManager = null;
+            bubbleContainer = null;
             INSTANCE = null;
         }
     }

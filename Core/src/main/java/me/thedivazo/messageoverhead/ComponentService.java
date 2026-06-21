@@ -2,16 +2,19 @@ package me.thedivazo.messageoverhead;
 
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
+import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
 import me.thedivazo.messageoverhead.core.render.capability.RendererView;
 
+import java.util.Objects;
 import java.util.Set;
 
 public final class ComponentService {
     private static final String PLUGIN_NAMESPACE = "messageoverhead";
 
     private final ComponentRegistry registry;
+    private final BubbleContainer bubbleContainer;
 
     public final ComponentKey<ViewComponent> VIEW;
     public final ComponentKey<PositionComponent> POSITION;
@@ -19,8 +22,9 @@ public final class ComponentService {
 
     private final SetMultimap<String, ComponentKey<?>> otherNamespaceToKeys = MultimapBuilder.hashKeys().hashSetValues().build();
 
-    public ComponentService(ComponentRegistry registry) {
-        this.registry = registry;
+    public ComponentService(ComponentRegistry registry, BubbleContainer bubbleContainer) {
+        this.registry = Objects.requireNonNull(registry, "registry");
+        this.bubbleContainer = Objects.requireNonNull(bubbleContainer, "bubbleContainer");
         VIEW = registerPluginComponent("view", ViewComponent.class, new ComponentMetadata(Set.of(RendererView.class)));
         POSITION = registerPluginComponent("position", PositionComponent.class, new ComponentMetadata(Set.of(RendererPosition.class)));
         LIFETIME = registerPluginComponent("lifetime", LifetimeComponent.class, ComponentMetadata.EMPTY);
@@ -50,7 +54,18 @@ public final class ComponentService {
     public synchronized <T extends BubbleComponent> void unregister(String namespace) {
         if (namespace.equals(PLUGIN_NAMESPACE)) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
 
-        otherNamespaceToKeys.removeAll(namespace).forEach(registry::unregister);
+        Set<ComponentKey<?>> keys = Set.copyOf(otherNamespaceToKeys.get(namespace));
+
+        if (bubbleContainer != null) {
+            bubbleContainer.getBubblesByMessageUid().values().forEach(bubble -> {
+                for (ComponentKey<?> key : keys) {
+                    bubble.container().detach(key);
+                }
+            });
+        }
+
+        otherNamespaceToKeys.removeAll(namespace);
+        keys.forEach(registry::unregister);
     }
 
 }
