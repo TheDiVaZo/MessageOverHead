@@ -1,10 +1,10 @@
 package me.thedivazo.messageoverhead.core.component;
 
-public abstract class BubbleComponent {
-    protected void onAttached() {};
+public interface BubbleComponent {
+    default void onAttached(){};
 
-    protected void onDetached() {}
+    default void onDetached(){};
 
-    protected void onTick() {}
+    void onTick();
 
 }

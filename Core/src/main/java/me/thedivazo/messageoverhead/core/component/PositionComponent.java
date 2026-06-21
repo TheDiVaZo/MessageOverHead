@@ -2,19 +2,23 @@ package me.thedivazo.messageoverhead.core.component;
 
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
+import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
+import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
 import me.thedivazo.messageoverhead.util.Position;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-public class PositionComponent extends BubbleComponent {
+public class PositionComponent implements BubbleScopeComponent<Position> {
     private final ActiveBubble activeBubble;
     private final RendererPosition rendererPosition;
-    private List<BiConsumer<Position, ActiveBubble>> components = new ArrayList<>();
+    private final List<ComponentScoped<Position>> components = new ArrayList<>();
 
     private final Position cachedPosition = new Position();
 
@@ -23,21 +27,23 @@ public class PositionComponent extends BubbleComponent {
         this.rendererPosition = rendererPosition;
     }
 
-    public boolean add(BiConsumer<Position, ActiveBubble> componentScoped) {
-        return components.add(componentScoped);
+    @Override
+    public void attach(Function<ActiveBubble, ComponentScoped<Position>> scopedFactory) {
+        Objects.requireNonNull(scopedFactory, "scopedFactory");
+        addScoped(Objects.requireNonNull(scopedFactory.apply(activeBubble), "scopedFactory result"));
     }
 
-    public boolean add(Consumer<Position> componentScoped) {
-        return components.add((pos, bubble) -> componentScoped.accept(pos));
+    private boolean addScoped(ComponentScoped<Position> componentScoped) {
+        return components.add(Objects.requireNonNull(componentScoped, "componentScoped"));
     }
 
     @Override
-    protected void onTick() {
+    public void onTick() {
         cachedPosition.zero();
         double offsetX=0, offsetY=0, offsetZ=0;
         for (int i = 0; i < components.size(); i++) {
-            BiConsumer<Position, ActiveBubble> component = components.get(i);
-            component.accept(cachedPosition, activeBubble);
+            ComponentScoped<Position> component = components.get(i);
+            component.onTick(cachedPosition);
             offsetX+= cachedPosition.x;
             offsetY+= cachedPosition.y;
             offsetZ+= cachedPosition.z;

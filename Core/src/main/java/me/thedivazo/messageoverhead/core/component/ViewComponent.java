@@ -2,6 +2,8 @@ package me.thedivazo.messageoverhead.core.component;
 
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
+import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
+import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.render.capability.RendererView;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.bukkit.Bukkit;
@@ -14,14 +16,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-public class ViewComponent extends BubbleComponent {
+public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewState> {
     private final Settings settings;
     private final double viewRadiusSquared;
 
     private final ActiveBubble activeBubble;
     private final RendererView rendererView;
-    private final List<BiConsumer<ViewState, ActiveBubble>> components = new ArrayList<>();
+    private final List<ComponentScoped<ViewState>> components = new ArrayList<>();
     private final List<Player> visiblePlayers = new ArrayList<>();
     private final List<Player> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
 
@@ -54,8 +57,14 @@ public class ViewComponent extends BubbleComponent {
         return visiblePlayers.contains(player);
     }
 
-    public boolean add(BiConsumer<ViewState, ActiveBubble> componentScoped) {
-        return components.add(componentScoped);
+    @Override
+    public void attach(Function<ActiveBubble, ComponentScoped<ViewState>> scopedFactory) {
+        Objects.requireNonNull(scopedFactory, "scopedFactory");
+        addScoped(Objects.requireNonNull(scopedFactory.apply(activeBubble), "scopedFactory result"));
+    }
+
+    private boolean addScoped(ComponentScoped<ViewState> componentScoped) {
+        return components.add(Objects.requireNonNull(componentScoped, "componentScoped"));
     }
 
     @Override
@@ -111,8 +120,8 @@ public class ViewComponent extends BubbleComponent {
         cachedViewState.setPlayer(player);
         cachedViewState.setVisible(true);
 
-        for (BiConsumer<ViewState, ActiveBubble> component : components) {
-            component.accept(cachedViewState, activeBubble);
+        for (ComponentScoped<ViewState> component : components) {
+            component.onTick(cachedViewState);
             if (!cachedViewState.isVisible()) {
                 return false;
             }

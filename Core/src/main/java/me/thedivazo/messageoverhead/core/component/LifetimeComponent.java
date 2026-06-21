@@ -4,7 +4,7 @@ import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import org.jetbrains.annotations.Nullable;
 
-public class LifetimeComponent extends BubbleComponent {
+public class LifetimeComponent implements BubbleComponent {
     private final ActiveBubble activeBubble;
     private final long lifetime;
 
@@ -14,7 +14,7 @@ public class LifetimeComponent extends BubbleComponent {
     }
 
     @Override
-    protected void onTick() {
+    public void onTick() {
         if (activeBubble.ageTicks() > lifetime) {
             activeBubble.remove();
         }
