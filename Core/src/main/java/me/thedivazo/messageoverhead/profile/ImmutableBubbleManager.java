@@ -6,10 +6,10 @@ import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.AuthorBubble;
 import me.thedivazo.messageoverhead.core.BubbleFactory;
 import me.thedivazo.messageoverhead.core.Message;
-import me.thedivazo.messageoverhead.core.TickableActiveBubble;
 import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
 import me.thedivazo.messageoverhead.core.component.ComponentKey;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
+import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,10 +34,10 @@ public final class ImmutableBubbleManager implements BubbleManager {
 
     @Override
     public ActiveBubble spawnBubble(Message message, AuthorBubble author, Positionc positionc) {
-        TickableActiveBubble tickable = factory.createBubble(message, author, positionc);
-        Objects.requireNonNull(tickable, "tickable");
+        SchedulableBubble schedulable = factory.createBubble(message, author, positionc);
+        Objects.requireNonNull(schedulable, "schedulable");
 
-        ActiveBubble bubble = Objects.requireNonNull(tickable.bubble(), "bubble");
+        ActiveBubble bubble = Objects.requireNonNull(schedulable.bubble(), "bubble");
 
         try {
             ActiveBubble finalBubble = bubble;
@@ -49,7 +49,7 @@ public final class ImmutableBubbleManager implements BubbleManager {
             throw exception;
         }
 
-        bubble = scheduler.put(tickable);
+        bubble = scheduler.put(schedulable);
 
         if (bubble == null) {
             throw new IllegalStateException("Created bubble cannot be scheduled");

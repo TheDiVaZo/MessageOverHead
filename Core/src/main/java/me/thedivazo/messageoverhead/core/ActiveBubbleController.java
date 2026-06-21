@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class ActiveBubbleController implements ActiveBubble, TickableActiveBubble, ComponentContext, CapabilityContainer {
+final class ActiveBubbleController implements ActiveBubble, ComponentContext, CapabilityContainer {
     private final UUID uuid = UUID.randomUUID();
 
     private final Message message;
@@ -19,7 +19,7 @@ public class ActiveBubbleController implements ActiveBubble, TickableActiveBubbl
 
     private final DefaultComponentContainer components;
 
-    public ActiveBubbleController(Message message, AuthorBubble author, RendererBubble renderer, ComponentRegistry registry) {
+    ActiveBubbleController(Message message, AuthorBubble author, RendererBubble renderer, ComponentRegistry registry) {
         this.message = message;
         this.author = author;
         this.renderer = renderer;
@@ -64,11 +64,13 @@ public class ActiveBubbleController implements ActiveBubble, TickableActiveBubbl
         return components;
     }
 
-    @Override
-    public void tick() {
+    void tick() {
         if (markRemoved) return;
         ageTicks++;
         components.tick();
+    }
+
+    void onTickEnd() {
     }
 
     @Override

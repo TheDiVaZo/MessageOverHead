@@ -1,7 +1,6 @@
 package me.thedivazo.messageoverhead.core.tick;
 
 import me.thedivazo.messageoverhead.core.ActiveBubble;
-import me.thedivazo.messageoverhead.core.TickableActiveBubble;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -38,27 +37,30 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
     }
 
     @Override
-    public @Nullable ActiveBubble put(TickableActiveBubble tickable) {
-        Objects.requireNonNull(tickable, "tickable");
+    public @Nullable ActiveBubble put(SchedulableBubble schedulable) {
+        Objects.requireNonNull(schedulable, "schedulable");
 
         if (closed) {
             throw new IllegalStateException("Bubble scheduler is closed");
         }
 
-        if (tickable.bubble().isRemove()) {
+        ActiveBubble bubble = schedulable.bubble();
+        TickableObject tickable = schedulable.tickable();
+
+        if (bubble.isRemove()) {
             return null;
         }
 
-        UUID uid = tickable.bubble().uuid();
+        UUID uid = bubble.uuid();
         ScheduledBubble existing = getSynced(uid);
         if (existing != null) {
-            if (existing.tickable() == tickable) {
-                return tickable.bubble();
+            if (existing.bubble() == bubble && existing.tickable() == tickable) {
+                return bubble;
             }
             remove(uid);
         }
 
-        ScheduledBubble scheduledBubble = new ScheduledBubble(tickable);
+        ScheduledBubble scheduledBubble = new ScheduledBubble(bubble, tickable);
         bubbles.put(uid, scheduledBubble);
 
         try {
@@ -74,7 +76,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             throw exception;
         }
 
-        return tickable.bubble();
+        return bubble;
     }
 
     @Override
@@ -87,7 +89,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
         if (entry == null) {
             return null;
         }
-        return entry.tickable().bubble();
+        return entry.bubble();
     }
 
     @Override
@@ -104,14 +106,14 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
         }
 
         try {
-            if (!entry.tickable().bubble().isRemove()) {
-                entry.tickable().bubble().remove();
+            if (!entry.bubble().isRemove()) {
+                entry.bubble().remove();
             }
         } finally {
             stop(entry, false);
         }
 
-        return entry.tickable().bubble();
+        return entry.bubble();
     }
 
     @Override
@@ -147,8 +149,8 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
 
         for (ScheduledBubble entry : entries) {
             try {
-                if (!entry.tickable().bubble().isRemove()) {
-                    entry.tickable().bubble().remove();
+                if (!entry.bubble().isRemove()) {
+                    entry.bubble().remove();
                 }
             } catch (RuntimeException exception) {
                 if (runtimeFailure == null) {
@@ -183,7 +185,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             return null;
         }
 
-        if (entry.tickable().bubble().isRemove()) {
+        if (entry.bubble().isRemove()) {
             stop(uid, entry, false);
             return null;
         }
@@ -202,7 +204,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             return;
         }
 
-        if (entry.tickable().bubble().isRemove()) {
+        if (entry.bubble().isRemove()) {
             stop(uid, entry, false);
             return;
         }
@@ -214,7 +216,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             throw exception;
         }
 
-        if (entry.tickable().bubble().isRemove()) {
+        if (entry.bubble().isRemove()) {
             stop(uid, entry, false);
         }
     }
@@ -245,15 +247,21 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
     }
 
     private static final class ScheduledBubble {
-        private final TickableActiveBubble tickable;
+        private final ActiveBubble bubble;
+        private final TickableObject tickable;
         private BukkitTask task;
         private boolean stopped;
 
-        private ScheduledBubble(TickableActiveBubble tickable) {
+        private ScheduledBubble(ActiveBubble bubble, TickableObject tickable) {
+            this.bubble = bubble;
             this.tickable = tickable;
         }
 
-        private TickableActiveBubble tickable() {
+        private ActiveBubble bubble() {
+            return bubble;
+        }
+
+        private TickableObject tickable() {
             return tickable;
         }
 

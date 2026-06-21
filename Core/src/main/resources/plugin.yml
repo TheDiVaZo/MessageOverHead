@@ -1,0 +1,8 @@
+name: MessageOverHead
+version: 4.0.0-alpha
+main: me.thedivazo.messageoverhead.MessageOverHeadPlugin
+api-version: '1.19'
+depend:
+  - ProtocolLib
+authors:
+  - TheDiVaZo

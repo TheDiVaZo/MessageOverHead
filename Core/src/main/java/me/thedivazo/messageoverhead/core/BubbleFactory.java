@@ -1,7 +1,8 @@
 package me.thedivazo.messageoverhead.core;
 
 import me.thedivazo.messageoverhead.util.Positionc;
+import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 
 public interface BubbleFactory {
-    TickableActiveBubble createBubble(Message message, AuthorBubble author, Positionc positionc);
+    SchedulableBubble createBubble(Message message, AuthorBubble author, Positionc positionc);
 }
