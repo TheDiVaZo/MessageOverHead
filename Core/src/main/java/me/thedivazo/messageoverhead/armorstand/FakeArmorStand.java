@@ -21,16 +21,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Client-side armor stand used to display a custom name without creating a
  * Bukkit entity on the server.
  */
-public final class FakeArmorStand {
+public final class FakeArmorStand implements ArmorStand {
 
     private static final int ENTITY_FLAGS_INDEX = 0;
     private static final int CUSTOM_NAME_INDEX = 2;
@@ -47,7 +45,6 @@ public final class FakeArmorStand {
     private final String message;
     private final int entityId;
     private final UUID entityUuid;
-    private final Set<Player> visiblePlayers;
 
     private final Location location;
     private boolean small = true;
@@ -61,8 +58,7 @@ public final class FakeArmorStand {
                 message,
                 location,
                 ProtocolLibrary.getProtocolManager(),
-                MessageOverHeadPlugin.SERVER_VERSION,
-                Collections.newSetFromMap(new WeakHashMap<>())
+                MessageOverHeadPlugin.SERVER_VERSION
         );
     }
 
@@ -70,75 +66,58 @@ public final class FakeArmorStand {
             String message,
             Location location,
             ProtocolManager protocolManager,
-            MinecraftVersion serverVersion,
-            Set<Player> visiblePlayers
+            MinecraftVersion serverVersion
     ) {
         this.message = Objects.requireNonNull(message, "message");
         this.location = Objects.requireNonNull(location, "location").clone();
         this.protocolManager = Objects.requireNonNull(protocolManager, "protocolManager");
         this.serverVersion = Objects.requireNonNull(serverVersion, "serverVersion");
-        this.visiblePlayers = Objects.requireNonNull(visiblePlayers, "visiblePlayers");
         this.protocolProfile = ProtocolProfile.forVersion(serverVersion);
         this.entityId = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
         this.entityUuid = UUID.randomUUID();
     }
 
+    @Override
     public void show(Player player) {
         Objects.requireNonNull(player, "player");
-        if (destroyed || !visiblePlayers.add(player)) {
+        if (destroyed) {
             return;
         }
 
-        try {
-            protocolManager.sendServerPacket(player, createSpawnPacket());
-            protocolManager.sendServerPacket(player, createMetadataPacket());
-        } catch (RuntimeException | Error exception) {
-            visiblePlayers.remove(player);
-            throw exception;
-        }
+        protocolManager.sendServerPacket(player, createSpawnPacket());
+        protocolManager.sendServerPacket(player, createMetadataPacket());
     }
 
+    @Override
     public void updatePosition(Player player) {
         Objects.requireNonNull(player, "player");
-        if (destroyed || !visiblePlayers.contains(player)) {
+        if (destroyed) {
             return;
         }
 
         protocolManager.sendServerPacket(player, createTeleportPacket());
     }
 
+    @Override
     public void hide(Player player) {
         Objects.requireNonNull(player, "player");
-        if (destroyed || !visiblePlayers.remove(player)) {
+        if (destroyed) {
             return;
         }
 
-        try {
-            protocolManager.sendServerPacket(player, createDestroyPacket());
-        } catch (RuntimeException | Error exception) {
-            visiblePlayers.add(player);
-            throw exception;
-        }
+        protocolManager.sendServerPacket(player, createDestroyPacket());
     }
 
+    @Override
     public void destroy() {
         if (destroyed) {
             return;
         }
 
-        visiblePlayers.forEach(player -> {
-            try {
-                protocolManager.sendServerPacket(player, createDestroyPacket());
-            } catch (RuntimeException | Error exception) {
-                visiblePlayers.add(player);
-                throw exception;
-            }
-        });
-
         destroyed = true;
-        visiblePlayers.clear();
     }
 
+    @Override
     public void setPosition(double x, double y, double z) {
         if (destroyed) {
             return;

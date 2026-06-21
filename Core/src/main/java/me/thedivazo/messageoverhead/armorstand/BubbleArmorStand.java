@@ -1,31 +1,36 @@
 package me.thedivazo.messageoverhead.armorstand;
 
+import kotlin.collections.CollectionsKt;
+import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
+import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
 import me.thedivazo.messageoverhead.core.render.capability.RendererView;
+import me.thedivazo.messageoverhead.util.ComponentTextUtil;
+import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import me.thedivazo.messageoverhead.util.Position;
 import me.thedivazo.messageoverhead.util.Positionc;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Armor stand implementation of the bubble renderer contracts.
  */
 public final class BubbleArmorStand implements RendererBubble, RendererPosition, RendererView {
-    private final FakeArmorStand armorStand;
+    private final ArmorStand armorStand;
     private final Position position;
 
     private boolean destroyed;
 
-    public BubbleArmorStand(String message, Positionc positionc) {
+    public BubbleArmorStand(ArmorStand armorStand, Positionc positionc) {
         Objects.requireNonNull(positionc, "positionc");
-        this.armorStand = new FakeArmorStand(
-                Objects.requireNonNull(message, "message"),
-                new Location(null, positionc.x(), positionc.y(), positionc.z())
-        );
+        this.armorStand = armorStand;
         this.position = new Position(positionc);
     }
 

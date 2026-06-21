@@ -1,14 +1,18 @@
 package me.thedivazo.messageoverhead.armorstand;
 
+import kotlin.collections.CollectionsKt;
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.Message;
-import me.thedivazo.messageoverhead.core.render.RendererFactory;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
+import me.thedivazo.messageoverhead.core.render.RendererFactory;
+import me.thedivazo.messageoverhead.util.ComponentTextUtil;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import me.thedivazo.messageoverhead.util.Positionc;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Location;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ArmorStandBubbleFactory implements RendererFactory {
@@ -21,12 +25,24 @@ public class ArmorStandBubbleFactory implements RendererFactory {
                     .useUnusualXRepeatedCharacterHexFormat()
                     .build();
 
-    public ArmorStandBubbleFactory() {
+    private final double lineSpacing;
+
+    public ArmorStandBubbleFactory(double lineSpacing) {
+        this.lineSpacing = lineSpacing;
     }
 
     @Override
     public RendererBubble create(Message message, Positionc positionc) {
-        return new BubbleArmorStand(serializeMessage(message.component()), positionc);
+        Location loc = new Location(null, positionc.x(), positionc.y(), positionc.z());
+        ArmorStand armorStand = new GroupedFakeArmorStand(
+                CollectionsKt.map(
+                        ComponentTextUtil.wrapMessage(message.component(), 28, 28),
+                        component -> new FakeArmorStand(serializeMessage(component), loc)
+                ),
+                lineSpacing,
+                positionc
+        );
+        return new BubbleArmorStand(armorStand, positionc);
     }
 
     private static String serializeMessage(Component message) {

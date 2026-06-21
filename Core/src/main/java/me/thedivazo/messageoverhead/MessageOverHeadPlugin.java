@@ -45,7 +45,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
 
         this.bubbleManager = new ImmutableBubbleManager(
-                new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory()),
+                new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.3)),
                 bubbleContainer,
                 Map.of(
                         PositionComponent.key(), context -> {
