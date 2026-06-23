@@ -1,6 +1,5 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
@@ -13,10 +12,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewState> {
+    private static final ComponentKey<ViewComponent> KEY = new ComponentKey<>(
+            ComponentId.of("messageoverhead", "view"),
+            ViewComponent.class,
+            new ComponentMetadata(
+                    Set.of(RendererView.class)
+            )
+    );
 
     private final Settings settings;
     private final double viewRadiusSquared;
@@ -168,7 +175,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     }
 
     public static ComponentKey<ViewComponent> key() {
-        return MessageOverHeadPlugin.getInstance().getComponentService().VIEW;
+        return KEY;
     }
 
     public static Factory factory(Supplier<? extends Iterable<Viewer>> allPlayerProvider, Settings settings) {

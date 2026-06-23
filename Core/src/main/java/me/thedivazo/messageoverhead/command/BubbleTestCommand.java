@@ -40,7 +40,7 @@ public final class BubbleTestCommand {
                 UUID.randomUUID(),
                 new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25)),
                 Set.of(
-                        new BubbleProfile.KeyToFactoryEntry<PositionComponent>(
+                        new BubbleProfile.KeyToFactoryEntry<>(
                                 PositionComponent.key(), PositionComponent.factory(new OffsetComponentScoped(0, 2.5, 0))
                         ),
                         new BubbleProfile.KeyToFactoryEntry<>(

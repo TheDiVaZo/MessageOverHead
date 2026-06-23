@@ -1,10 +1,15 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import org.jetbrains.annotations.Nullable;
 
 public class LifetimeComponent implements BubbleComponent {
+    private static final ComponentKey<LifetimeComponent> KEY = new ComponentKey<>(
+            ComponentId.of("messageoverhead", "lifetime"),
+            LifetimeComponent.class,
+            ComponentMetadata.EMPTY
+    );
+
     private final ActiveBubble activeBubble;
     private final long lifetime;
 
@@ -21,7 +26,7 @@ public class LifetimeComponent implements BubbleComponent {
     }
 
     public static ComponentKey<LifetimeComponent> key() {
-        return MessageOverHeadPlugin.getInstance().getComponentService().LIFETIME;
+        return KEY;
     }
 
     public static Factory factory(long lifetime) {

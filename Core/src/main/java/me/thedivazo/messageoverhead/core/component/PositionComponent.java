@@ -1,6 +1,5 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
@@ -8,15 +7,20 @@ import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
 import me.thedivazo.messageoverhead.util.Position;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PositionComponent implements BubbleScopeComponent<Position> {
+    private static final ComponentKey<PositionComponent> KEY = new ComponentKey<>(
+            ComponentId.of("messageoverhead", "position"),
+            PositionComponent.class,
+            new ComponentMetadata(
+                    Set.of(RendererPosition.class)
+            )
+    );
+
     private final ActiveBubble activeBubble;
     private final RendererPosition rendererPosition;
     private final List<ComponentScoped<Position>> components = new ArrayList<>();
@@ -59,7 +63,7 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
     }
 
     public static ComponentKey<PositionComponent> key() {
-        return MessageOverHeadPlugin.getInstance().getComponentService().POSITION;
+        return KEY;
     }
 
     public static PositionComponent attach(ActiveBubble activeBubble, Factory factory) {

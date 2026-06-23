@@ -10,36 +10,21 @@ public final class ComponentRegistry {
 
     private boolean frozen;
 
-    public <T extends BubbleComponent> ComponentKey<T> register(
-            ComponentId id,
-            Class<T> type
-    ) {
-        return register(id, type, ComponentMetadata.EMPTY);
-    }
+    public <T extends BubbleComponent> void register(ComponentKey<T> componentKey) {
+        Objects.requireNonNull(componentKey, "key");
 
-    public <T extends BubbleComponent> ComponentKey<T> register(
-            ComponentId id,
-            Class<T> type,
-            ComponentMetadata metadata
-    ) {
-        Objects.requireNonNull(id, "id");
-        Objects.requireNonNull(type, "type");
-        Objects.requireNonNull(metadata, "metadata");
-
-        ComponentKey<?> existing = keys.get(id);
+        ComponentKey<?> existing = keys.get(componentKey.id());
 
         if (existing != null) {
-            if (!existing.type().equals(type)) {
+            if (!existing.type().equals(componentKey.type())) {
                 throw new IllegalStateException(
-                        "Component ID " + id
+                        "Component ID " + componentKey.id()
                                 + " is already registered for "
                                 + existing.type().getName()
                                 + ", cannot register "
-                                + type.getName()
+                                + componentKey.type().getName()
                 );
             }
-
-            return castExisting(existing, type);
         }
 
         if (frozen) {
@@ -48,9 +33,7 @@ public final class ComponentRegistry {
             );
         }
 
-        ComponentKey<T> key = new ComponentKey<>(id, type, metadata);
-        keys.put(id, key);
-        return key;
+        keys.put(componentKey.id(), componentKey);
     }
 
     public <T extends BubbleComponent> void unregister(

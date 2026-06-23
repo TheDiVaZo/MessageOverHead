@@ -4,55 +4,38 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.component.*;
-import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
-import me.thedivazo.messageoverhead.core.render.capability.RendererView;
 
 import java.util.Objects;
 import java.util.Set;
 
 public final class ComponentService {
-    private static final String PLUGIN_NAMESPACE = "messageoverhead";
-
     private final ComponentRegistry registry;
     private final BubbleContainer bubbleContainer;
-
-    public final ComponentKey<ViewComponent> VIEW;
-    public final ComponentKey<PositionComponent> POSITION;
-    public final ComponentKey<LifetimeComponent> LIFETIME;
 
     private final SetMultimap<String, ComponentKey<?>> otherNamespaceToKeys = MultimapBuilder.hashKeys().hashSetValues().build();
 
     public ComponentService(ComponentRegistry registry, BubbleContainer bubbleContainer) {
         this.registry = Objects.requireNonNull(registry, "registry");
         this.bubbleContainer = Objects.requireNonNull(bubbleContainer, "bubbleContainer");
-        VIEW = registerPluginComponent("view", ViewComponent.class, new ComponentMetadata(Set.of(RendererView.class)));
-        POSITION = registerPluginComponent("position", PositionComponent.class, new ComponentMetadata(Set.of(RendererPosition.class)));
-        LIFETIME = registerPluginComponent("lifetime", LifetimeComponent.class, ComponentMetadata.EMPTY);
+        registerPluginComponent(ViewComponent.key());
+        registerPluginComponent(PositionComponent.key());
+        registerPluginComponent(LifetimeComponent.key());
     }
 
-    <T extends BubbleComponent> ComponentKey<T> registerPluginComponent(String value, Class<T> componentClass, ComponentMetadata metadata) {
-        return registry.register(
-                new ComponentId(PLUGIN_NAMESPACE, value),
-                componentClass,
-                metadata
-        );
+    <T extends BubbleComponent> void registerPluginComponent(ComponentKey<T> key) {
+        if (!isPluginNamespace(key.id().namespace())) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace to " + pluginNamespace());
+        registry.register(key);
     }
 
-    public synchronized <T extends BubbleComponent> ComponentKey<T> register(String namespace, String value, Class<T> componentClass, ComponentMetadata metadata) {
-        if (namespace.equals(PLUGIN_NAMESPACE)) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
+    public synchronized <T extends BubbleComponent> void register(ComponentKey<T> key) {
+        if (isPluginNamespace(key.id().namespace())) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace");
 
-        ComponentKey<T> key = registry.register(
-                new ComponentId(namespace, value),
-                componentClass,
-                metadata
-        );
-        otherNamespaceToKeys.put(namespace, key);
-
-        return key;
+        registry.register(key);
+        otherNamespaceToKeys.put(key.id().namespace(), key);
     }
 
     public synchronized <T extends BubbleComponent> void unregister(String namespace) {
-        if (namespace.equals(PLUGIN_NAMESPACE)) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
+        if (isPluginNamespace(namespace)) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
 
         Set<ComponentKey<?>> keys = Set.copyOf(otherNamespaceToKeys.get(namespace));
 
@@ -66,6 +49,14 @@ public final class ComponentService {
 
         otherNamespaceToKeys.removeAll(namespace);
         keys.forEach(registry::unregister);
+    }
+
+    private boolean isPluginNamespace(String namespace) {
+        return pluginNamespace().equals(namespace);
+    }
+
+    private String pluginNamespace() {
+        return PositionComponent.key().id().namespace();
     }
 
 }
