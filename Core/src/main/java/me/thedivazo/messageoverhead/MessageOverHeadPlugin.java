@@ -5,7 +5,7 @@ import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.profile.BubbleSpawnManager;
-import me.thedivazo.messageoverhead.profile.BubbleSpawnManagerWithScheduler;
+import me.thedivazo.messageoverhead.profile.BubbleSpawnManagerImpl;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.core.tick.BukkitBubbleScheduler;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
@@ -41,7 +41,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         this.bubbleContainer = new BubbleContainer();
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
 
-        this.bubbleManager = new BubbleSpawnManagerWithScheduler(
+        this.bubbleManager = new BubbleSpawnManagerImpl(
                 bubbleContainer,
                 bubbleScheduler
         );

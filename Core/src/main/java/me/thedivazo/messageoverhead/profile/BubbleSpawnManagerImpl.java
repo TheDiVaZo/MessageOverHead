@@ -13,11 +13,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public final class BubbleSpawnManagerWithScheduler implements BubbleSpawnManager {
+public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
     private final BubbleContainer container;
     private final BubbleScheduler scheduler;
 
-    public BubbleSpawnManagerWithScheduler(
+    public BubbleSpawnManagerImpl(
             BubbleContainer container,
             BubbleScheduler scheduler
     ) {
