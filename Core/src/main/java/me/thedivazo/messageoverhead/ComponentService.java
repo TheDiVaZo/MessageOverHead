@@ -40,7 +40,7 @@ public final class ComponentService {
         Set<ComponentKey<?>> keys = Set.copyOf(otherNamespaceToKeys.get(namespace));
 
         if (bubbleContainer != null) {
-            bubbleContainer.getBubblesByMessageUid().values().forEach(bubble -> {
+            bubbleContainer.getBubblesByBubbleId().values().forEach(bubble -> {
                 for (ComponentKey<?> key : keys) {
                     bubble.container().detach(key);
                 }

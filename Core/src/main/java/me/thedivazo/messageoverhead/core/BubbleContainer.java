@@ -13,7 +13,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 public class BubbleContainer {
-    private final Map<UUID, ActiveBubble> bubblesByMessageUid = new LinkedHashMap<>();
+    private final Map<UUID, ActiveBubble> bubblesByBubbleId = new LinkedHashMap<>();
     private final Map<UUID, ActiveBubble> lastBubblesByPlayerUid = new LinkedHashMap<>();
     private final Map<UUID, Set<ActiveBubble>> oldBubblesByPlayerUid = new LinkedHashMap<>();
 
@@ -25,17 +25,17 @@ public class BubbleContainer {
             return null;
         }
 
-        UUID messageUid = bubble.id();
+        UUID bubbleId = bubble.id();
         UUID playerUid = playerUid(bubble);
-        ActiveBubble previousByMessage = bubblesByMessageUid.get(messageUid);
+        ActiveBubble previousByBubbleId = bubblesByBubbleId.get(bubbleId);
         ActiveBubble previousLast = lastBubblesByPlayerUid.get(playerUid);
         boolean previousLastCanBecomeOld = previousLast != null && !previousLast.isRemove();
 
-        if (previousByMessage != null && previousByMessage != bubble) {
-            unregisterActive(previousByMessage);
+        if (previousByBubbleId != null && previousByBubbleId != bubble) {
+            unregisterActive(previousByBubbleId);
         }
 
-        bubblesByMessageUid.put(bubble.id(), bubble);
+        bubblesByBubbleId.put(bubble.id(), bubble);
 
         if (previousLastCanBecomeOld && previousLast != bubble) {
             oldBubblesByPlayerUid
@@ -50,20 +50,20 @@ public class BubbleContainer {
     public @Nullable ActiveBubble get(UUID uid) {
         Objects.requireNonNull(uid, "uid");
         pruneActiveIndexes();
-        return bubblesByMessageUid.get(uid);
+        return bubblesByBubbleId.get(uid);
     }
 
-    public @Nullable ActiveBubble getBubble(UUID messageUid) {
-        return get(messageUid);
+    public @Nullable ActiveBubble getBubble(UUID bubbleId) {
+        return get(bubbleId);
     }
 
     public Map<UUID, ActiveBubble> getBubbles() {
-        return getBubblesByMessageUid();
+        return getBubblesByBubbleId();
     }
 
-    public Map<UUID, ActiveBubble> getBubblesByMessageUid() {
+    public Map<UUID, ActiveBubble> getBubblesByBubbleId() {
         pruneActiveIndexes();
-        return Collections.unmodifiableMap(new LinkedHashMap<>(bubblesByMessageUid));
+        return Collections.unmodifiableMap(new LinkedHashMap<>(bubblesByBubbleId));
     }
 
     public @Nullable ActiveBubble getLastBubble(UUID playerUid) {
@@ -110,7 +110,7 @@ public class BubbleContainer {
     public @Nullable ActiveBubble remove(UUID uid) {
         Objects.requireNonNull(uid, "uid");
 
-        ActiveBubble removed = bubblesByMessageUid.remove(uid);
+        ActiveBubble removed = bubblesByBubbleId.remove(uid);
         if (removed != null) {
             unregisterActive(removed);
         }
@@ -123,13 +123,13 @@ public class BubbleContainer {
     }
 
     public void clear() {
-        bubblesByMessageUid.clear();
+        bubblesByBubbleId.clear();
         lastBubblesByPlayerUid.clear();
         oldBubblesByPlayerUid.clear();
     }
 
     private void pruneActiveIndexes() {
-        bubblesByMessageUid.entrySet().removeIf(entry -> {
+        bubblesByBubbleId.entrySet().removeIf(entry -> {
             ActiveBubble bubble = entry.getValue();
             boolean active = !bubble.isRemove();
             if (!active) {
@@ -142,7 +142,7 @@ public class BubbleContainer {
     }
 
     private void unregisterActive(ActiveBubble bubble) {
-        bubblesByMessageUid.remove(bubble.id(), bubble);
+        bubblesByBubbleId.remove(bubble.id(), bubble);
         removeLastBubbleIfSame(bubble);
     }
 

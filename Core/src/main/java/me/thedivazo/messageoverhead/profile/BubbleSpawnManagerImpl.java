@@ -4,7 +4,6 @@ import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Author;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.Message;
-import me.thedivazo.messageoverhead.core.component.BubbleComponent;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.util.Positionc;
@@ -36,11 +35,11 @@ public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
         try {
             ActiveBubble finalBubble = bubble;
             profile.componentFactories()
-                    .forEach(entry -> {
-                        BubbleComponent component = finalBubble.container().attachUnchecked(entry.key(), entry.factory());
+                    .forEach((key, factory) -> {
+                        var component = finalBubble.container().attachUnchecked(key, factory);
                         if (component == null) {
                             throw new IllegalStateException(
-                                    "Component " + entry.key().id() + " was not attached to bubble " + finalBubble.id()
+                                    "Component " + key.id() + " was not attached to bubble " + finalBubble.id()
                             );
                         }
                     });
@@ -97,7 +96,7 @@ public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
 
     @Override
     public void clearBubbles() {
-        for (UUID uid : Set.copyOf(container.getBubblesByMessageUid().keySet())) {
+        for (UUID uid : Set.copyOf(container.getBubblesByBubbleId().keySet())) {
             removeBubble(uid);
         }
         scheduler.clear();

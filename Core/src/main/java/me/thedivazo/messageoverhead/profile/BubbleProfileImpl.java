@@ -1,22 +1,28 @@
 package me.thedivazo.messageoverhead.profile;
 
 import me.thedivazo.messageoverhead.core.BubbleFactory;
+import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
+import me.thedivazo.messageoverhead.core.component.ComponentKey;
 
 import java.util.*;
 
 public final class BubbleProfileImpl implements BubbleProfile {
-    private final UUID id;
+    private final ProfileId id;
     private final BubbleFactory bubbleFactory;
-    private final Set<KeyToFactoryEntry<?>> componentFactories;
+    private final Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories;
 
-    public BubbleProfileImpl(UUID id, BubbleFactory bubbleFactory, Set<KeyToFactoryEntry<?>> componentFactories) {
-        this.id = id;
-        this.bubbleFactory = bubbleFactory;
-        this.componentFactories = Set.copyOf(componentFactories);
+    public BubbleProfileImpl(
+            ProfileId id,
+            BubbleFactory bubbleFactory,
+            Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories
+    ) {
+        this.id = Objects.requireNonNull(id, "id");
+        this.bubbleFactory = Objects.requireNonNull(bubbleFactory, "bubbleFactory");
+        this.componentFactories = Map.copyOf(Objects.requireNonNull(componentFactories, "componentFactories"));
     }
 
     @Override
-    public UUID id() {
+    public ProfileId id() {
         return id;
     }
 
@@ -26,7 +32,7 @@ public final class BubbleProfileImpl implements BubbleProfile {
     }
 
     @Override
-    public Set<KeyToFactoryEntry<?>> componentFactories() {
+    public Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories() {
         return componentFactories;
     }
 
