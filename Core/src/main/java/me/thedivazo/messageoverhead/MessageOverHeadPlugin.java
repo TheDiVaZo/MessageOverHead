@@ -2,6 +2,8 @@ package me.thedivazo.messageoverhead;
 
 import me.thedivazo.messageoverhead.command.BubbleTestCommand;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
+import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;
+import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.profile.BubbleSpawnManager;
 import me.thedivazo.messageoverhead.profile.BubbleSpawnManagerWithScheduler;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
@@ -14,6 +16,7 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 
 public class MessageOverHeadPlugin extends JavaPlugin {
+    public static final OnlinePlayerProvider DEFAULT_ONLINE_PLAYER_PROVIDER = new OnlinePlayerProvider();
     private static MessageOverHeadPlugin INSTANCE;
 
     public static MessageOverHeadPlugin getInstance() {
@@ -24,6 +27,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     private final ComponentRegistry componentRegistry = new ComponentRegistry();
     private BubbleContainer bubbleContainer;
+    private BubbleScheduler bubbleScheduler = new BukkitBubbleScheduler(this);
     private ComponentService componentService;
 
     private BubbleSpawnManager bubbleManager;
@@ -34,11 +38,12 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         if (INSTANCE != null) throw new IllegalStateException("Already initialized!");
         INSTANCE = this;
 
-        this.bubbleContainer = new BubbleContainer(new BukkitBubbleScheduler(this, 0, 1));
+        this.bubbleContainer = new BubbleContainer();
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
 
         this.bubbleManager = new BubbleSpawnManagerWithScheduler(
-                bubbleContainer
+                bubbleContainer,
+                bubbleScheduler
         );
 
         commandManager = LegacyPaperCommandManager.createNative(

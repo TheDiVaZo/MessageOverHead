@@ -13,13 +13,13 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
     private final Message message;
     private long ageTicks = 0;
 
-    private final AuthorBubble author;
+    private final Author author;
     private final RendererBubble renderer;
     private boolean markRemoved;
 
     private final DefaultComponentContainer components;
 
-    ActiveBubbleController(Message message, AuthorBubble author, RendererBubble renderer, ComponentRegistry registry) {
+    ActiveBubbleController(Message message, Author author, RendererBubble renderer, ComponentRegistry registry) {
         this.message = message;
         this.author = author;
         this.renderer = renderer;
@@ -27,12 +27,12 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
     }
 
     @Override
-    public AuthorBubble author() {
+    public Author author() {
         return author;
     }
 
     @Override
-    public UUID uuid() {
+    public UUID id() {
         return uuid;
     }
 
@@ -58,6 +58,8 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
         components.detachAll();
         markRemoved = true;
     }
+
+    void onTickEnd() {}
 
     @Override
     public ComponentContainer container() {

@@ -1,9 +1,9 @@
 package me.thedivazo.messageoverhead.core.render.capability;
 
-import org.bukkit.entity.Player;
+import me.thedivazo.messageoverhead.core.Viewer;
 
 public interface RendererView {
-    void show(Player player);
-    void hide(Player player);
-    void update(Player player);
+    void show(Viewer player);
+    void hide(Viewer player);
+    void update(Viewer player);
 }

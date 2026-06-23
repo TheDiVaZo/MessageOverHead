@@ -16,7 +16,7 @@ public class DefaultBubbleFactory implements BubbleFactory {
     }
 
     @Override
-    public SchedulableBubble createBubble(Message message, AuthorBubble author, Positionc positionc) {
+    public SchedulableBubble createBubble(Message message, Author author, Positionc positionc) {
         ActiveBubbleController bubble = new ActiveBubbleController(
                 message,
                 author,

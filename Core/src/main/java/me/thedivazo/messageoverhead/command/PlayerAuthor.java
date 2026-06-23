@@ -1,7 +1,6 @@
 package me.thedivazo.messageoverhead.command;
 
-import me.thedivazo.messageoverhead.core.AuthorBubble;
-import me.thedivazo.messageoverhead.util.Position;
+import me.thedivazo.messageoverhead.core.Author;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -9,11 +8,11 @@ import org.bukkit.entity.Player;
 import java.util.Objects;
 import java.util.UUID;
 
-final class PlayerBubbleAuthor implements AuthorBubble {
+final class PlayerAuthor implements Author {
     private final Player player;
     private final Positionc positionc;
 
-    PlayerBubbleAuthor(Player player) {
+    PlayerAuthor(Player player) {
         this.player = Objects.requireNonNull(player, "player");
 
         positionc = new Positionc() {

@@ -51,7 +51,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             return null;
         }
 
-        UUID uid = bubble.uuid();
+        UUID uid = bubble.id();
         ScheduledBubble existing = getSynced(uid);
         if (existing != null) {
             if (existing.bubble() == bubble && existing.tickable() == tickable) {

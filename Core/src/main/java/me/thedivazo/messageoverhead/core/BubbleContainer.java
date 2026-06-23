@@ -1,7 +1,5 @@
 package me.thedivazo.messageoverhead.core;
 
-import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
-import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,50 +12,41 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-public class BubbleContainer implements BubbleScheduler {
-    private final BubbleScheduler scheduler;
+public class BubbleContainer {
     private final Map<UUID, ActiveBubble> bubblesByMessageUid = new LinkedHashMap<>();
     private final Map<UUID, ActiveBubble> lastBubblesByPlayerUid = new LinkedHashMap<>();
     private final Map<UUID, Set<ActiveBubble>> oldBubblesByPlayerUid = new LinkedHashMap<>();
 
-    public BubbleContainer(BubbleScheduler scheduler) {
-        this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
-    }
-
-    @Override
-    public @Nullable ActiveBubble put(SchedulableBubble schedulable) {
-        Objects.requireNonNull(schedulable, "schedulable");
+    public @Nullable ActiveBubble put(ActiveBubble bubble) {
+        Objects.requireNonNull(bubble, "bubble");
         pruneActiveIndexes();
 
-        ActiveBubble candidate = Objects.requireNonNull(schedulable.bubble(), "bubble");
-        UUID messageUid = candidate.uuid();
-        UUID playerUid = playerUid(candidate);
+        if (bubble.isRemove()) {
+            return null;
+        }
+
+        UUID messageUid = bubble.id();
+        UUID playerUid = playerUid(bubble);
         ActiveBubble previousByMessage = bubblesByMessageUid.get(messageUid);
         ActiveBubble previousLast = lastBubblesByPlayerUid.get(playerUid);
         boolean previousLastCanBecomeOld = previousLast != null && !previousLast.isRemove();
 
-        ActiveBubble scheduled = scheduler.put(schedulable);
-        if (scheduled == null) {
-            return null;
-        }
-
-        if (previousByMessage != null && previousByMessage != scheduled) {
+        if (previousByMessage != null && previousByMessage != bubble) {
             unregisterActive(previousByMessage);
         }
 
-        bubblesByMessageUid.put(scheduled.uuid(), scheduled);
+        bubblesByMessageUid.put(bubble.id(), bubble);
 
-        if (previousLastCanBecomeOld && previousLast != scheduled) {
+        if (previousLastCanBecomeOld && previousLast != bubble) {
             oldBubblesByPlayerUid
                     .computeIfAbsent(playerUid, ignored -> newWeakBubbleSet())
                     .add(previousLast);
         }
 
-        lastBubblesByPlayerUid.put(playerUid(scheduled), scheduled);
-        return scheduled;
+        lastBubblesByPlayerUid.put(playerUid(bubble), bubble);
+        return bubble;
     }
 
-    @Override
     public @Nullable ActiveBubble get(UUID uid) {
         Objects.requireNonNull(uid, "uid");
         pruneActiveIndexes();
@@ -118,67 +107,42 @@ public class BubbleContainer implements BubbleScheduler {
         return Collections.unmodifiableMap(snapshot);
     }
 
-    @Override
     public @Nullable ActiveBubble remove(UUID uid) {
         Objects.requireNonNull(uid, "uid");
 
-        ActiveBubble indexed = bubblesByMessageUid.get(uid);
-        ActiveBubble removed = scheduler.remove(uid);
+        ActiveBubble removed = bubblesByMessageUid.remove(uid);
         if (removed != null) {
             unregisterActive(removed);
-        } else if (indexed != null) {
-            unregisterActive(indexed);
         }
 
         return removed;
     }
 
-    @Override
     public boolean contains(UUID uid) {
         return get(uid) != null;
     }
 
-    @Override
     public void clear() {
-        try {
-            scheduler.clear();
-        } finally {
-            bubblesByMessageUid.clear();
-            lastBubblesByPlayerUid.clear();
-            oldBubblesByPlayerUid.clear();
-        }
-    }
-
-    @Override
-    public void close() {
-        try {
-            scheduler.close();
-        } finally {
-            bubblesByMessageUid.clear();
-            lastBubblesByPlayerUid.clear();
-            oldBubblesByPlayerUid.clear();
-        }
+        bubblesByMessageUid.clear();
+        lastBubblesByPlayerUid.clear();
+        oldBubblesByPlayerUid.clear();
     }
 
     private void pruneActiveIndexes() {
         bubblesByMessageUid.entrySet().removeIf(entry -> {
             ActiveBubble bubble = entry.getValue();
-            boolean active = isScheduled(bubble);
+            boolean active = !bubble.isRemove();
             if (!active) {
                 removeLastBubbleIfSame(bubble);
             }
             return !active;
         });
 
-        lastBubblesByPlayerUid.entrySet().removeIf(entry -> !isScheduled(entry.getValue()));
-    }
-
-    private boolean isScheduled(ActiveBubble bubble) {
-        return !bubble.isRemove() && scheduler.get(bubble.uuid()) == bubble;
+        lastBubblesByPlayerUid.entrySet().removeIf(entry -> entry.getValue().isRemove());
     }
 
     private void unregisterActive(ActiveBubble bubble) {
-        bubblesByMessageUid.remove(bubble.uuid(), bubble);
+        bubblesByMessageUid.remove(bubble.id(), bubble);
         removeLastBubbleIfSame(bubble);
     }
 

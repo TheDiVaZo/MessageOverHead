@@ -5,9 +5,9 @@ import me.thedivazo.messageoverhead.core.component.ComponentContainer;
 import java.util.UUID;
 
 public interface ActiveBubble {
-    AuthorBubble author();
+    Author author();
 
-    UUID uuid();
+    UUID id();
     Message message();
     long ageTicks();
     boolean isRemove();

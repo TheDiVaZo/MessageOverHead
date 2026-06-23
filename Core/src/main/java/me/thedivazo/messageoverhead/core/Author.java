@@ -4,7 +4,7 @@ import me.thedivazo.messageoverhead.util.Positionc;
 
 import java.util.UUID;
 
-public interface AuthorBubble {
+public interface Author {
     UUID getUID();
     boolean isLive();
     Positionc getPosition();

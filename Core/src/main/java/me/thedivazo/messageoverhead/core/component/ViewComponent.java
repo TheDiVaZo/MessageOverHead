@@ -2,39 +2,40 @@ package me.thedivazo.messageoverhead.core.component;
 
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
+import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.render.capability.RendererView;
 import me.thedivazo.messageoverhead.util.Positionc;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewState> {
+
     private final Settings settings;
     private final double viewRadiusSquared;
 
+    private final Supplier<? extends Iterable<Viewer>> allPlayerProvider;
     private final ActiveBubble activeBubble;
     private final RendererView rendererView;
     private final List<ComponentScoped<ViewState>> components = new ArrayList<>();
-    private final List<Player> visiblePlayers = new ArrayList<>();
-    private final List<Player> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
+    private final List<Viewer> visiblePlayers = new ArrayList<>();
+    private final List<Viewer> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
 
     private final ViewState cachedViewState = new ViewState();
 
-    private ViewComponent(ActiveBubble activeBubble, RendererView rendererView, Settings settings) {
+    private ViewComponent(Supplier<? extends Iterable<Viewer>> allPlayerProvider, ActiveBubble activeBubble, RendererView rendererView, Settings settings) {
+        this.allPlayerProvider = Objects.requireNonNull(allPlayerProvider, "allPlayerProvider");
         this.settings = Objects.requireNonNull(settings, "settings");
         this.viewRadiusSquared = settings.viewRadius() * settings.viewRadius();
-        this.activeBubble = activeBubble;
-        this.rendererView = rendererView;
+        this.activeBubble = Objects.requireNonNull(activeBubble, "activeBubble");
+        this.rendererView = Objects.requireNonNull(rendererView, "rendererView");
     }
 
     public Settings settings() {
@@ -49,11 +50,11 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         return settings.updateIntervalTicks();
     }
 
-    public List<Player> visiblePlayers() {
+    public List<Viewer> visiblePlayers() {
         return visiblePlayersView;
     }
 
-    public boolean isVisible(Player player) {
+    public boolean isVisible(Viewer player) {
         return visiblePlayers.contains(player);
     }
 
@@ -73,10 +74,10 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
             visiblePlayers.forEach(rendererView::update);
         }
 
-        List<Player> nextVisiblePlayers = new ArrayList<>();
+        List<Viewer> nextVisiblePlayers = new ArrayList<>();
         Positionc bubblePosition = activeBubble.author().getPosition();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Viewer player : allPlayerProvider.get()) {
             if (!isInsideViewRadius(player, bubblePosition) || !isAllowedByComponents(player)) {
                 continue;
             }
@@ -89,7 +90,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
             }
         }
 
-        for (Player player : visiblePlayers) {
+        for (Viewer player : visiblePlayers) {
             if (!nextVisiblePlayers.contains(player)) {
                 rendererView.hide(player);
             }
@@ -101,22 +102,22 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
 
     @Override
     public void onDetached() {
-        for (Player player : visiblePlayers) {
+        for (Viewer player : visiblePlayers) {
             rendererView.hide(player);
         }
         visiblePlayers.clear();
     }
 
-    private boolean isInsideViewRadius(Player player, Positionc bubblePosition) {
-        Location playerLocation = player.getLocation();
-        if (!Objects.equals(playerLocation.getWorld().getUID(), activeBubble.author().getWorldUID())) return false;
-        double offsetX = playerLocation.getX() - bubblePosition.x();
-        double offsetY = playerLocation.getY() - bubblePosition.y();
-        double offsetZ = playerLocation.getZ() - bubblePosition.z();
+    private boolean isInsideViewRadius(Viewer player, Positionc bubblePosition) {
+        Positionc playerLocation = player.getPosition();
+        if (!Objects.equals(player.getWorldUID(), activeBubble.author().getWorldUID())) return false;
+        double offsetX = playerLocation.x() - bubblePosition.x();
+        double offsetY = playerLocation.y() - bubblePosition.y();
+        double offsetZ = playerLocation.z() - bubblePosition.z();
         return offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ <= viewRadiusSquared;
     }
 
-    private boolean isAllowedByComponents(Player player) {
+    private boolean isAllowedByComponents(Viewer player) {
         cachedViewState.setPlayer(player);
         cachedViewState.setVisible(true);
 
@@ -146,14 +147,14 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         }
 
     public static final class ViewState {
-        private Player player;
+        private Viewer player;
         private boolean visible = true;
 
-        public Player getPlayer() {
+        public Viewer getPlayer() {
             return player;
         }
 
-        private void setPlayer(Player player) {
+        private void setPlayer(Viewer player) {
             this.player = player;
         }
 
@@ -170,8 +171,8 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         return MessageOverHeadPlugin.getInstance().getComponentService().VIEW;
     }
 
-    public static Factory factory(Settings settings) {
-        return new Factory(settings);
+    public static Factory factory(Supplier<? extends Iterable<Viewer>> allPlayerProvider, Settings settings) {
+        return new Factory(allPlayerProvider, settings);
     }
 
     public static @Nullable ViewComponent attach(ActiveBubble activeBubble, Factory factory) {
@@ -191,15 +192,17 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     }
 
     public static final class Factory implements BubbleComponentFactory<ViewComponent> {
+        private final Supplier<? extends Iterable<Viewer>> allPlayerProvider;
         private final Settings settings;
 
-        private Factory(Settings settings) {
-            this.settings = settings;
+        private Factory(Supplier<? extends Iterable<Viewer>> allPlayerProvider, Settings settings) {
+            this.allPlayerProvider = Objects.requireNonNull(allPlayerProvider, "allPlayerProvider");
+            this.settings = Objects.requireNonNull(settings, "settings");
         }
 
         @Override
         public ViewComponent create(ComponentContext context) throws Exception {
-            return new ViewComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererView.class), settings);
+            return new ViewComponent(allPlayerProvider, context.bubble(), context.capabilityContainer().requireCapability(RendererView.class), settings);
         }
     }
 }

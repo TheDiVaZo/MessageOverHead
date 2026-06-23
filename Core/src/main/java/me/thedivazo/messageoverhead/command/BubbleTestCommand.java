@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.command;
 
+import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.armorstand.ArmorStandBubbleFactory;
 import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
@@ -43,7 +44,11 @@ public final class BubbleTestCommand {
                                 PositionComponent.key(), PositionComponent.factory(new OffsetComponentScoped(0, 2.5, 0))
                         ),
                         new BubbleProfile.KeyToFactoryEntry<>(
-                                ViewComponent.key(), ViewComponent.factory(new ViewComponent.Settings(20, 5))
+                                ViewComponent.key(),
+                                ViewComponent.factory(
+                                        MessageOverHeadPlugin.DEFAULT_ONLINE_PLAYER_PROVIDER,
+                                        new ViewComponent.Settings(20, 5)
+                                )
                         )
                 )
         );
@@ -55,7 +60,7 @@ public final class BubbleTestCommand {
                         .handler(context -> {
                             Player player = context.sender();
                             String text = context.optional(TEXT).orElseThrow();
-                            PlayerBubbleAuthor author = new PlayerBubbleAuthor(player);
+                            PlayerAuthor author = new PlayerAuthor(player);
 
                             bubbleSpawnManager.spawnBubble(
                                     new Message(Component.text(text)),
