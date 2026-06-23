@@ -54,8 +54,8 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
     @Override
     public void remove() {
         if (markRemoved) return;
-        onTickEnd();
         renderer.destroy();
+        components.detachAll();
         markRemoved = true;
     }
 
@@ -68,9 +68,6 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
         if (markRemoved) return;
         ageTicks++;
         components.tick();
-    }
-
-    void onTickEnd() {
     }
 
     @Override

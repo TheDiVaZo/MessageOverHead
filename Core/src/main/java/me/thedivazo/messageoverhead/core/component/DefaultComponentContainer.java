@@ -201,6 +201,6 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
     private boolean hasAttach(ComponentKey<?> key, ComponentContext context) {
         CapabilityContainer container = context.capabilityContainer();
-        return CollectionsKt.all(key.metadata().requiredCapabilities(), container::hasCapability);
+        return CollectionsKt.all(key.metadata().requiredCapabilities(), container::hasCapability) && key.metadata().bubblePredicate().test(context.bubble());
     }
 }

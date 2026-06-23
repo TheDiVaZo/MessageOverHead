@@ -97,7 +97,9 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
 
         @Override
         public PositionComponent create(ComponentContext context) {
-            return new PositionComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererPosition.class));
+            PositionComponent component = new PositionComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererPosition.class));
+            scopedFactories.forEach(scopedFactory -> component.addScoped(scopedFactory.apply(context.bubble())));
+            return component;
         }
     }
 }

@@ -45,7 +45,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 this,
                 ExecutionCoordinator.simpleCoordinator()
         );
-        BubbleTestCommand.register(commandManager, bubbleManager);
+        BubbleTestCommand.register(commandManager, bubbleManager, componentRegistry);
     }
 
     @Override
