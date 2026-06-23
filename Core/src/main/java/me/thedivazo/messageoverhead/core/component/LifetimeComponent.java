@@ -28,7 +28,7 @@ public class LifetimeComponent implements BubbleComponent {
         return new Factory(lifetime);
     }
 
-    public static @Nullable LifetimeComponent attach(ActiveBubble activeBubble, long lifetime) {
+    public static LifetimeComponent attach(ActiveBubble activeBubble, long lifetime) {
         return activeBubble.container().attach(key(), factory(lifetime));
     }
 

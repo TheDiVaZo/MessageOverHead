@@ -1,6 +1,5 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import kotlin.collections.CollectionsKt;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,18 +18,15 @@ public final class DefaultComponentContainer implements ComponentContainer {
     }
 
     @Override
-    public @Nullable BubbleComponent attachUnchecked(
+    public BubbleComponent attachUnchecked(
             ComponentKey<?> key,
             BubbleComponentFactory<?> factory
     ) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(factory, "factory");
 
-        if (!registry.isValid(key)) return null;
-
-        if (!hasAttach(key, context)) {
-            return null;
-        }
+        ensureValidKey(key);
+        ensureAttachAllowed(key, context);
 
         BubbleComponent component = createComponent(key, factory);
         if (!key.type().isInstance(component)) throw new IllegalArgumentException(key + " is not of type " + component.getClass().getName() + ", key is type "+key.type().getName());
@@ -199,8 +195,27 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
     }
 
-    private boolean hasAttach(ComponentKey<?> key, ComponentContext context) {
+    private void ensureValidKey(ComponentKey<?> key) {
+        if (!registry.isValid(key)) {
+            throw new IllegalArgumentException("Component key is not registered: " + key.id());
+        }
+    }
+
+    private void ensureAttachAllowed(ComponentKey<?> key, ComponentContext context) {
         CapabilityContainer container = context.capabilityContainer();
-        return CollectionsKt.all(key.metadata().requiredCapabilities(), container::hasCapability) && key.metadata().bubblePredicate().test(context.bubble());
+
+        for (Class<?> capability : key.metadata().requiredCapabilities()) {
+            if (!container.hasCapability(capability)) {
+                throw new IllegalStateException(
+                        "Component " + key.id() + " requires renderer capability " + capability.getName()
+                );
+            }
+        }
+
+        if (!key.metadata().bubblePredicate().test(context.bubble())) {
+            throw new IllegalStateException(
+                    "Component " + key.id() + " cannot be attached to bubble " + context.bubble().id()
+            );
+        }
     }
 }

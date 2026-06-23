@@ -3,9 +3,9 @@ package me.thedivazo.messageoverhead.core.component;
 import org.jetbrains.annotations.Nullable;
 
 public interface ComponentContainer {
-    @Nullable BubbleComponent attachUnchecked(ComponentKey<?> key, BubbleComponentFactory<?> factory);
+    BubbleComponent attachUnchecked(ComponentKey<?> key, BubbleComponentFactory<?> factory);
 
-    default <T extends BubbleComponent> @Nullable T attach(ComponentKey<T> key, BubbleComponentFactory<T> factory) {
+    default <T extends BubbleComponent> T attach(ComponentKey<T> key, BubbleComponentFactory<T> factory) {
         return key.type().cast(attachUnchecked(key, factory));
     };
 

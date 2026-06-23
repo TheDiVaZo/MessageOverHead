@@ -62,7 +62,7 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
         return MessageOverHeadPlugin.getInstance().getComponentService().POSITION;
     }
 
-    public static @Nullable PositionComponent attach(ActiveBubble activeBubble, Factory factory) {
+    public static PositionComponent attach(ActiveBubble activeBubble, Factory factory) {
         return activeBubble.container().attach(key(), factory);
     }
 

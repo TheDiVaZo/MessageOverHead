@@ -175,7 +175,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         return new Factory(allPlayerProvider, settings);
     }
 
-    public static @Nullable ViewComponent attach(ActiveBubble activeBubble, Factory factory) {
+    public static ViewComponent attach(ActiveBubble activeBubble, Factory factory) {
         return activeBubble.container().attach(key(), factory);
     }
 
