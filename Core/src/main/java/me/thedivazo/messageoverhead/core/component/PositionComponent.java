@@ -9,6 +9,7 @@ import me.thedivazo.messageoverhead.util.Position;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -61,10 +62,20 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
         return MessageOverHeadPlugin.getInstance().getComponentService().POSITION;
     }
 
-    public static @Nullable PositionComponent attach(ActiveBubble activeBubble) {
-        return activeBubble.container().attach(key(), Factory.INSTANCE);
+    public static @Nullable PositionComponent attach(ActiveBubble activeBubble, Factory factory) {
+        return activeBubble.container().attach(key(), factory);
     }
 
+    public static Factory factory(List<Function<ActiveBubble, ComponentScoped<Position>>> scopedFactories) {
+        return new Factory(scopedFactories);
+    }
+
+    public static Factory factory(ComponentScoped<Position>... scopedComponents) {
+        return new Factory(Arrays.stream(scopedComponents)
+                .map(component -> (Function<ActiveBubble, ComponentScoped<Position>>) active -> component)
+                .toList()
+        );
+    }
     public static @Nullable PositionComponent detach(ActiveBubble activeBubble) {
         return activeBubble.container().detach(key());
     }
@@ -77,8 +88,12 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
         return activeBubble.container().contains(key());
     }
 
-    public enum Factory implements BubbleComponentFactory<PositionComponent> {
-        INSTANCE;
+    public static final class Factory implements BubbleComponentFactory<PositionComponent> {
+        private final List<Function<ActiveBubble, ComponentScoped<Position>>> scopedFactories;
+
+        public Factory(List<Function<ActiveBubble, ComponentScoped<Position>>> scopedFactories) {
+            this.scopedFactories = List.copyOf(scopedFactories);
+        }
 
         @Override
         public PositionComponent create(ComponentContext context) {

@@ -8,8 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public interface BubbleManager extends AutoCloseable {
-    ActiveBubble spawnBubble(Message message, AuthorBubble author, Positionc positionc);
+public interface BubbleSpawnManager extends AutoCloseable {
+    ActiveBubble spawnBubble(Message message, AuthorBubble author, Positionc positionc, BubbleProfile profile);
 
     @Nullable ActiveBubble getBubble(UUID uid);
 
