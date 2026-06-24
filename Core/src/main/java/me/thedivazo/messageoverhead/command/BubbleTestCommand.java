@@ -1,6 +1,7 @@
 package me.thedivazo.messageoverhead.command;
 
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
+import me.thedivazo.messageoverhead.SpawnService;
 import me.thedivazo.messageoverhead.armorstand.ArmorStandBubbleFactory;
 import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
@@ -11,7 +12,6 @@ import me.thedivazo.messageoverhead.core.component.ViewComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.component.scope.OffsetComponentScoped;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
-import me.thedivazo.messageoverhead.profile.BubbleSpawnManager;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.profile.BubbleProfileImpl;
 import me.thedivazo.messageoverhead.profile.ProfileId;
@@ -38,11 +38,11 @@ public final class BubbleTestCommand {
 
     public static void register(
             LegacyPaperCommandManager<CommandSender> commandManager,
-            BubbleSpawnManager bubbleSpawnManager,
+            SpawnService spawnService,
             ComponentRegistry componentRegistry
     ) {
         Objects.requireNonNull(commandManager, "commandManager");
-        Objects.requireNonNull(bubbleSpawnManager, "bubbleSpawnManager");
+        Objects.requireNonNull(spawnService, "spawnService");
 
         Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories = new LinkedHashMap<>();
         componentFactories.put(
@@ -74,7 +74,7 @@ public final class BubbleTestCommand {
                             String text = context.optional(TEXT).orElseThrow();
                             PlayerAuthor author = new PlayerAuthor(player);
 
-                            bubbleSpawnManager.spawnBubble(
+                            spawnService.spawnBubble(
                                     new Message(Component.text(text)),
                                     author,
                                     author.getPosition(),

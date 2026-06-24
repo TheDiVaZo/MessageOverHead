@@ -1,4 +1,4 @@
-package me.thedivazo.messageoverhead.profile;
+package me.thedivazo.messageoverhead;
 
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Author;
@@ -6,6 +6,7 @@ import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
+import me.thedivazo.messageoverhead.profile.BubbleProfile;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,11 +14,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
+public final class SpawnService {
     private final BubbleContainer container;
     private final BubbleScheduler scheduler;
 
-    public BubbleSpawnManagerImpl(
+    public SpawnService(
             BubbleContainer container,
             BubbleScheduler scheduler
     ) {
@@ -25,7 +26,6 @@ public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
         this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
     }
 
-    @Override
     public ActiveBubble spawnBubble(Message message, Author author, Positionc positionc, BubbleProfile profile) {
         SchedulableBubble schedulable = profile.bubbleFactory().createBubble(message, author, positionc);
         Objects.requireNonNull(schedulable, "schedulable");
@@ -68,12 +68,10 @@ public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
         return bubble;
     }
 
-    @Override
     public @Nullable ActiveBubble getBubble(UUID uid) {
         return container.get(uid);
     }
 
-    @Override
     public @Nullable ActiveBubble removeBubble(UUID uid) {
         ActiveBubble indexed = container.remove(uid);
         ActiveBubble scheduled = scheduler.remove(uid);
@@ -89,12 +87,10 @@ public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
         return indexed;
     }
 
-    @Override
     public boolean containsBubble(UUID uid) {
         return container.contains(uid);
     }
 
-    @Override
     public void clearBubbles() {
         for (UUID uid : Set.copyOf(container.getBubblesByBubbleId().keySet())) {
             removeBubble(uid);
@@ -103,7 +99,6 @@ public final class BubbleSpawnManagerImpl implements BubbleSpawnManager {
         container.clear();
     }
 
-    @Override
     public void close() {
         try {
             clearBubbles();

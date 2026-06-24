@@ -4,8 +4,6 @@ import me.thedivazo.messageoverhead.command.BubbleTestCommand;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
-import me.thedivazo.messageoverhead.profile.BubbleSpawnManager;
-import me.thedivazo.messageoverhead.profile.BubbleSpawnManagerImpl;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.core.tick.BukkitBubbleScheduler;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
@@ -30,7 +28,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     private BubbleScheduler bubbleScheduler = new BukkitBubbleScheduler(this);
     private ComponentService componentService;
 
-    private BubbleSpawnManager bubbleManager;
+    private SpawnService spawnService;
     private LegacyPaperCommandManager<CommandSender> commandManager;
 
     @Override
@@ -41,7 +39,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         this.bubbleContainer = new BubbleContainer();
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
 
-        this.bubbleManager = new BubbleSpawnManagerImpl(
+        this.spawnService = new SpawnService(
                 bubbleContainer,
                 bubbleScheduler
         );
@@ -50,18 +48,18 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 this,
                 ExecutionCoordinator.simpleCoordinator()
         );
-        BubbleTestCommand.register(commandManager, bubbleManager, componentRegistry);
+        BubbleTestCommand.register(commandManager, spawnService, componentRegistry);
     }
 
     @Override
     public void onDisable() {
         try {
-            if (bubbleManager != null) {
-                bubbleManager.close();
+            if (spawnService != null) {
+                spawnService.close();
             }
         } finally {
             commandManager = null;
-            bubbleManager = null;
+            spawnService = null;
             bubbleContainer = null;
             INSTANCE = null;
         }
@@ -71,7 +69,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         return componentService;
     }
 
-    public BubbleSpawnManager getBubbleManager() {
-        return bubbleManager;
+    public SpawnService getSpawnService() {
+        return spawnService;
     }
 }
