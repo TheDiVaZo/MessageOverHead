@@ -20,6 +20,7 @@ public final class ComponentService {
         registerPluginComponent(ViewComponent.key());
         registerPluginComponent(PositionComponent.key());
         registerPluginComponent(LifetimeComponent.key());
+        registerPluginComponent(ProfileComponent.key());
     }
 
     <T extends BubbleComponent> void registerPluginComponent(ComponentKey<T> key) {
