@@ -1,7 +1,7 @@
 package me.thedivazo.messageoverhead.command;
 
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
-import me.thedivazo.messageoverhead.SpawnService;
+import me.thedivazo.messageoverhead.api.SpawnService;
 import me.thedivazo.messageoverhead.armorstand.ArmorStandBubbleFactory;
 import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
@@ -13,7 +13,6 @@ import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.component.scope.OffsetComponentScoped;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Message;
-import me.thedivazo.messageoverhead.profile.BubbleProfileImpl;
 import me.thedivazo.messageoverhead.profile.ProfileId;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
 import me.thedivazo.messageoverhead.util.Position;

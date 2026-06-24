@@ -1,4 +1,4 @@
-package me.thedivazo.messageoverhead;
+package me.thedivazo.messageoverhead.api;
 
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;

@@ -1,9 +1,10 @@
-package me.thedivazo.messageoverhead;
+package me.thedivazo.messageoverhead.api;
 
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Author;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.Message;
+import me.thedivazo.messageoverhead.core.component.ProfileComponent;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
@@ -31,6 +32,7 @@ public final class SpawnService {
         Objects.requireNonNull(schedulable, "schedulable");
 
         ActiveBubble bubble = Objects.requireNonNull(schedulable.bubble(), "bubble");
+        ProfileComponent.attach(bubble, profile.id());
 
         try {
             ActiveBubble finalBubble = bubble;

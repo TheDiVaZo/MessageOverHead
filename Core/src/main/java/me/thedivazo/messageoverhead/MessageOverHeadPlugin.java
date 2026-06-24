@@ -1,5 +1,7 @@
 package me.thedivazo.messageoverhead;
 
+import me.thedivazo.messageoverhead.api.ComponentService;
+import me.thedivazo.messageoverhead.api.SpawnService;
 import me.thedivazo.messageoverhead.command.BubbleTestCommand;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;

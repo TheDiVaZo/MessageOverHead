@@ -1,6 +1,5 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import me.thedivazo.messageoverhead.ComponentService;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;

@@ -25,9 +25,7 @@ public interface BubbleProfile {
         return new BubbleProfileImpl(
                 id,
                 bubbleFactory,
-                MapsKt.plus(componentFactories, Map.of(
-                        ProfileComponent.key(), context -> new ProfileComponent(context.bubble(), id)
-                ))
+                componentFactories
         );
     }
 }
