@@ -1,6 +1,7 @@
 package me.thedivazo.messageoverhead;
 
 import me.thedivazo.messageoverhead.api.ComponentService;
+import me.thedivazo.messageoverhead.api.ProfileService;
 import me.thedivazo.messageoverhead.api.SpawnService;
 import me.thedivazo.messageoverhead.command.BubbleTestCommand;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
@@ -29,6 +30,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     private BubbleContainer bubbleContainer;
     private BubbleScheduler bubbleScheduler = new BukkitBubbleScheduler(this);
     private ComponentService componentService;
+    private ProfileService profileService;
 
     private SpawnService spawnService;
     private LegacyPaperCommandManager<CommandSender> commandManager;
@@ -40,6 +42,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
         this.bubbleContainer = new BubbleContainer();
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
+        this.profileService = new ProfileService(componentRegistry);
 
         this.spawnService = new SpawnService(
                 bubbleContainer,
@@ -62,6 +65,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         } finally {
             commandManager = null;
             spawnService = null;
+            profileService = null;
             bubbleContainer = null;
             INSTANCE = null;
         }
@@ -69,6 +73,10 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     public ComponentService getComponentService() {
         return componentService;
+    }
+
+    public ProfileService getProfileService() {
+        return profileService;
     }
 
     public SpawnService getSpawnService() {

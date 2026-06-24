@@ -3,8 +3,6 @@ package me.thedivazo.messageoverhead.core.component;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.profile.ProfileId;
 
-import java.util.Set;
-
 public class ProfileComponent implements BubbleComponent {
     private static final ComponentKey<ProfileComponent> KEY = new ComponentKey<>(
             ComponentId.of("messageoverhead", "profile"),
