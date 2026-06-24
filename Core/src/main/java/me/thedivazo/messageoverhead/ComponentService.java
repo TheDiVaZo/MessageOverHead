@@ -23,19 +23,19 @@ public final class ComponentService {
     }
 
     <T extends BubbleComponent> void registerPluginComponent(ComponentKey<T> key) {
-        if (!isPluginNamespace(key.id().namespace())) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace to " + pluginNamespace());
+        if (!Objects.equals(key.id().namespace(), "messageoverhead")) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace to \"messageoverhead\"");
         registry.register(key);
     }
 
     public synchronized <T extends BubbleComponent> void register(ComponentKey<T> key) {
-        if (isPluginNamespace(key.id().namespace())) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace");
+        if (Objects.equals(key.id().namespace(), "messageoverhead")) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace");
 
         registry.register(key);
         otherNamespaceToKeys.put(key.id().namespace(), key);
     }
 
     public synchronized <T extends BubbleComponent> void unregister(String namespace) {
-        if (isPluginNamespace(namespace)) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
+        if (Objects.equals(namespace, "messageoverhead")) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
 
         Set<ComponentKey<?>> keys = Set.copyOf(otherNamespaceToKeys.get(namespace));
 
@@ -49,14 +49,6 @@ public final class ComponentService {
 
         otherNamespaceToKeys.removeAll(namespace);
         keys.forEach(registry::unregister);
-    }
-
-    private boolean isPluginNamespace(String namespace) {
-        return pluginNamespace().equals(namespace);
-    }
-
-    private String pluginNamespace() {
-        return PositionComponent.key().id().namespace();
     }
 
 }
