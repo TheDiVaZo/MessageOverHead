@@ -5,6 +5,6 @@ public interface BubbleComponent {
 
     default void onDetached(){};
 
-    void onTick();
+    default void onTick(){};
 
 }

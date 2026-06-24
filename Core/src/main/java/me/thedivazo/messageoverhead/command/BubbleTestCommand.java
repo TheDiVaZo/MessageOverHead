@@ -59,7 +59,7 @@ public final class BubbleTestCommand {
                 )
         );
 
-        BubbleProfile TEST_BUBBLE_PROFILE = new BubbleProfileImpl(
+        BubbleProfile TEST_BUBBLE_PROFILE = BubbleProfile.create(
                 ProfileId.of("test"),
                 new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25)),
                 componentFactories

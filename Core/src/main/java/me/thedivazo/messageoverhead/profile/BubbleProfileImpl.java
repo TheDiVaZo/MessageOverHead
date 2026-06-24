@@ -11,7 +11,7 @@ public final class BubbleProfileImpl implements BubbleProfile {
     private final BubbleFactory bubbleFactory;
     private final Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories;
 
-    public BubbleProfileImpl(
+    BubbleProfileImpl(
             ProfileId id,
             BubbleFactory bubbleFactory,
             Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories
