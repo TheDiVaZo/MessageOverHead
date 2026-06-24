@@ -80,6 +80,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     public void onTick() {
         if (activeBubble.ageTicks() % settings.updateIntervalTicks() != 0) {
             visiblePlayers.forEach(rendererView::update);
+            return;
         }
 
         List<Viewer> nextVisiblePlayers = new ArrayList<>();
