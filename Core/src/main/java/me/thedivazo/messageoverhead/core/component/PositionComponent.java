@@ -33,6 +33,11 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
     }
 
     @Override
+    public TypeComponent getType() {
+        return TypeComponent.BUBBLE;
+    }
+
+    @Override
     public void attach(Function<ActiveBubble, ComponentScoped<Position>> scopedFactory) {
         Objects.requireNonNull(scopedFactory, "scopedFactory");
         addScoped(Objects.requireNonNull(scopedFactory.apply(activeBubble), "scopedFactory result"));

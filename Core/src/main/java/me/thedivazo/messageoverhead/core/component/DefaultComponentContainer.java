@@ -1,6 +1,7 @@
 package me.thedivazo.messageoverhead.core.component;
 
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -9,8 +10,10 @@ public final class DefaultComponentContainer implements ComponentContainer {
     private final ComponentRegistry registry;
     private final ComponentContext context;
 
-    private final Map<ComponentId, Entry<?>> components =
-            new LinkedHashMap<>();
+    private int counter = 0;
+
+    private final Map<ComponentId, Entry<?>> components = new LinkedHashMap<>();
+    private final SortedSet<Entry<?>> sortedComponents = new TreeSet<>(Comparator.naturalOrder());
 
     public DefaultComponentContainer(ComponentRegistry registry, ComponentContext context) {
         this.registry = Objects.requireNonNull(registry, "registry");
@@ -22,6 +25,15 @@ public final class DefaultComponentContainer implements ComponentContainer {
             ComponentKey<?> key,
             BubbleComponentFactory<?> factory
     ) {
+        BubbleComponent component = attackComponent(key, factory);
+        component.onPostInit();
+        return component;
+    }
+
+    private BubbleComponent attackComponent(
+                ComponentKey<?> key,
+                BubbleComponentFactory<?> factory
+    ) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(factory, "factory");
 
@@ -31,23 +43,37 @@ public final class DefaultComponentContainer implements ComponentContainer {
         BubbleComponent component = createComponent(key, factory);
         if (!key.type().isInstance(component)) throw new IllegalArgumentException(key + " is not of type " + component.getClass().getName() + ", key is type "+key.type().getName());
 
-        Entry<?> entry = new Entry<>(key, component);
+        Entry<?> entry = new Entry<>(key, component, counter++);
         Entry<?> previousEntry = components.remove(key.id());
 
         if (previousEntry != null) {
+            sortedComponents.remove(previousEntry);
             previousEntry.component().onDetached();
         }
 
         components.put(key.id(), entry);
+        sortedComponents.add(entry);
 
         try {
             component.onAttached();
         } catch (RuntimeException | Error exception) {
             components.remove(key.id());
+            sortedComponents.remove(entry);
             throw exception;
         }
 
         return key.type().cast(component);
+    }
+
+    @Override
+    public void attachGroup(Map<ComponentKey<?>, ? extends BubbleComponentFactory<?>> components) {
+        List<BubbleComponent> attached = new ArrayList<>();
+        for (Map.Entry<ComponentKey<?>, ? extends BubbleComponentFactory<?>> entry : components.entrySet()) {
+            ComponentKey<?> key = entry.getKey();
+            BubbleComponentFactory<?> factory = entry.getValue();
+            attached.add(attackComponent(key, factory));
+        }
+        attached.forEach(BubbleComponent::onPostInit);
     }
 
     @Override
@@ -61,6 +87,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
         }
 
         components.remove(key.id());
+        sortedComponents.remove(entry);
 
         entry.component().onDetached();
 
@@ -92,7 +119,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
     }
 
     public void tick() {
-        components.values().forEach(entry -> {
+        sortedComponents.forEach(entry -> {
             entry.component().onTick();
         });
     }
@@ -152,16 +179,24 @@ public final class DefaultComponentContainer implements ComponentContainer {
         }
     }
 
-    private static final class Entry<T extends BubbleComponent> {
+    private static final class Entry<T extends BubbleComponent> implements Comparable<Entry<?>> {
         private final ComponentKey<?> key;
         private final BubbleComponent component;
 
+        int getCount() {
+            return count;
+        }
+
+        private final int count;
+
         private Entry(
                 ComponentKey<?> key,
-                BubbleComponent component
+                BubbleComponent component,
+                int count
         ) {
             this.key = key;
             this.component = component;
+            this.count = count;
         }
 
         public ComponentKey<T> key() {
@@ -193,6 +228,11 @@ public final class DefaultComponentContainer implements ComponentContainer {
                     "component=" + component + ']';
         }
 
+        @Override
+        public int compareTo(@NotNull DefaultComponentContainer.Entry<?> o) {
+            int difference = component.getType().getPriority() - o.component.getType().getPriority();
+            return difference == 0 ? Integer.compare(getCount(), o.getCount()) : difference;
+        }
     }
 
     private void ensureValidKey(ComponentKey<?> key) {

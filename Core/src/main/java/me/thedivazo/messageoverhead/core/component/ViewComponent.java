@@ -66,6 +66,11 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     }
 
     @Override
+    public TypeComponent getType() {
+        return TypeComponent.VIEW;
+    }
+
+    @Override
     public void attach(Function<ActiveBubble, ComponentScoped<ViewState>> scopedFactory) {
         Objects.requireNonNull(scopedFactory, "scopedFactory");
         addScoped(Objects.requireNonNull(scopedFactory.apply(activeBubble), "scopedFactory result"));

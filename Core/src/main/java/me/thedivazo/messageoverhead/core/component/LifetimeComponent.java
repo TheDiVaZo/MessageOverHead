@@ -19,6 +19,11 @@ public class LifetimeComponent implements BubbleComponent {
     }
 
     @Override
+    public TypeComponent getType() {
+        return TypeComponent.BUBBLE;
+    }
+
+    @Override
     public void onTick() {
         if (activeBubble.ageTicks() > lifetime) {
             activeBubble.remove();

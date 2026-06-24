@@ -4,6 +4,8 @@ import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Author;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.Message;
+import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
+import me.thedivazo.messageoverhead.core.component.ComponentKey;
 import me.thedivazo.messageoverhead.core.component.ProfileComponent;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
@@ -11,6 +13,7 @@ import me.thedivazo.messageoverhead.profile.BubbleProfile;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -35,16 +38,7 @@ public final class SpawnService {
         ProfileComponent.attach(bubble, profile.id());
 
         try {
-            ActiveBubble finalBubble = bubble;
-            profile.componentFactories()
-                    .forEach((key, factory) -> {
-                        var component = finalBubble.container().attachUnchecked(key, factory);
-                        if (component == null) {
-                            throw new IllegalStateException(
-                                    "Component " + key.id() + " was not attached to bubble " + finalBubble.id()
-                            );
-                        }
-                    });
+            bubble.container().attachGroup(profile.componentFactories());
         } catch (RuntimeException | Error exception) {
             if (!bubble.isRemove()) {
                 bubble.remove();
