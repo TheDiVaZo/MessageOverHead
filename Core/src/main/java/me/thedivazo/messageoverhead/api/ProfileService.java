@@ -13,12 +13,13 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class ProfileService {
-    private final ProfileRegistry registry = new ProfileRegistry();
+    private final ProfileRegistry registry;
     private final ComponentRegistry componentRegistry;
 
     private ProfileId defaultProfileId;
 
-    public ProfileService(ComponentRegistry componentRegistry) {
+    public ProfileService(ProfileRegistry registry, ComponentRegistry componentRegistry) {
+        this.registry = Objects.requireNonNull(registry, "registry");
         this.componentRegistry = Objects.requireNonNull(componentRegistry, "componentRegistry");
     }
 
