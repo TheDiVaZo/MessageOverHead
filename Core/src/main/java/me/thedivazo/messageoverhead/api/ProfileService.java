@@ -5,7 +5,7 @@ import me.thedivazo.messageoverhead.core.component.ComponentKey;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.core.component.ProfileComponent;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
-import me.thedivazo.messageoverhead.profile.BubbleProfileRegistry;
+import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import me.thedivazo.messageoverhead.profile.ProfileId;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class ProfileService {
-    private final BubbleProfileRegistry registry = new BubbleProfileRegistry();
+    private final ProfileRegistry registry = new ProfileRegistry();
     private final ComponentRegistry componentRegistry;
 
     private ProfileId defaultProfileId;

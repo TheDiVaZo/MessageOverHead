@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class BubbleProfileRegistry {
+public final class ProfileRegistry {
     private final Map<ProfileId, BubbleProfile> profiles =
             new LinkedHashMap<>();
 
