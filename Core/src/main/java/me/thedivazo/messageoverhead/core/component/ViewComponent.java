@@ -21,7 +21,8 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
             ComponentId.of("messageoverhead", "view"),
             ViewComponent.class,
             new ComponentMetadata(
-                    Set.of(RendererView.class)
+                    Set.of(RendererView.class),
+                    TypeComponent.VIEW
             )
     );
 
@@ -63,11 +64,6 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
 
     public boolean isVisible(Viewer player) {
         return visiblePlayers.contains(player);
-    }
-
-    @Override
-    public TypeComponent getType() {
-        return TypeComponent.VIEW;
     }
 
     @Override

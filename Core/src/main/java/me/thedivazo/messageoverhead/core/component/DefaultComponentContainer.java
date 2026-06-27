@@ -230,7 +230,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
         @Override
         public int compareTo(@NotNull DefaultComponentContainer.Entry<?> o) {
-            int difference = component.getType().getPriority() - o.component.getType().getPriority();
+            int difference = key.metadata().typeComponent().getPriority() - o.key.metadata().typeComponent().getPriority();
             return difference == 0 ? Integer.compare(getCount(), o.getCount()) : difference;
         }
     }
@@ -250,12 +250,6 @@ public final class DefaultComponentContainer implements ComponentContainer {
                         "Component " + key.id() + " requires renderer capability " + capability.getName()
                 );
             }
-        }
-
-        if (!key.metadata().bubblePredicate().test(context.bubble())) {
-            throw new IllegalStateException(
-                    "Component " + key.id() + " cannot be attached to bubble " + context.bubble().id()
-            );
         }
     }
 }

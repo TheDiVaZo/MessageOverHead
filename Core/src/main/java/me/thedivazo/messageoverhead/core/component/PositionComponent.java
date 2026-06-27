@@ -17,7 +17,8 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
             ComponentId.of("messageoverhead", "position"),
             PositionComponent.class,
             new ComponentMetadata(
-                    Set.of(RendererPosition.class)
+                    Set.of(RendererPosition.class),
+                    TypeComponent.BUBBLE
             )
     );
 
@@ -30,11 +31,6 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
     private PositionComponent(ActiveBubble activeBubble, RendererPosition rendererPosition) {
         this.activeBubble = activeBubble;
         this.rendererPosition = rendererPosition;
-    }
-
-    @Override
-    public TypeComponent getType() {
-        return TypeComponent.BUBBLE;
     }
 
     @Override

@@ -7,7 +7,7 @@ public class LifetimeComponent implements BubbleComponent {
     private static final ComponentKey<LifetimeComponent> KEY = new ComponentKey<>(
             ComponentId.of("messageoverhead", "lifetime"),
             LifetimeComponent.class,
-            ComponentMetadata.EMPTY
+            new ComponentMetadata(TypeComponent.BUBBLE)
     );
 
     private final ActiveBubble activeBubble;
@@ -16,11 +16,6 @@ public class LifetimeComponent implements BubbleComponent {
     public LifetimeComponent(ActiveBubble activeBubble, long lifetime) {
         this.activeBubble = activeBubble;
         this.lifetime = lifetime;
-    }
-
-    @Override
-    public TypeComponent getType() {
-        return TypeComponent.BUBBLE;
     }
 
     @Override

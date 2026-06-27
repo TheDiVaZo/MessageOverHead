@@ -1,28 +1,21 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import com.google.common.base.Predicates;
-import me.thedivazo.messageoverhead.core.ActiveBubble;
-
-import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public record ComponentMetadata(
         Set<Class<?>> requiredCapabilities,
-        Predicate<ActiveBubble> bubblePredicate
+        TypeComponent typeComponent
 ) {
-    public static ComponentMetadata EMPTY = new ComponentMetadata();
+    public static final ComponentMetadata EMPTY = new ComponentMetadata();
+    private ComponentMetadata() {
+        this(Set.of(), TypeComponent.DEFAULT);
+    }
 
-    public ComponentMetadata() {
-        this(Collections.emptySet());
+    public ComponentMetadata(TypeComponent typeComponent) {
+        this(Set.of(), typeComponent);
     }
 
     public ComponentMetadata(Set<Class<?>> requiredCapabilities) {
-        this(requiredCapabilities, Predicates.alwaysTrue());
-    }
-
-    public ComponentMetadata(Set<Class<?>> requiredCapabilities, Predicate<ActiveBubble> bubblePredicate) {
-        this.requiredCapabilities = Set.copyOf(requiredCapabilities);
-        this.bubblePredicate = bubblePredicate;
+        this(requiredCapabilities, TypeComponent.DEFAULT);
     }
 }
