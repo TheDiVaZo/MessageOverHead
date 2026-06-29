@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core.tick;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+@MainThread
 public final class BukkitBubbleScheduler implements BubbleScheduler {
     private final Plugin plugin;
     private final long delay;

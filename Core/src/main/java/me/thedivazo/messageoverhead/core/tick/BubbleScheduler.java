@@ -1,10 +1,12 @@
 package me.thedivazo.messageoverhead.core.tick;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@MainThread
 public interface BubbleScheduler extends AutoCloseable {
     @Nullable ActiveBubble put(SchedulableBubble bubble);
 
