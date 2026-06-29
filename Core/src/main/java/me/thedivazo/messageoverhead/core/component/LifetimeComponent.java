@@ -1,8 +1,10 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import org.jetbrains.annotations.Nullable;
 
+@MainThread
 public class LifetimeComponent implements BubbleComponent {
     private static final ComponentKey<LifetimeComponent> KEY = new ComponentKey<>(
             ComponentId.of("messageoverhead", "lifetime"),

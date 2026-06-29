@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.api;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Author;
 import me.thedivazo.messageoverhead.core.Message;
@@ -7,18 +8,32 @@ import me.thedivazo.messageoverhead.core.component.ProfileComponent;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
+import me.thedivazo.messageoverhead.profile.ProfileId;
+import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
+@MainThread
 public final class SpawnService {
     private final BubbleScheduler scheduler;
+    private final ProfileComponent.Factory profileFactory;
+    private final ProfileComponent.BubbleProfileContainer profileContainer;
+    private final ProfileRegistry registry;
 
     public SpawnService(
-            BubbleScheduler scheduler
+            BubbleScheduler scheduler, ProfileComponent.BubbleProfileContainer profileContainer, ProfileRegistry registry
     ) {
         this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
+        this.profileFactory = new ProfileComponent.Factory(profileContainer);
+        this.profileContainer = Objects.requireNonNull(profileContainer, "profileContainer");
+        this.registry = registry;
+    }
+
+    public ActiveBubble spawn(Message message, Author author, ProfileId profileId) {
+        return spawn(message, author, Objects.requireNonNull(registry.find(profileId)));
     }
 
     public ActiveBubble spawn(Message message, Author author, BubbleProfile profile) {
@@ -28,7 +43,7 @@ public final class SpawnService {
         Objects.requireNonNull(schedulable, "schedulable");
 
         ActiveBubble bubble = Objects.requireNonNull(schedulable.bubble(), "bubble");
-        ProfileComponent.attach(bubble, profile.id());
+        bubble.container().attach(ProfileComponent.key(), (context) -> profileFactory.create(context, profile));
 
         try {
             bubble.container().attachGroup(profile.componentFactories());
@@ -63,7 +78,7 @@ public final class SpawnService {
         return scheduler.contains(uid);
     }
 
-    public void clear() {
-        scheduler.clear();
+    public synchronized Collection<ProfileComponent> getByProfileId(ProfileId id) {
+        return profileContainer.get(id);
     }
 }

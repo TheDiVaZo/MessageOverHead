@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.api;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
 import me.thedivazo.messageoverhead.core.component.ComponentKey;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
@@ -12,15 +13,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
+@MainThread
 public final class ProfileService {
     private final ProfileRegistry registry;
     private final ComponentRegistry componentRegistry;
+    private final ProfileComponent.BubbleProfileContainer profileContainer;
 
-    private ProfileId defaultProfileId;
-
-    public ProfileService(ProfileRegistry registry, ComponentRegistry componentRegistry) {
+    public ProfileService(ProfileRegistry registry, ComponentRegistry componentRegistry, ProfileComponent.BubbleProfileContainer profileContainer) {
         this.registry = Objects.requireNonNull(registry, "registry");
         this.componentRegistry = Objects.requireNonNull(componentRegistry, "componentRegistry");
+        this.profileContainer = Objects.requireNonNull(profileContainer, "profileContainer");
     }
 
     public synchronized void register(BubbleProfile profile) {
@@ -32,9 +34,9 @@ public final class ProfileService {
         Objects.requireNonNull(id, "id");
 
         BubbleProfile profile = registry.unregister(id);
-        if (Objects.equals(defaultProfileId, id)) {
-            defaultProfileId = null;
-        }
+
+        profileContainer.get(id).forEach(component -> component.getActiveBubble().remove());
+        profileContainer.remove(id);
         return profile;
     }
 
@@ -42,28 +44,6 @@ public final class ProfileService {
         Objects.requireNonNull(id, "id");
 
         return registry.find(id);
-    }
-
-    public synchronized @Nullable BubbleProfile defaultProfile() {
-        if (defaultProfileId == null) {
-            return null;
-        }
-
-        BubbleProfile profile = registry.find(defaultProfileId);
-        if (profile == null) {
-            defaultProfileId = null;
-        }
-        return profile;
-    }
-
-    public synchronized void setDefaultProfile(ProfileId id) {
-        Objects.requireNonNull(id, "id");
-
-        if (!registry.contains(id)) {
-            throw new IllegalArgumentException("Unknown profile id: " + id);
-        }
-
-        defaultProfileId = id;
     }
 
     private void validate(BubbleProfile profile) {

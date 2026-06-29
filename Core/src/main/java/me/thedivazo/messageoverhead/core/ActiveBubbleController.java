@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@MainThread
 final class ActiveBubbleController implements ActiveBubble, ComponentContext, CapabilityContainer {
     private final UUID uuid = UUID.randomUUID();
 

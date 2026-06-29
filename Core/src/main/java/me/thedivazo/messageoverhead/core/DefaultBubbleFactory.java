@@ -1,11 +1,13 @@
 package me.thedivazo.messageoverhead.core;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.core.render.RendererFactory;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.core.tick.TickableObject;
 import me.thedivazo.messageoverhead.util.Positionc;
 
+@MainThread
 public class DefaultBubbleFactory implements BubbleFactory {
     private final ComponentRegistry componentRegistry;
     private final RendererFactory rendererFactory;

@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
@@ -12,6 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@MainThread
 public class PositionComponent implements BubbleScopeComponent<Position> {
     private static final ComponentKey<PositionComponent> KEY = new ComponentKey<>(
             ComponentId.of("messageoverhead", "position"),

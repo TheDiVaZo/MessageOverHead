@@ -1,9 +1,11 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+@MainThread
 public interface ComponentContainer {
     BubbleComponent attachUnchecked(ComponentKey<?> key, BubbleComponentFactory<?> factory);
 

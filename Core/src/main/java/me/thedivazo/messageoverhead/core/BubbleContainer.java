@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
+@MainThread
 public class BubbleContainer {
     private final Map<UUID, ActiveBubble> bubblesByBubbleId = new LinkedHashMap<>();
     private final Map<UUID, ActiveBubble> lastBubblesByPlayerUid = new LinkedHashMap<>();

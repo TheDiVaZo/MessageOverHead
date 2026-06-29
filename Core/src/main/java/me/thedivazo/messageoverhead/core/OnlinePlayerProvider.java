@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core;
 
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,6 +15,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+@MainThread
 public class OnlinePlayerProvider implements Supplier<Iterable<Viewer>> {
     private final Map<UUID, OnlinePlayerViewer> viewersByUid = new HashMap<>();
 

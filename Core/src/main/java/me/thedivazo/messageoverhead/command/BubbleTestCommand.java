@@ -3,6 +3,7 @@ package me.thedivazo.messageoverhead.command;
 import me.thedivazo.messageoverhead.api.ProfileService;
 import me.thedivazo.messageoverhead.api.SpawnService;
 import me.thedivazo.messageoverhead.core.Message;
+import me.thedivazo.messageoverhead.profile.ProfileId;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,11 +22,11 @@ public final class BubbleTestCommand {
     public static void register(
             LegacyPaperCommandManager<CommandSender> commandManager,
             SpawnService spawnService,
-            ProfileService profileService
+            ProfileId profileId
     ) {
         Objects.requireNonNull(commandManager, "commandManager");
         Objects.requireNonNull(spawnService, "spawnService");
-        Objects.requireNonNull(profileService, "profileService");
+        Objects.requireNonNull(profileId, "profileId");
 
         commandManager.command(
                 commandManager.commandBuilder("bubble-test")
@@ -39,7 +40,7 @@ public final class BubbleTestCommand {
                             spawnService.spawn(
                                     new Message(Component.text(text)),
                                     author,
-                                    profileService.defaultProfile()
+                                    profileId
                             );
                         })
         );

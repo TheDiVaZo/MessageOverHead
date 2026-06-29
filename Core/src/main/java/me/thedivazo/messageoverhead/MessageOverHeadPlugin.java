@@ -40,6 +40,9 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     public static final MinecraftVersion SERVER_VERSION = MinecraftVersion.parse(Bukkit.getMinecraftVersion());
 
+    private BubbleScheduler bubbleScheduler = new BukkitBubbleScheduler(this, 0, 1);
+
+    //Services
     private ComponentService componentService;
     private ProfileService profileService;
     private SpawnService spawnService;
@@ -53,22 +56,23 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         BubbleContainer bubbleContainer = new BubbleContainer();
         ComponentRegistry componentRegistry = new ComponentRegistry();
         ProfileRegistry profileRegistry = new ProfileRegistry();
-
-        registerDefaultProfile(componentRegistry);
+        ProfileComponent.BubbleProfileContainer profileContainer = new ProfileComponent.BubbleProfileContainer();
 
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
-        this.profileService = new ProfileService(profileRegistry, componentRegistry);
-        this.spawnService = new SpawnService(new BukkitBubbleScheduler(this, 0, 1));
+        this.profileService = new ProfileService(profileRegistry, componentRegistry, profileContainer);
+        this.spawnService = new SpawnService(bubbleScheduler, profileContainer, profileRegistry);
+
+        ProfileId testProfileId = registerTestProfile(componentRegistry);
 
         commandManager = LegacyPaperCommandManager.createNative(
                 this,
                 ExecutionCoordinator.simpleCoordinator()
         );
-        BubbleTestCommand.register(commandManager, spawnService, profileService);
+        BubbleTestCommand.register(commandManager, spawnService, testProfileId);
     }
 
-    private void registerDefaultProfile(ComponentRegistry componentRegistry) {
-        ProfileId defaultProfileId = new ProfileId("default");
+    private ProfileId registerTestProfile(ComponentRegistry componentRegistry) {
+        ProfileId testProfileId = new ProfileId("default");
         Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories = new LinkedHashMap<>();
         componentFactories.put(
                 PositionComponent.key(),
@@ -84,22 +88,23 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 )
         );
 
-        BubbleProfile bubbleProfile = BubbleProfile.create(
-                defaultProfileId,
+        BubbleProfile testProfile = BubbleProfile.create(
+                testProfileId,
                 new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25)),
                 componentFactories
         );
-        profileService.register(bubbleProfile);
-        profileService.setDefaultProfile(defaultProfileId);
+        profileService.register(testProfile);
+        return testProfileId;
     }
 
     @Override
     public void onDisable() {
         try {
-            if (spawnService != null) {
-                spawnService.clear();
+            if (bubbleScheduler != null) {
+                bubbleScheduler.clear();
             }
         } finally {
+            bubbleScheduler = null;
             commandManager = null;
             spawnService = null;
             profileService = null;

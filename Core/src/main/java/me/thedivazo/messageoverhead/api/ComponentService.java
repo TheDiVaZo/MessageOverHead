@@ -2,12 +2,14 @@ package me.thedivazo.messageoverhead.api;
 
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
+import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.component.*;
 
 import java.util.Objects;
 import java.util.Set;
 
+@MainThread
 public final class ComponentService {
     private final ComponentRegistry registry;
     private final BubbleContainer bubbleContainer;
