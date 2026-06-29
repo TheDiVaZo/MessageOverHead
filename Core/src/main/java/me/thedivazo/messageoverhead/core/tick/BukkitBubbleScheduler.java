@@ -13,13 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Level;
 
 @MainThread
 public final class BukkitBubbleScheduler implements BubbleScheduler {
     private final Plugin plugin;
     private final long delay;
     private final long period;
-    private final Map<UUID, ScheduledBubble> bubbles = new LinkedHashMap<>();
+    private final Map<UUID, SchedulableBubble> bubbles = new LinkedHashMap<>();
+    private BukkitTask task;
     private boolean closed;
 
     public BukkitBubbleScheduler(Plugin plugin) {
@@ -54,7 +56,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
         }
 
         UUID uid = bubble.id();
-        ScheduledBubble existing = getSynced(uid);
+        SchedulableBubble existing = getSynced(uid);
         if (existing != null) {
             if (existing.bubble() == bubble && existing.tickable() == tickable) {
                 return bubble;
@@ -62,19 +64,12 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             remove(uid);
         }
 
-        ScheduledBubble scheduledBubble = new ScheduledBubble(bubble, tickable);
-        bubbles.put(uid, scheduledBubble);
+        bubbles.put(uid, schedulable);
 
         try {
-            BukkitTask task = Bukkit.getScheduler().runTaskTimer(
-                    plugin,
-                    () -> tick(uid, scheduledBubble),
-                    delay,
-                    period
-            );
-            scheduledBubble.task(task);
+            ensureTask();
         } catch (RuntimeException | Error exception) {
-            bubbles.remove(uid);
+            bubbles.remove(uid, schedulable);
             throw exception;
         }
 
@@ -87,7 +82,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             return null;
         }
 
-        ScheduledBubble entry = getSynced(uid);
+        SchedulableBubble entry = getSynced(uid);
         if (entry == null) {
             return null;
         }
@@ -102,7 +97,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
             return null;
         }
 
-        ScheduledBubble entry = bubbles.remove(uid);
+        SchedulableBubble entry = bubbles.remove(uid);
         if (entry == null) {
             return null;
         }
@@ -112,7 +107,7 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
                 entry.bubble().remove();
             }
         } finally {
-            stop(entry, false);
+            stopTaskIfIdle();
         }
 
         return entry.bubble();
@@ -143,13 +138,13 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
     }
 
     private void clearEntries() {
-        List<ScheduledBubble> entries = new ArrayList<>(bubbles.values());
+        List<SchedulableBubble> entries = new ArrayList<>(bubbles.values());
         bubbles.clear();
 
         RuntimeException runtimeFailure = null;
         Error errorFailure = null;
 
-        for (ScheduledBubble entry : entries) {
+        for (SchedulableBubble entry : entries) {
             try {
                 if (!entry.bubble().isRemove()) {
                     entry.bubble().remove();
@@ -166,10 +161,10 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
                 } else {
                     errorFailure.addSuppressed(exception);
                 }
-            } finally {
-                stop(entry, false);
             }
         }
+
+        cancelTask();
 
         if (errorFailure != null) {
             throw errorFailure;
@@ -179,35 +174,64 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
         }
     }
 
-    private @Nullable ScheduledBubble getSynced(UUID uid) {
+    private @Nullable SchedulableBubble getSynced(UUID uid) {
         Objects.requireNonNull(uid, "uid");
 
-        ScheduledBubble entry = bubbles.get(uid);
+        SchedulableBubble entry = bubbles.get(uid);
         if (entry == null) {
             return null;
         }
 
         if (entry.bubble().isRemove()) {
-            stop(uid, entry, false);
+            bubbles.remove(uid, entry);
+            stopTaskIfIdle();
             return null;
         }
 
         return entry;
     }
 
-    private void tick(UUID uid, ScheduledBubble entry) {
-        if (entry.isStopped()) {
+    private void ensureTask() {
+        if (task != null && !task.isCancelled()) {
             return;
         }
 
-        ScheduledBubble current = bubbles.get(uid);
+        task = Bukkit.getScheduler().runTaskTimer(
+                plugin,
+                this::tickAll,
+                delay,
+                period
+        );
+    }
+
+    private void tickAll() {
+        if (closed) {
+            cancelTask();
+            return;
+        }
+
+        List<Map.Entry<UUID, SchedulableBubble>> entries = new ArrayList<>(bubbles.entrySet());
+        for (Map.Entry<UUID, SchedulableBubble> entry : entries) {
+            UUID uid = entry.getKey();
+            try {
+                tick(uid, entry.getValue());
+            } catch (RuntimeException | Error exception) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to tick bubble " + uid, exception);
+            }
+        }
+
+        stopTaskIfIdle();
+    }
+
+    private void tick(UUID uid, SchedulableBubble entry) {
+        SchedulableBubble current = bubbles.get(uid);
         if (current != entry) {
-            stop(entry, false);
             return;
         }
 
         if (entry.bubble().isRemove()) {
-            stop(uid, entry, false);
+            bubbles.remove(uid, entry);
+            stopTaskIfIdle();
             return;
         }
 
@@ -220,77 +244,44 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
                 }
             } catch (RuntimeException | Error cleanupException) {
                 exception.addSuppressed(cleanupException);
-            } finally {
+            }
+            try {
                 stop(uid, entry, true);
+            } catch (RuntimeException | Error cleanupException) {
+                exception.addSuppressed(cleanupException);
             }
             throw exception;
         }
 
         if (entry.bubble().isRemove()) {
-            stop(uid, entry, false);
+            bubbles.remove(uid, entry);
+            stopTaskIfIdle();
         }
     }
 
-    private void stop(UUID uid, ScheduledBubble entry, boolean tickEnd) {
-        ScheduledBubble current = bubbles.get(uid);
+    private void stop(UUID uid, SchedulableBubble entry, boolean tickEnd) {
+        SchedulableBubble current = bubbles.get(uid);
         if (current == entry) {
             bubbles.remove(uid);
         }
-        stop(entry, tickEnd);
-    }
 
-    private void stop(ScheduledBubble entry, boolean tickEnd) {
-        if (entry.isStopped()) {
-            entry.cancel();
-            return;
-        }
-
-        entry.stopped(true);
-
-        try {
-            if (tickEnd) {
-                entry.tickable().onTickEnd();
-            }
-        } finally {
-            entry.cancel();
+        if (tickEnd) {
+            entry.tickable().onTickEnd();
         }
     }
 
-    private static final class ScheduledBubble {
-        private final ActiveBubble bubble;
-        private final TickableObject tickable;
-        private BukkitTask task;
-        private boolean stopped;
-
-        private ScheduledBubble(ActiveBubble bubble, TickableObject tickable) {
-            this.bubble = bubble;
-            this.tickable = tickable;
+    private void stopTaskIfIdle() {
+        if (bubbles.isEmpty()) {
+            cancelTask();
         }
+    }
 
-        private ActiveBubble bubble() {
-            return bubble;
-        }
+    private void cancelTask() {
+        BukkitTask currentTask = task;
+        task = null;
 
-        private TickableObject tickable() {
-            return tickable;
-        }
-
-        private boolean isStopped() {
-            return stopped;
-        }
-
-        private void stopped(boolean stopped) {
-            this.stopped = stopped;
-        }
-
-        private void task(BukkitTask task) {
-            this.task = task;
-        }
-
-        private void cancel() {
-            if (task != null) {
-                task.cancel();
-            }
+        if (currentTask != null) {
+            currentTask.cancel();
         }
     }
 }

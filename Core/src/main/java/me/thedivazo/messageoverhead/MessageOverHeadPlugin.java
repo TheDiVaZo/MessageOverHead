@@ -5,12 +5,10 @@ import me.thedivazo.messageoverhead.api.ProfileService;
 import me.thedivazo.messageoverhead.api.SpawnService;
 import me.thedivazo.messageoverhead.armorstand.ArmorStandBubbleFactory;
 import me.thedivazo.messageoverhead.command.BubbleTestCommand;
-import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;
 import me.thedivazo.messageoverhead.core.component.*;
-import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.component.scope.OffsetComponentScoped;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.BukkitBubbleScheduler;
@@ -18,7 +16,6 @@ import me.thedivazo.messageoverhead.profile.BubbleProfile;
 import me.thedivazo.messageoverhead.profile.ProfileId;
 import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
-import me.thedivazo.messageoverhead.util.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,7 +25,6 @@ import org.incendo.cloud.paper.LegacyPaperCommandManager;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class MessageOverHeadPlugin extends JavaPlugin {
     public static final OnlinePlayerProvider DEFAULT_ONLINE_PLAYER_PROVIDER = new OnlinePlayerProvider();
