@@ -5,9 +5,10 @@ import me.thedivazo.messageoverhead.core.component.BubbleComponentFactory;
 import me.thedivazo.messageoverhead.core.component.ComponentKey;
 import me.thedivazo.messageoverhead.core.component.ComponentRegistry;
 import me.thedivazo.messageoverhead.core.component.ProfileComponent;
+import me.thedivazo.messageoverhead.core.component.ProfileComponentIndex;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
-import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import me.thedivazo.messageoverhead.profile.ProfileId;
+import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -17,12 +18,12 @@ import java.util.Objects;
 public final class ProfileService {
     private final ProfileRegistry registry;
     private final ComponentRegistry componentRegistry;
-    private final ProfileComponent.BubbleProfileContainer profileContainer;
+    private final ProfileComponentIndex profileIndex;
 
-    public ProfileService(ProfileRegistry registry, ComponentRegistry componentRegistry, ProfileComponent.BubbleProfileContainer profileContainer) {
+    public ProfileService(ProfileRegistry registry, ComponentRegistry componentRegistry, ProfileComponentIndex profileIndex) {
         this.registry = Objects.requireNonNull(registry, "registry");
         this.componentRegistry = Objects.requireNonNull(componentRegistry, "componentRegistry");
-        this.profileContainer = Objects.requireNonNull(profileContainer, "profileContainer");
+        this.profileIndex = Objects.requireNonNull(profileIndex, "profileIndex");
     }
 
     public synchronized void register(BubbleProfile profile) {
@@ -34,9 +35,12 @@ public final class ProfileService {
         Objects.requireNonNull(id, "id");
 
         BubbleProfile profile = registry.unregister(id);
+        if (profile == null) {
+            return null;
+        }
 
-        profileContainer.get(id).forEach(component -> component.getActiveBubble().remove());
-        profileContainer.remove(id);
+        profileIndex.get(id).forEach(component -> component.activeBubble().remove());
+        profileIndex.remove(id);
         return profile;
     }
 

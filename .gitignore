@@ -6,4 +6,5 @@
 .idea
 /ggg/
 /Core/build/
+/Core/.gradle/
 /Core/run/

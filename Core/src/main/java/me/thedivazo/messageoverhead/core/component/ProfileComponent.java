@@ -1,20 +1,15 @@
 package me.thedivazo.messageoverhead.core.component;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
 import me.thedivazo.messageoverhead.profile.ProfileId;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
 
 @MainThread
-public class ProfileComponent implements BubbleComponent {
+public final class ProfileComponent implements BubbleComponent {
     private static final ComponentKey<ProfileComponent> KEY = new ComponentKey<>(
             ComponentId.of("messageoverhead", "profile"),
             ProfileComponent.class,
@@ -23,74 +18,80 @@ public class ProfileComponent implements BubbleComponent {
 
     private final ActiveBubble activeBubble;
     private final BubbleProfile profile;
-    private final BubbleProfileContainer container;
+    private final ProfileComponentIndex index;
 
-    public ProfileComponent(ActiveBubble activeBubble, BubbleProfile profile, BubbleProfileContainer container) {
-        this.activeBubble = activeBubble;
-        this.profile = profile;
-        this.container = container;
+    public ProfileComponent(ActiveBubble activeBubble, BubbleProfile profile, ProfileComponentIndex index) {
+        this.activeBubble = Objects.requireNonNull(activeBubble, "activeBubble");
+        this.profile = Objects.requireNonNull(profile, "profile");
+        this.index = Objects.requireNonNull(index, "index");
     }
 
     @Override
     public void onAttached() {
-        container.put(this);
+        index.add(this);
     }
 
     @Override
     public void onDetached() {
-        container.remove(this);
+        index.remove(this);
     }
 
-    public BubbleProfile getProfile() {
+    public BubbleProfile profile() {
         return profile;
     }
 
-    public ActiveBubble getActiveBubble() {
+    public BubbleProfile getProfile() {
+        return profile();
+    }
+
+    public ProfileId profileId() {
+        return profile.id();
+    }
+
+    public ProfileId getProfileId() {
+        return profileId();
+    }
+
+    public ActiveBubble activeBubble() {
         return activeBubble;
+    }
+
+    public ActiveBubble getActiveBubble() {
+        return activeBubble();
     }
 
     public static ComponentKey<ProfileComponent> key() {
         return KEY;
     }
 
-    public static class Factory {
-        private final BubbleProfileContainer container;
-
-        public Factory(BubbleProfileContainer container) {
-            this.container = container;
-        }
-
-        public ProfileComponent create(ComponentContext context, BubbleProfile profile) throws Exception {
-            return new ProfileComponent(context.bubble(), profile, container);
-        }
+    public static Factory factory(ProfileComponentIndex index, BubbleProfile profile) {
+        return new Factory(index, profile);
     }
 
-    public static class BubbleProfileContainer {
-        private Map<UUID, ProfileComponent> bubbleIdToProfiles = new HashMap<>();
-        private Multimap<ProfileId, ProfileComponent> profileIdToProfiles = MultimapBuilder.hashKeys().arrayListValues().build();
+    public static @Nullable ProfileComponent detach(ActiveBubble activeBubble) {
+        return activeBubble.container().detach(key());
+    }
 
-        public void put(ProfileComponent profileComponent) {
-            bubbleIdToProfiles.put(profileComponent.activeBubble.id(), profileComponent);
-            profileIdToProfiles.put(profileComponent.getProfile().id(), profileComponent);
+    public static @Nullable ProfileComponent get(ActiveBubble activeBubble) {
+        return activeBubble.container().get(key());
+    }
+
+    public static boolean contains(ActiveBubble activeBubble) {
+        return activeBubble.container().contains(key());
+    }
+
+    public static final class Factory implements BubbleComponentFactory<ProfileComponent> {
+        private final ProfileComponentIndex index;
+        private final BubbleProfile profile;
+
+        private Factory(ProfileComponentIndex index, BubbleProfile profile) {
+            this.index = Objects.requireNonNull(index, "index");
+            this.profile = Objects.requireNonNull(profile, "profile");
         }
 
-        public void remove(ProfileComponent profileComponent) {
-            bubbleIdToProfiles.remove(profileComponent.activeBubble.id());
-            profileIdToProfiles.removeAll(profileComponent.getProfile().id());
-        }
-
-        public void remove(ProfileId profileId) {
-            Collection<ProfileComponent> removedComponents = profileIdToProfiles.removeAll(profileId);
-            removedComponents.forEach(component -> bubbleIdToProfiles.remove(component.activeBubble.id()));
-        }
-
-        @Nullable
-        public ProfileComponent get(UUID activeBubbleId) {
-            return bubbleIdToProfiles.get(activeBubbleId);
-        }
-
-        public Collection<ProfileComponent> get(ProfileId profileId) {
-            return profileIdToProfiles.get(profileId);
+        @Override
+        public ProfileComponent create(ComponentContext context) {
+            return new ProfileComponent(context.bubble(), profile, index);
         }
     }
 }

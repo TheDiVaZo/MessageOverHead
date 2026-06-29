@@ -1,6 +1,5 @@
 package me.thedivazo.messageoverhead.command;
 
-import me.thedivazo.messageoverhead.api.ProfileService;
 import me.thedivazo.messageoverhead.api.SpawnService;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.profile.ProfileId;

@@ -3,8 +3,10 @@ package me.thedivazo.messageoverhead.api;
 import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Author;
+import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.component.ProfileComponent;
+import me.thedivazo.messageoverhead.core.component.ProfileComponentIndex;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
@@ -19,66 +21,107 @@ import java.util.UUID;
 @MainThread
 public final class SpawnService {
     private final BubbleScheduler scheduler;
-    private final ProfileComponent.Factory profileFactory;
-    private final ProfileComponent.BubbleProfileContainer profileContainer;
+    private final BubbleContainer bubbleContainer;
+    private final ProfileComponentIndex profileIndex;
     private final ProfileRegistry registry;
 
     public SpawnService(
-            BubbleScheduler scheduler, ProfileComponent.BubbleProfileContainer profileContainer, ProfileRegistry registry
+            BubbleScheduler scheduler,
+            BubbleContainer bubbleContainer,
+            ProfileComponentIndex profileIndex,
+            ProfileRegistry registry
     ) {
         this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
-        this.profileFactory = new ProfileComponent.Factory(profileContainer);
-        this.profileContainer = Objects.requireNonNull(profileContainer, "profileContainer");
-        this.registry = registry;
+        this.bubbleContainer = Objects.requireNonNull(bubbleContainer, "bubbleContainer");
+        this.profileIndex = Objects.requireNonNull(profileIndex, "profileIndex");
+        this.registry = Objects.requireNonNull(registry, "registry");
     }
 
     public ActiveBubble spawn(Message message, Author author, ProfileId profileId) {
-        return spawn(message, author, Objects.requireNonNull(registry.find(profileId)));
+        Objects.requireNonNull(profileId, "profileId");
+
+        BubbleProfile profile = registry.find(profileId);
+        if (profile == null) {
+            throw new IllegalArgumentException("Unknown profile id: " + profileId);
+        }
+
+        return spawn(message, author, profile);
     }
 
     public ActiveBubble spawn(Message message, Author author, BubbleProfile profile) {
+        Objects.requireNonNull(message, "message");
+        Objects.requireNonNull(author, "author");
         Objects.requireNonNull(profile, "profile");
+        Objects.requireNonNull(profile.id(), "profile.id");
+        Objects.requireNonNull(profile.bubbleFactory(), "profile.bubbleFactory");
+        Objects.requireNonNull(profile.componentFactories(), "profile.componentFactories");
+        if (profile.componentFactories().containsKey(ProfileComponent.key())) {
+            throw new IllegalArgumentException(
+                    "Profile component is managed by SpawnService and cannot be included in profile " + profile.id()
+            );
+        }
 
         SchedulableBubble schedulable = profile.bubbleFactory().createBubble(message, author, author.getPosition());
         Objects.requireNonNull(schedulable, "schedulable");
 
         ActiveBubble bubble = Objects.requireNonNull(schedulable.bubble(), "bubble");
-        bubble.container().attach(ProfileComponent.key(), (context) -> profileFactory.create(context, profile));
 
         try {
+            bubble.container().attach(ProfileComponent.key(), ProfileComponent.factory(profileIndex, profile));
             bubble.container().attachGroup(profile.componentFactories());
+
+            ActiveBubble scheduledBubble = scheduler.put(schedulable);
+            if (scheduledBubble == null) {
+                throw new IllegalStateException("Created bubble cannot be scheduled");
+            }
+
+            ActiveBubble indexedBubble = bubbleContainer.put(scheduledBubble);
+            if (indexedBubble == null) {
+                scheduler.remove(scheduledBubble.id());
+                throw new IllegalStateException("Scheduled bubble cannot be indexed");
+            }
+
+            return scheduledBubble;
         } catch (RuntimeException | Error exception) {
             if (!bubble.isRemove()) {
                 bubble.remove();
             }
             throw exception;
         }
-
-        bubble = scheduler.put(schedulable);
-
-        if (bubble == null) {
-            if (!schedulable.bubble().isRemove()) {
-                schedulable.bubble().remove();
-            }
-            throw new IllegalStateException("Created bubble cannot be scheduled");
-        }
-
-        return bubble;
     }
 
     public @Nullable ActiveBubble get(UUID uid) {
+        Objects.requireNonNull(uid, "uid");
+
         return scheduler.get(uid);
     }
 
     public @Nullable ActiveBubble remove(UUID uid) {
-        return scheduler.remove(uid);
+        Objects.requireNonNull(uid, "uid");
+
+        try {
+            return scheduler.remove(uid);
+        } finally {
+            bubbleContainer.remove(uid);
+        }
     }
 
     public boolean contains(UUID uid) {
+        Objects.requireNonNull(uid, "uid");
+
         return scheduler.contains(uid);
     }
 
-    public synchronized Collection<ProfileComponent> getByProfileId(ProfileId id) {
-        return profileContainer.get(id);
+    public void clear() {
+        try {
+            scheduler.clear();
+        } finally {
+            bubbleContainer.clear();
+            profileIndex.clear();
+        }
+    }
+
+    public Collection<ProfileComponent> getByProfileId(ProfileId id) {
+        return profileIndex.get(id);
     }
 }

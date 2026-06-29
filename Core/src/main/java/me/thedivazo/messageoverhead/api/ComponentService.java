@@ -11,6 +11,8 @@ import java.util.Set;
 
 @MainThread
 public final class ComponentService {
+    private static final String PLUGIN_NAMESPACE = "messageoverhead";
+
     private final ComponentRegistry registry;
     private final BubbleContainer bubbleContainer;
 
@@ -25,30 +27,45 @@ public final class ComponentService {
         registerPluginComponent(ProfileComponent.key());
     }
 
-    <T extends BubbleComponent> void registerPluginComponent(ComponentKey<T> key) {
-        if (!Objects.equals(key.id().namespace(), "messageoverhead")) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace to \"messageoverhead\"");
+    private <T extends BubbleComponent> void registerPluginComponent(ComponentKey<T> key) {
+        if (!Objects.equals(key.id().namespace(), PLUGIN_NAMESPACE)) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace to \"messageoverhead\""
+            );
+        }
+
         registry.register(key);
     }
 
     public synchronized <T extends BubbleComponent> void register(ComponentKey<T> key) {
-        if (Objects.equals(key.id().namespace(), "messageoverhead")) throw new IllegalArgumentException("Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace");
+        Objects.requireNonNull(key, "key");
+
+        if (Objects.equals(key.id().namespace(), PLUGIN_NAMESPACE)) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace name (" + key.id().namespace() + "). Please, rename namespace"
+            );
+        }
 
         registry.register(key);
         otherNamespaceToKeys.put(key.id().namespace(), key);
     }
 
-    public synchronized <T extends BubbleComponent> void unregister(String namespace) {
-        if (Objects.equals(namespace, "messageoverhead")) throw new IllegalArgumentException("Invalid namespace name (" + namespace + "). Please, rename namespace");
+    public synchronized void unregister(String namespace) {
+        Objects.requireNonNull(namespace, "namespace");
+
+        if (Objects.equals(namespace, PLUGIN_NAMESPACE)) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace name (" + namespace + "). Please, rename namespace"
+            );
+        }
 
         Set<ComponentKey<?>> keys = Set.copyOf(otherNamespaceToKeys.get(namespace));
 
-        if (bubbleContainer != null) {
-            bubbleContainer.getBubblesByBubbleId().values().forEach(bubble -> {
-                for (ComponentKey<?> key : keys) {
-                    bubble.container().detach(key);
-                }
-            });
-        }
+        bubbleContainer.getBubblesByBubbleId().values().forEach(bubble -> {
+            for (ComponentKey<?> key : keys) {
+                bubble.container().detach(key);
+            }
+        });
 
         otherNamespaceToKeys.removeAll(namespace);
         keys.forEach(registry::unregister);

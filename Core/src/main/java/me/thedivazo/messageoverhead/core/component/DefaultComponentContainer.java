@@ -25,12 +25,12 @@ public final class DefaultComponentContainer implements ComponentContainer {
             ComponentKey<?> key,
             BubbleComponentFactory<?> factory
     ) {
-        BubbleComponent component = attackComponent(key, factory);
+        BubbleComponent component = attachComponent(key, factory);
         component.onPostInit();
         return component;
     }
 
-    private BubbleComponent attackComponent(
+    private BubbleComponent attachComponent(
                 ComponentKey<?> key,
                 BubbleComponentFactory<?> factory
     ) {
@@ -71,7 +71,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
         for (Map.Entry<ComponentKey<?>, ? extends BubbleComponentFactory<?>> entry : components.entrySet()) {
             ComponentKey<?> key = entry.getKey();
             BubbleComponentFactory<?> factory = entry.getValue();
-            attached.add(attackComponent(key, factory));
+            attached.add(attachComponent(key, factory));
         }
         attached.forEach(BubbleComponent::onPostInit);
     }

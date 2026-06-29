@@ -214,7 +214,15 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
         try {
             entry.tickable().tick();
         } catch (RuntimeException | Error exception) {
-            stop(uid, entry, true);
+            try {
+                if (!entry.bubble().isRemove()) {
+                    entry.bubble().remove();
+                }
+            } catch (RuntimeException | Error cleanupException) {
+                exception.addSuppressed(cleanupException);
+            } finally {
+                stop(uid, entry, true);
+            }
             throw exception;
         }
 

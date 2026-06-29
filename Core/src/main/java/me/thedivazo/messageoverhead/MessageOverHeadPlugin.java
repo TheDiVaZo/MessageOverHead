@@ -32,6 +32,7 @@ import java.util.function.Function;
 
 public class MessageOverHeadPlugin extends JavaPlugin {
     public static final OnlinePlayerProvider DEFAULT_ONLINE_PLAYER_PROVIDER = new OnlinePlayerProvider();
+    private static final ProfileId DEFAULT_PROFILE_ID = ProfileId.of(ProfileId.DEFAULT_NAMESPACE, "default");
     private static MessageOverHeadPlugin INSTANCE;
 
     public static MessageOverHeadPlugin getInstance() {
@@ -40,9 +41,9 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     public static final MinecraftVersion SERVER_VERSION = MinecraftVersion.parse(Bukkit.getMinecraftVersion());
 
-    private BubbleScheduler bubbleScheduler = new BukkitBubbleScheduler(this, 0, 1);
+    private BubbleScheduler bubbleScheduler;
 
-    //Services
+    // Services
     private ComponentService componentService;
     private ProfileService profileService;
     private SpawnService spawnService;
@@ -50,33 +51,35 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (INSTANCE != null) throw new IllegalStateException("Already initialized!");
+        if (INSTANCE != null) {
+            throw new IllegalStateException("Already initialized!");
+        }
         INSTANCE = this;
 
         BubbleContainer bubbleContainer = new BubbleContainer();
         ComponentRegistry componentRegistry = new ComponentRegistry();
         ProfileRegistry profileRegistry = new ProfileRegistry();
-        ProfileComponent.BubbleProfileContainer profileContainer = new ProfileComponent.BubbleProfileContainer();
+        ProfileComponentIndex profileIndex = new ProfileComponentIndex();
+        bubbleScheduler = new BukkitBubbleScheduler(this);
 
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
-        this.profileService = new ProfileService(profileRegistry, componentRegistry, profileContainer);
-        this.spawnService = new SpawnService(bubbleScheduler, profileContainer, profileRegistry);
+        this.profileService = new ProfileService(profileRegistry, componentRegistry, profileIndex);
+        this.spawnService = new SpawnService(bubbleScheduler, bubbleContainer, profileIndex, profileRegistry);
 
-        ProfileId testProfileId = registerTestProfile(componentRegistry);
+        registerDefaultProfile(componentRegistry);
 
         commandManager = LegacyPaperCommandManager.createNative(
                 this,
                 ExecutionCoordinator.simpleCoordinator()
         );
-        BubbleTestCommand.register(commandManager, spawnService, testProfileId);
+        BubbleTestCommand.register(commandManager, spawnService, DEFAULT_PROFILE_ID);
     }
 
-    private ProfileId registerTestProfile(ComponentRegistry componentRegistry) {
-        ProfileId testProfileId = new ProfileId("default");
+    private void registerDefaultProfile(ComponentRegistry componentRegistry) {
         Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories = new LinkedHashMap<>();
         componentFactories.put(
                 PositionComponent.key(),
-                PositionComponent.factory(List.<Function<ActiveBubble, ComponentScoped<Position>>>of(
+                PositionComponent.factory(List.of(
                         activeBubble -> new OffsetComponentScoped(0, 2.5, 0)
                 ))
         );
@@ -88,20 +91,19 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 )
         );
 
-        BubbleProfile testProfile = BubbleProfile.create(
-                testProfileId,
+        BubbleProfile defaultProfile = BubbleProfile.create(
+                DEFAULT_PROFILE_ID,
                 new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25)),
                 componentFactories
         );
-        profileService.register(testProfile);
-        return testProfileId;
+        profileService.register(defaultProfile);
     }
 
     @Override
     public void onDisable() {
         try {
-            if (bubbleScheduler != null) {
-                bubbleScheduler.clear();
+            if (spawnService != null) {
+                spawnService.clear();
             }
         } finally {
             bubbleScheduler = null;
