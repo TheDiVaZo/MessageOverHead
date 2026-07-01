@@ -39,10 +39,6 @@ public class LifetimeComponent implements BubbleComponent {
         return activeBubble.container().attach(key(), factory(lifetime));
     }
 
-    public static @Nullable LifetimeComponent detach(ActiveBubble activeBubble) {
-        return activeBubble.container().detach(key());
-    }
-
     public static @Nullable LifetimeComponent get(ActiveBubble activeBubble) {
         return activeBubble.container().get(key());
     }

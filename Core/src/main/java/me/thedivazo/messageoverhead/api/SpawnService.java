@@ -15,6 +15,7 @@ import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -67,8 +68,18 @@ public final class SpawnService {
         ActiveBubble bubble = Objects.requireNonNull(schedulable.bubble(), "bubble");
 
         try {
-            bubble.container().attach(ProfileComponent.key(), ProfileComponent.factory(profileIndex, profile));
-            bubble.container().attachGroup(profile.componentFactories());
+            ProfileComponent profileComponent = bubble.container().attach(
+                    ProfileComponent.key(),
+                    ProfileComponent.factory(profileIndex, profile)
+            );
+            if (profileComponent == null) {
+                throw new IllegalStateException("Profile component cannot be attached");
+            }
+
+            Collection<?> attachedComponents = bubble.container().attachGroup(profile.componentFactories());
+            if (attachedComponents == null || attachedComponents.size() != profile.componentFactories().size()) {
+                throw new IllegalStateException("Profile components cannot be attached");
+            }
 
             ActiveBubble scheduledBubble = scheduler.put(schedulable);
             if (scheduledBubble == null) {

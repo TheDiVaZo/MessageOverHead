@@ -4,7 +4,7 @@ import me.thedivazo.messageoverhead.annotation.MainThread;
 
 @MainThread
 public interface BubbleComponent {
-    default void onAttached(){};
+    default void onPreAttached(){};
     default void onPostInit(){};
 
     default void onDetached(){};

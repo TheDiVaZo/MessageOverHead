@@ -27,7 +27,7 @@ public final class ProfileComponent implements BubbleComponent {
     }
 
     @Override
-    public void onAttached() {
+    public void onPreAttached() {
         index.add(this);
     }
 

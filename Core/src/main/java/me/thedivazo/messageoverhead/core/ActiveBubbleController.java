@@ -56,9 +56,9 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
     @Override
     public void remove() {
         if (markRemoved) return;
-        renderer.destroy();
-        components.detachAll();
         markRemoved = true;
+        components.detachAllAndClose();
+        renderer.destroy();
     }
 
     void onTickEnd() {}

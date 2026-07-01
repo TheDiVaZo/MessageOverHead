@@ -211,7 +211,8 @@ public final class BukkitBubbleScheduler implements BubbleScheduler {
         }
 
         List<Map.Entry<UUID, SchedulableBubble>> entries = new ArrayList<>(bubbles.entrySet());
-        for (Map.Entry<UUID, SchedulableBubble> entry : entries) {
+        for (int i = 0; i < entries.size(); i++) {
+            Map.Entry<UUID, SchedulableBubble> entry = entries.get(i);
             UUID uid = entry.getKey();
             try {
                 tick(uid, entry.getValue());

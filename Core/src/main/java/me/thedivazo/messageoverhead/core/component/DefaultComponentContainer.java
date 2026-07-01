@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import kotlin.collections.MapsKt;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,88 +16,98 @@ public final class DefaultComponentContainer implements ComponentContainer {
     private final Map<ComponentId, Entry<?>> components = new LinkedHashMap<>();
     private final SortedSet<Entry<?>> sortedComponents = new TreeSet<>(Comparator.naturalOrder());
 
+    private boolean closed = false;
+
+    private boolean isMutating = false;
+
+    private final PrepareComponents cachedPrepareComponents = new PrepareComponents();
+
     public DefaultComponentContainer(ComponentRegistry registry, ComponentContext context) {
         this.registry = Objects.requireNonNull(registry, "registry");
         this.context = Objects.requireNonNull(context, "context");
     }
 
     @Override
-    public BubbleComponent attachUnchecked(
-            ComponentKey<?> key,
-            BubbleComponentFactory<?> factory
-    ) {
-        BubbleComponent component = attachComponent(key, factory);
-        component.onPostInit();
-        return component;
-    }
+    public BubbleComponent attachUnchecked(ComponentKey<?> key, BubbleComponentFactory<?> factory) {
+        if (isMutating || closed) return null;
 
-    private BubbleComponent attachComponent(
-                ComponentKey<?> key,
-                BubbleComponentFactory<?> factory
-    ) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(factory, "factory");
-
-        ensureValidKey(key);
-        ensureAttachAllowed(key, context);
-
-        BubbleComponent component = createComponent(key, factory);
-        if (!key.type().isInstance(component)) throw new IllegalArgumentException(key + " is not of type " + component.getClass().getName() + ", key is type "+key.type().getName());
-
-        Entry<?> entry = new Entry<>(key, component, counter++);
-        Entry<?> previousEntry = components.remove(key.id());
-
-        if (previousEntry != null) {
-            sortedComponents.remove(previousEntry);
-            previousEntry.component().onDetached();
-        }
-
-        components.put(key.id(), entry);
-        sortedComponents.add(entry);
-
+        List<BubbleComponent> attachedComponents = null;
+        isMutating = true;
         try {
-            component.onAttached();
-        } catch (RuntimeException | Error exception) {
-            components.remove(key.id());
-            sortedComponents.remove(entry);
-            throw exception;
-        }
+            cachedPrepareComponents.invalidate();
+            if (!cachedPrepareComponents.addPreparedEntry(key, factory)) {
+                isMutating = false;
+                return null;
+            }
 
-        return key.type().cast(component);
+            attachedComponents = cachedPrepareComponents.applyAttachNewEntries();
+
+            return attachedComponents == null || attachedComponents.isEmpty() ? null : attachedComponents.get(0);
+        } finally {
+            callPostInit(attachedComponents);
+            isMutating = false;
+        }
     }
 
     @Override
-    public void attachGroup(Map<ComponentKey<?>, ? extends BubbleComponentFactory<?>> components) {
-        List<BubbleComponent> attached = new ArrayList<>();
-        for (Map.Entry<ComponentKey<?>, ? extends BubbleComponentFactory<?>> entry : components.entrySet()) {
-            ComponentKey<?> key = entry.getKey();
-            BubbleComponentFactory<?> factory = entry.getValue();
-            attached.add(attachComponent(key, factory));
+    public List<BubbleComponent> attachGroup(Map<ComponentKey<?>, ? extends BubbleComponentFactory<?>> components) {
+        if (isMutating || closed) return null;
+
+        isMutating = true;
+        List<BubbleComponent> attachedComponents = null;
+        try {
+            cachedPrepareComponents.invalidate();
+            if (!MapsKt.all(
+                    components,
+                    entry -> cachedPrepareComponents.addPreparedEntry(entry.getKey(), entry.getValue())
+            )) {
+                isMutating = false;
+                return null;
+            }
+            attachedComponents = cachedPrepareComponents.applyAttachNewEntries();
+
+            return attachedComponents;
+        } finally {
+            callPostInit(attachedComponents);
+            isMutating = false;
         }
-        attached.forEach(BubbleComponent::onPostInit);
+    }
+
+    private void callPostInit(@Nullable List<? extends BubbleComponent> components) {
+        if (components == null) return;
+        for (int i = 0; i < components.size(); i++) {
+            BubbleComponent component = components.get(i);
+            try {
+                component.onPostInit();
+            } catch (Exception | Error exception) {
+                exception.printStackTrace();
+            }
+        }
     }
 
     @Override
     public <T extends BubbleComponent> @Nullable T detach(ComponentKey<T> key) {
-        Objects.requireNonNull(key, "key");
+        if (isMutating || closed) return null;
 
-        Entry<T> entry = (Entry<T>) components.get(key.id());
-
-        if (entry == null) {
-            return null;
+        isMutating = true;
+        try {
+            cachedPrepareComponents.invalidate();
+            if (!cachedPrepareComponents.removePreparedEntry(key)) {
+                isMutating = false;
+                return null;
+            }
+            List<BubbleComponent> detachedComponents = cachedPrepareComponents.applyDetachRemovedEntries();
+            return detachedComponents == null || detachedComponents.isEmpty() ? null : key.type().cast(detachedComponents.get(0));
+        } finally {
+            isMutating = false;
         }
-
-        components.remove(key.id());
-        sortedComponents.remove(entry);
-
-        entry.component().onDetached();
-
-        return entry.component();
     }
 
     @Override
-    public <T extends BubbleComponent> @Nullable T get(ComponentKey<T> key) {
+    @SuppressWarnings("unchecked")
+    public @Nullable <T extends BubbleComponent> T get(ComponentKey<T> key) {
         Objects.requireNonNull(key, "key");
+        if (closed) return null;
 
         if (!registry.isValid(key)) return null;
 
@@ -105,13 +116,13 @@ public final class DefaultComponentContainer implements ComponentContainer {
         if (entry == null) {
             return null;
         }
-
-        return entry.component();
+        else return key.type().cast(entry.component());
     }
 
     @Override
     public boolean contains(ComponentKey<?> key) {
         Objects.requireNonNull(key, "key");
+        if (closed) return false;
 
         if (!registry.isValid(key)) return false;
 
@@ -119,64 +130,35 @@ public final class DefaultComponentContainer implements ComponentContainer {
     }
 
     public void tick() {
-        sortedComponents.forEach(entry -> {
-            entry.component().onTick();
-        });
-    }
-
-    public void detachAll() {
-        List<ComponentKey<?>> keys = new ArrayList<>();
-
-        for (Entry<?> entry : components.values()) {
-            keys.add(entry.key());
-        }
-
-        for (ComponentKey<?> key : keys) {
-            detach(key);
-        }
-    }
-
-    public int size() {
-        return components.size();
-    }
-
-    public boolean isEmpty() {
-        return components.isEmpty();
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends BubbleComponent> T createComponent(
-            ComponentKey<?> key,
-            BubbleComponentFactory<?> factory
-    ) {
-        try {
-            T component = (T) factory.create(context);
-
-            if (component == null) {
-                throw new IllegalStateException(
-                        "Component factory returned null for " + key.id()
-                );
+        if (closed) return;
+        List<Entry<?>> list = new ArrayList<>(sortedComponents);
+        for (int i = 0; i < list.size(); i++) {
+            if (closed) return;
+            Entry<?> entry = list.get(i);
+            if (entry == null || components.get(entry.key.id()) != entry) continue;
+            try {
+                entry.component.onTick();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            if (!key.type().isInstance(component)) {
-                throw new IllegalStateException(
-                        "Component factory for " + key.id()
-                                + " returned "
-                                + component.getClass().getName()
-                                + ", expected "
-                                + key.type().getName()
-                );
-            }
-
-            return component;
-        } catch (RuntimeException exception) {
-            throw exception;
-        } catch (Exception exception) {
-            throw new IllegalStateException(
-                    "Failed to create component " + key.id(),
-                    exception
-            );
         }
+    }
+
+    public void detachAllAndClose() {
+        if (closed) return;
+        closed = true;
+        cachedPrepareComponents.invalidate();
+        ArrayList<Entry<?>> entries = new ArrayList<>(sortedComponents);
+        for (int i = 0; i < entries.size(); i++) {
+            Entry<?> component = entries.get(i);
+            try {
+                component.component.onDetached();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        components.clear();
+        sortedComponents.clear();
     }
 
     private static final class Entry<T extends BubbleComponent> implements Comparable<Entry<?>> {
@@ -235,21 +217,173 @@ public final class DefaultComponentContainer implements ComponentContainer {
         }
     }
 
-    private void ensureValidKey(ComponentKey<?> key) {
-        if (!registry.isValid(key)) {
-            throw new IllegalArgumentException("Component key is not registered: " + key.id());
-        }
+    private boolean keyIsValid(ComponentKey<?> key) {
+        return registry.isValid(key) && hasRequiredCapabilities(key);
     }
 
-    private void ensureAttachAllowed(ComponentKey<?> key, ComponentContext context) {
+    private boolean hasRequiredCapabilities(ComponentKey<?> key) {
         CapabilityContainer container = context.capabilityContainer();
 
         for (Class<?> capability : key.metadata().requiredCapabilities()) {
             if (!container.hasCapability(capability)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private <T extends BubbleComponent> T createComponent(
+            ComponentKey<?> key,
+            BubbleComponentFactory<?> factory
+    ) {
+        try {
+            T component = (T) factory.create(context);
+
+            if (component == null) {
                 throw new IllegalStateException(
-                        "Component " + key.id() + " requires renderer capability " + capability.getName()
+                        "Component factory returned null for " + key.id()
                 );
             }
+
+            if (!key.type().isInstance(component)) {
+                throw new IllegalStateException(
+                        "Component factory for " + key.id()
+                                + " returned "
+                                + component.getClass().getName()
+                                + ", expected "
+                                + key.type().getName()
+                );
+            }
+
+            return component;
+        } catch (RuntimeException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new IllegalStateException(
+                    "Failed to create component " + key.id(),
+                    exception
+            );
+        }
+    }
+
+    private final class PrepareComponents {
+        private int localCounter = counter;
+        private final List<Entry<?>> newEntries = new ArrayList<>();
+        private final List<@Nullable Entry<?>> oldEntries = new ArrayList<>();
+
+        private final List<Entry<?>> removedEntries = new ArrayList<>();
+
+        public boolean addPreparedEntry(
+                ComponentKey<?> key,
+                BubbleComponentFactory<?> factory
+        ) {
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(factory, "factory");
+
+            if (!keyIsValid(key)) return false;
+
+            BubbleComponent component;
+            Entry<?> previousEntry;
+            try {
+                component = createComponent(key, factory);
+                if (!key.type().isInstance(component)) throw new IllegalArgumentException(key + " is not of type " + component.getClass().getName() + ", key is type "+key.type().getName());
+                previousEntry = components.get(key.id());
+
+            } catch (Exception | Error exception) {
+                exception.printStackTrace();
+                return false;
+            }
+
+            Entry<?> entry = new Entry<>(key, component, localCounter++);
+            newEntries.add(entry);
+            oldEntries.add(previousEntry);
+            return true;
+        }
+
+        public boolean removePreparedEntry(
+                ComponentKey<?> key
+        ) {
+            Objects.requireNonNull(key, "key");
+
+            Entry<?> entry = components.get(key.id());
+
+            if (entry == null) {
+                return false;
+            }
+
+            removedEntries.add(entry);
+            return true;
+        }
+
+        public List<BubbleComponent> applyDetachRemovedEntries() {
+            List<BubbleComponent> removedComponents = new ArrayList<>();
+            for (int i = 0; i < removedEntries.size(); i++) {
+                Entry<?> entry = removedEntries.get(i);
+                try {
+                    boolean isRemoved = components.remove(entry.key.id(), entry) | sortedComponents.remove(entry);
+                    if (!isRemoved) continue;
+
+                    entry.component.onDetached();
+                    removedComponents.add(entry.component);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            counter = localCounter;
+            return removedComponents;
+        }
+
+        public List<BubbleComponent> applyAttachNewEntries() {
+            List<BubbleComponent> addedComponents = new ArrayList<>();
+            for (int i = 0; i < newEntries.size(); i++) {
+                Entry<?> oldEntry = oldEntries.get(i);
+                Entry<?> entry = newEntries.get(i);
+
+                try {
+                    entry.component.onPreAttached();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (closed) return null;
+                    continue;
+                }
+                if (closed) return null;
+
+
+                if (oldEntry != null) {try {
+                    components.remove(oldEntry.key.id(), oldEntry);
+                    sortedComponents.remove(oldEntry);
+                    oldEntry.component.onDetached();
+                } catch (Exception ignore) {
+                    ignore.printStackTrace();
+                }}
+
+                if (closed) return null;
+
+                if (components.put(entry.key.id(), entry) != null | !sortedComponents.add(entry)) {
+                    Throwable detachException = null;
+                    try {
+                        entry.component().onDetached();
+                    }  catch (Throwable e) {
+                        detachException = e;
+                    }
+                    detachAllAndClose();
+                    IllegalStateException exception = new IllegalStateException("Failed to add a component " + entry.key.id());
+                    if (detachException != null) {
+                        exception.addSuppressed(detachException);
+                    }
+                    throw exception;
+                }
+                addedComponents.add(entry.component);
+            }
+            counter = localCounter;
+            return addedComponents;
+        }
+
+        public void invalidate() {
+            localCounter = counter;
+            removedEntries.clear();
+            newEntries.clear();
+            oldEntries.clear();
         }
     }
 }
