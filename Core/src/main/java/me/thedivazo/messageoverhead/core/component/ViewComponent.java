@@ -212,8 +212,8 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         }
 
         @Override
-        public ViewComponent create(ComponentContext context) throws Exception {
-            return new ViewComponent(allPlayerProvider, context.bubble(), context.capabilityContainer().requireCapability(ViewCapability.class), settings);
+        public ViewComponent create(ActiveBubble bubble) throws Exception {
+            return new ViewComponent(allPlayerProvider, bubble, bubble.capabilities().requireCapability(ViewCapability.class), settings);
         }
     }
 }

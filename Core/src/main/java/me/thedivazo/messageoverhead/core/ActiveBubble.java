@@ -2,6 +2,7 @@ package me.thedivazo.messageoverhead.core;
 
 import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.component.ComponentContainer;
+import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 
 import java.util.UUID;
 
@@ -16,4 +17,5 @@ public interface ActiveBubble {
     void remove();
 
     ComponentContainer container();
+    CapabilityContainer capabilities();
 }

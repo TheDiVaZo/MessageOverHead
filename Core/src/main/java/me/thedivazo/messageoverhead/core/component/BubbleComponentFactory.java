@@ -1,5 +1,7 @@
 package me.thedivazo.messageoverhead.core.component;
 
+import me.thedivazo.messageoverhead.core.ActiveBubble;
+
 public interface BubbleComponentFactory<T extends BubbleComponent> {
-    T create(ComponentContext context) throws Exception;
+    T create(ActiveBubble bubble) throws Exception;
 }

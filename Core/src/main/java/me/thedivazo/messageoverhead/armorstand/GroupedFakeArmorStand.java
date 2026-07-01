@@ -43,8 +43,8 @@ public class GroupedFakeArmorStand implements ArmorStand {
 
         double offset = lineSpacing * stands.size();
         for (int i = 0; i < stands.size(); i++) {
-            stands.get(i).setPosition(x, y + offset, z);
             offset -= lineSpacing;
+            stands.get(i).setPosition(x, y + offset, z);
         }
     }
 

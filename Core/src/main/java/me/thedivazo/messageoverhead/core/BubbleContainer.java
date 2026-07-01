@@ -1,17 +1,11 @@
 package me.thedivazo.messageoverhead.core;
 
+import kotlin.collections.CollectionsKt;
+import kotlin.collections.MapsKt;
 import me.thedivazo.messageoverhead.annotation.MainThread;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @MainThread
 public class BubbleContainer {
@@ -21,7 +15,6 @@ public class BubbleContainer {
 
     public @Nullable ActiveBubble put(ActiveBubble bubble) {
         Objects.requireNonNull(bubble, "bubble");
-        pruneActiveIndexes();
 
         if (bubble.isRemove()) {
             return null;
@@ -51,45 +44,31 @@ public class BubbleContainer {
 
     public @Nullable ActiveBubble get(UUID uid) {
         Objects.requireNonNull(uid, "uid");
-        pruneActiveIndexes();
-        return bubblesByBubbleId.get(uid);
+        ActiveBubble activeBubble = bubblesByBubbleId.get(uid);
+        return activeBubble == null || activeBubble.isRemove() ? null : activeBubble;
     }
 
     public @Nullable ActiveBubble getBubble(UUID bubbleId) {
         return get(bubbleId);
     }
 
-    public Map<UUID, ActiveBubble> getBubbles() {
-        return getBubblesByBubbleId();
-    }
-
     public Map<UUID, ActiveBubble> getBubblesByBubbleId() {
-        pruneActiveIndexes();
-        return Collections.unmodifiableMap(new LinkedHashMap<>(bubblesByBubbleId));
+        return MapsKt.filter(bubblesByBubbleId, entry -> !entry.getValue().isRemove());
     }
 
     public @Nullable ActiveBubble getLastBubble(UUID playerUid) {
         Objects.requireNonNull(playerUid, "playerUid");
-        pruneActiveIndexes();
-        return lastBubblesByPlayerUid.get(playerUid);
+        ActiveBubble activeBubble = lastBubblesByPlayerUid.get(playerUid);
+        return activeBubble == null || activeBubble.isRemove() ? null : activeBubble;
     }
 
-    public Map<UUID, ActiveBubble> getLastBubbles() {
-        return getLastBubblesByPlayerUid();
-    }
-
-    public Map<UUID, ActiveBubble> getLastBubblesByPlayerUid() {
-        pruneActiveIndexes();
-        return Collections.unmodifiableMap(new LinkedHashMap<>(lastBubblesByPlayerUid));
-    }
-
-    public Collection<ActiveBubble> getOldBubbles(UUID playerUid) {
+    public Set<ActiveBubble> getOldBubbles(UUID playerUid) {
         Objects.requireNonNull(playerUid, "playerUid");
         Set<ActiveBubble> oldBubbles = oldBubblesByPlayerUid.get(playerUid);
         if (oldBubbles == null) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        return Collections.unmodifiableList(new ArrayList<>(oldBubbles));
+        return CollectionsKt.filterTo(oldBubbles, new HashSet<>(), bubble -> !bubble.isRemove());
     }
 
     public Map<UUID, Collection<ActiveBubble>> getOldBubbles() {
@@ -97,16 +76,10 @@ public class BubbleContainer {
     }
 
     public Map<UUID, Collection<ActiveBubble>> getOldBubblesByPlayerUid() {
-        Map<UUID, Collection<ActiveBubble>> snapshot = new LinkedHashMap<>();
-        oldBubblesByPlayerUid.entrySet().removeIf(entry -> {
-            Set<ActiveBubble> oldBubbles = entry.getValue();
-            if (oldBubbles.isEmpty()) {
-                return true;
-            }
-            snapshot.put(entry.getKey(), Collections.unmodifiableList(new ArrayList<>(oldBubbles)));
-            return false;
-        });
-        return Collections.unmodifiableMap(snapshot);
+        return MapsKt.mapValues(
+                oldBubblesByPlayerUid,
+                entry -> CollectionsKt.filter(entry.getValue(), bubble -> !bubble.isRemove())
+        );
     }
 
     public @Nullable ActiveBubble remove(UUID uid) {
@@ -117,7 +90,7 @@ public class BubbleContainer {
             unregisterActive(removed);
         }
 
-        return removed;
+        return removed == null || removed.isRemove() ? null : removed;
     }
 
     public boolean contains(UUID uid) {
@@ -128,6 +101,11 @@ public class BubbleContainer {
         bubblesByBubbleId.clear();
         lastBubblesByPlayerUid.clear();
         oldBubblesByPlayerUid.clear();
+    }
+
+    public void invalidate() {
+        pruneActiveIndexes();
+        pruneOldIndexes();
     }
 
     private void pruneActiveIndexes() {
@@ -141,6 +119,16 @@ public class BubbleContainer {
         });
 
         lastBubblesByPlayerUid.entrySet().removeIf(entry -> entry.getValue().isRemove());
+    }
+
+    private void pruneOldIndexes() {
+        oldBubblesByPlayerUid.entrySet().removeIf(entry -> {
+            Set<ActiveBubble> oldBubbles = entry.getValue();
+            oldBubbles.removeIf(bubble -> bubble == null
+                    || bubble.isRemove()
+                    || !bubblesByBubbleId.containsKey(bubble.id()));
+            return oldBubbles.isEmpty();
+        });
     }
 
     private void unregisterActive(ActiveBubble bubble) {

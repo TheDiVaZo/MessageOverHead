@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @MainThread
-final class ActiveBubbleController implements ActiveBubble, ComponentContext, CapabilityContainer {
+final class ActiveBubbleController implements ActiveBubble, CapabilityContainer {
     private final UUID uuid = UUID.randomUUID();
 
     private final Message message;
@@ -73,20 +73,15 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
         return components;
     }
 
+    @Override
+    public CapabilityContainer capabilities() {
+        return this;
+    }
+
     void tick() {
         if (markRemoved) return;
         ageTicks++;
         components.tick();
-    }
-
-    @Override
-    public ActiveBubble bubble() {
-        return this;
-    }
-
-    @Override
-    public CapabilityContainer capabilityContainer() {
-        return this;
     }
 
     @Override

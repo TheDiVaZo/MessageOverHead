@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead;
 
+import me.thedivazo.messageoverhead.animation.AnimationUpHandler;
 import me.thedivazo.messageoverhead.api.ComponentService;
 import me.thedivazo.messageoverhead.api.ProfileService;
 import me.thedivazo.messageoverhead.api.SpawnService;
@@ -12,6 +13,7 @@ import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.component.scope.OffsetComponentScoped;
 import me.thedivazo.messageoverhead.core.event.EventBus;
 import me.thedivazo.messageoverhead.core.event.SimpleEventBus;
+import me.thedivazo.messageoverhead.core.event.SpawnBubbleEvent;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.BukkitBubbleScheduler;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
@@ -21,6 +23,7 @@ import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 
@@ -40,6 +43,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     public static final MinecraftVersion SERVER_VERSION = MinecraftVersion.parse(Bukkit.getMinecraftVersion());
 
     private BubbleScheduler bubbleScheduler;
+    private BukkitTask bubbleContainerInvalidationTask;
 
     // Services
     private ComponentService componentService;
@@ -73,6 +77,15 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 ExecutionCoordinator.simpleCoordinator()
         );
         BubbleTestCommand.register(commandManager, spawnService, DEFAULT_PROFILE_ID);
+
+        eventBus.subscribe(SpawnBubbleEvent.class, new AnimationUpHandler(spawnService));
+
+        bubbleContainerInvalidationTask = Bukkit.getScheduler().runTaskTimer(
+                this,
+                bubbleContainer::invalidate,
+                200L,
+                200L
+        );
     }
 
     private void registerDefaultProfile(ComponentRegistry componentRegistry) {
@@ -90,6 +103,10 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                         new ViewComponent.Settings(20, 5)
                 )
         );
+        componentFactories.put(
+                LifetimeComponent.key(),
+                LifetimeComponent.factory(120)
+        );
 
         BubbleProfile defaultProfile = BubbleProfile.create(
                 DEFAULT_PROFILE_ID,
@@ -102,10 +119,14 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
+            if (bubbleContainerInvalidationTask != null) {
+                bubbleContainerInvalidationTask.cancel();
+            }
             if (spawnService != null) {
                 spawnService.clear();
             }
         } finally {
+            bubbleContainerInvalidationTask = null;
             bubbleScheduler = null;
             commandManager = null;
             spawnService = null;

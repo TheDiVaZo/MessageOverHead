@@ -90,8 +90,8 @@ public final class ProfileComponent implements BubbleComponent {
         }
 
         @Override
-        public ProfileComponent create(ComponentContext context) {
-            return new ProfileComponent(context.bubble(), profile, index);
+        public ProfileComponent create(ActiveBubble bubble) {
+            return new ProfileComponent(bubble, profile, index);
         }
     }
 }

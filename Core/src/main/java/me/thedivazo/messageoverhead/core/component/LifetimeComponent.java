@@ -55,8 +55,8 @@ public class LifetimeComponent implements BubbleComponent {
         }
 
         @Override
-        public LifetimeComponent create(ComponentContext context) {
-            return new LifetimeComponent(context.bubble(), lifetime);
+        public LifetimeComponent create(ActiveBubble bubble) {
+            return new LifetimeComponent(bubble, lifetime);
         }
     }
 }

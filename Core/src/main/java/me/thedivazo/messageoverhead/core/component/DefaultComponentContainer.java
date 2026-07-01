@@ -1,7 +1,7 @@
 package me.thedivazo.messageoverhead.core.component;
 
 import kotlin.collections.MapsKt;
-import me.thedivazo.messageoverhead.core.event.EventBus;
+import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +10,7 @@ import java.util.*;
 
 public final class DefaultComponentContainer implements ComponentContainer {
     private final ComponentRegistry registry;
-    private final ComponentContext context;
+    private final ActiveBubble context;
 
     private int counter = 0;
 
@@ -23,7 +23,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
 
     private final PrepareComponents cachedPrepareComponents = new PrepareComponents();
 
-    public DefaultComponentContainer(ComponentRegistry registry, ComponentContext context) {
+    public DefaultComponentContainer(ComponentRegistry registry, ActiveBubble context) {
         this.registry = Objects.requireNonNull(registry, "registry");
         this.context = Objects.requireNonNull(context, "context");
     }
@@ -223,7 +223,7 @@ public final class DefaultComponentContainer implements ComponentContainer {
     }
 
     private boolean hasRequiredCapabilities(ComponentKey<?> key) {
-        CapabilityContainer container = context.capabilityContainer();
+        CapabilityContainer container = context.capabilities();
 
         for (Class<?> capability : key.metadata().requiredCapabilities()) {
             if (!container.hasCapability(capability)) {

@@ -16,10 +16,7 @@ import me.thedivazo.messageoverhead.profile.ProfileId;
 import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @MainThread
 public final class SpawnService {
@@ -111,6 +108,16 @@ public final class SpawnService {
         Objects.requireNonNull(uid, "uid");
 
         return scheduler.get(uid);
+    }
+
+    public @Nullable ActiveBubble getActualByActorId(UUID uid) {
+        Objects.requireNonNull(uid, "uid");
+        return bubbleContainer.getLastBubble(uid);
+    }
+
+    public Collection<ActiveBubble> getOldByActorId(UUID uid) {
+        Objects.requireNonNull(uid, "uid");
+        return bubbleContainer.getOldBubbles(uid);
     }
 
     public @Nullable ActiveBubble remove(UUID uid) {

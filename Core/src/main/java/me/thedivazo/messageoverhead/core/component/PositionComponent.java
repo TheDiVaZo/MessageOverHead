@@ -89,11 +89,20 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
         return activeBubble.container().get(key());
     }
 
+    public static PositionComponent getOrAttach(ActiveBubble activeBubble) {
+        if (activeBubble.container().contains(key())) {
+            return get(activeBubble);
+        }
+        else return attach(activeBubble, Factory.EMPTY);
+    }
+
     public static boolean contains(ActiveBubble activeBubble) {
         return activeBubble.container().contains(key());
     }
 
     public static final class Factory implements BubbleComponentFactory<PositionComponent> {
+        public static final Factory EMPTY = new Factory(List.of());
+
         private final List<Function<ActiveBubble, ComponentScoped<Position>>> scopedFactories;
 
         public Factory(List<Function<ActiveBubble, ComponentScoped<Position>>> scopedFactories) {
@@ -101,9 +110,9 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
         }
 
         @Override
-        public PositionComponent create(ComponentContext context) {
-            PositionComponent component = new PositionComponent(context.bubble(), context.capabilityContainer().requireCapability(PositionCapability.class));
-            scopedFactories.forEach(scopedFactory -> component.addScoped(scopedFactory.apply(context.bubble())));
+        public PositionComponent create(ActiveBubble bubble) {
+            PositionComponent component = new PositionComponent(bubble, bubble.capabilities().requireCapability(PositionCapability.class));
+            scopedFactories.forEach(scopedFactory -> component.addScoped(scopedFactory.apply(bubble)));
             return component;
         }
     }

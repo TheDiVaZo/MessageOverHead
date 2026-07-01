@@ -15,7 +15,7 @@ import java.util.Objects;
  * Armor stand implementation of the bubble renderer contracts.
  */
 public final class BubbleArmorStand implements RendererBubble, PositionCapability, ViewCapability, HeightCapability {
-    private static final double HOLOGRAM_LINE_HEIGHT = 0.25;
+    private static final double HOLOGRAM_LINE_HEIGHT = 0.289;
 
     private final GroupedFakeArmorStand armorStand;
     private final Position position;
@@ -92,6 +92,6 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
 
     @Override
     public double getHeight() {
-        return (HOLOGRAM_LINE_HEIGHT*armorStand.countLines()) + (Math.max(0, armorStand.countLines()-1)*armorStand.getLineSpacing());
+        return (Math.max(0, armorStand.countLines()-1)*armorStand.getLineSpacing()) + HOLOGRAM_LINE_HEIGHT;
     }
 }
