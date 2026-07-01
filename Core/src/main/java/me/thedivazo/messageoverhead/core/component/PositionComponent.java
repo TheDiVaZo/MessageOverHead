@@ -4,13 +4,11 @@ import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
-import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
+import me.thedivazo.messageoverhead.core.render.capability.PositionCapability;
 import me.thedivazo.messageoverhead.util.Position;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @MainThread
@@ -19,20 +17,20 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
             ComponentId.of("messageoverhead", "position"),
             PositionComponent.class,
             new ComponentMetadata(
-                    Set.of(RendererPosition.class),
+                    Set.of(PositionCapability.class),
                     TypeComponent.BUBBLE
             )
     );
 
     private final ActiveBubble activeBubble;
-    private final RendererPosition rendererPosition;
+    private final PositionCapability positionCapability;
     private final List<ComponentScoped<Position>> components = new ArrayList<>();
 
     private final Position cachedPosition = new Position();
 
-    private PositionComponent(ActiveBubble activeBubble, RendererPosition rendererPosition) {
+    private PositionComponent(ActiveBubble activeBubble, PositionCapability positionCapability) {
         this.activeBubble = activeBubble;
-        this.rendererPosition = rendererPosition;
+        this.positionCapability = positionCapability;
     }
 
     @Override
@@ -58,7 +56,7 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
             cachedPosition.zero();
         }
 
-        rendererPosition.setPosition(
+        positionCapability.setPosition(
                 activeBubble.author().getPosition().x() + offsetX,
                 activeBubble.author().getPosition().y() + offsetY,
                 activeBubble.author().getPosition().z() + offsetZ
@@ -104,7 +102,7 @@ public class PositionComponent implements BubbleScopeComponent<Position> {
 
         @Override
         public PositionComponent create(ComponentContext context) {
-            PositionComponent component = new PositionComponent(context.bubble(), context.capabilityContainer().requireCapability(RendererPosition.class));
+            PositionComponent component = new PositionComponent(context.bubble(), context.capabilityContainer().requireCapability(PositionCapability.class));
             scopedFactories.forEach(scopedFactory -> component.addScoped(scopedFactory.apply(context.bubble())));
             return component;
         }

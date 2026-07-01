@@ -25,6 +25,14 @@ public class GroupedFakeArmorStand implements ArmorStand {
         setPosition(position.x(), position.y(), position.z());
     }
 
+    public int countLines() {
+        return stands.size();
+    }
+
+    public double getLineSpacing() {
+        return lineSpacing;
+    }
+
     @Override
     public void setPosition(double x, double y, double z) {
         if (destroyed) {

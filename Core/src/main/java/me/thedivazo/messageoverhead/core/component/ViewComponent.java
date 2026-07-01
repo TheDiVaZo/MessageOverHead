@@ -5,7 +5,7 @@ import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
-import me.thedivazo.messageoverhead.core.render.capability.RendererView;
+import me.thedivazo.messageoverhead.core.render.capability.ViewCapability;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
             ComponentId.of("messageoverhead", "view"),
             ViewComponent.class,
             new ComponentMetadata(
-                    Set.of(RendererView.class),
+                    Set.of(ViewCapability.class),
                     TypeComponent.VIEW
             )
     );
@@ -33,19 +33,19 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
 
     private final Supplier<? extends Iterable<Viewer>> allPlayerProvider;
     private final ActiveBubble activeBubble;
-    private final RendererView rendererView;
+    private final ViewCapability viewCapability;
     private final List<ComponentScoped<ViewState>> components = new ArrayList<>();
     private final List<Viewer> visiblePlayers = new ArrayList<>();
     private final List<Viewer> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
 
     private final ViewState cachedViewState = new ViewState();
 
-    private ViewComponent(Supplier<? extends Iterable<Viewer>> allPlayerProvider, ActiveBubble activeBubble, RendererView rendererView, Settings settings) {
+    private ViewComponent(Supplier<? extends Iterable<Viewer>> allPlayerProvider, ActiveBubble activeBubble, ViewCapability viewCapability, Settings settings) {
         this.allPlayerProvider = Objects.requireNonNull(allPlayerProvider, "allPlayerProvider");
         this.settings = Objects.requireNonNull(settings, "settings");
         this.viewRadiusSquared = settings.viewRadius() * settings.viewRadius();
         this.activeBubble = Objects.requireNonNull(activeBubble, "activeBubble");
-        this.rendererView = Objects.requireNonNull(rendererView, "rendererView");
+        this.viewCapability = Objects.requireNonNull(viewCapability, "rendererView");
     }
 
     public Settings settings() {
@@ -81,7 +81,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     @Override
     public void onTick() {
         if (activeBubble.ageTicks() % settings.updateIntervalTicks() != 0) {
-            visiblePlayers.forEach(rendererView::update);
+            visiblePlayers.forEach(viewCapability::update);
             return;
         }
 
@@ -95,15 +95,15 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
 
             nextVisiblePlayers.add(player);
             if (visiblePlayers.contains(player)) {
-                rendererView.update(player);
+                viewCapability.update(player);
             } else {
-                rendererView.show(player);
+                viewCapability.show(player);
             }
         }
 
         for (Viewer player : visiblePlayers) {
             if (!nextVisiblePlayers.contains(player)) {
-                rendererView.hide(player);
+                viewCapability.hide(player);
             }
         }
 
@@ -114,7 +114,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     @Override
     public void onDetached() {
         for (Viewer player : visiblePlayers) {
-            rendererView.hide(player);
+            viewCapability.hide(player);
         }
         visiblePlayers.clear();
     }
@@ -213,7 +213,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
 
         @Override
         public ViewComponent create(ComponentContext context) throws Exception {
-            return new ViewComponent(allPlayerProvider, context.bubble(), context.capabilityContainer().requireCapability(RendererView.class), settings);
+            return new ViewComponent(allPlayerProvider, context.bubble(), context.capabilityContainer().requireCapability(ViewCapability.class), settings);
         }
     }
 }

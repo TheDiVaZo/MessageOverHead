@@ -34,7 +34,7 @@ public class ArmorStandBubbleFactory implements RendererFactory {
     @Override
     public RendererBubble create(Message message, Positionc positionc) {
         Location loc = new Location(null, positionc.x(), positionc.y(), positionc.z());
-        ArmorStand armorStand = new GroupedFakeArmorStand(
+        GroupedFakeArmorStand armorStand = new GroupedFakeArmorStand(
                 CollectionsKt.map(
                         ComponentTextUtil.wrapMessage(message.component(), 28, 28),
                         component -> new FakeArmorStand(serializeMessage(component), loc)

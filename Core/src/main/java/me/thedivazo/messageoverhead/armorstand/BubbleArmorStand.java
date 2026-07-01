@@ -2,8 +2,9 @@ package me.thedivazo.messageoverhead.armorstand;
 
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
-import me.thedivazo.messageoverhead.core.render.capability.RendererPosition;
-import me.thedivazo.messageoverhead.core.render.capability.RendererView;
+import me.thedivazo.messageoverhead.core.render.capability.HeightCapability;
+import me.thedivazo.messageoverhead.core.render.capability.PositionCapability;
+import me.thedivazo.messageoverhead.core.render.capability.ViewCapability;
 import me.thedivazo.messageoverhead.util.Position;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
@@ -13,13 +14,15 @@ import java.util.Objects;
 /**
  * Armor stand implementation of the bubble renderer contracts.
  */
-public final class BubbleArmorStand implements RendererBubble, RendererPosition, RendererView {
-    private final ArmorStand armorStand;
+public final class BubbleArmorStand implements RendererBubble, PositionCapability, ViewCapability, HeightCapability {
+    private static final double HOLOGRAM_LINE_HEIGHT = 0.25;
+
+    private final GroupedFakeArmorStand armorStand;
     private final Position position;
 
     private boolean destroyed;
 
-    public BubbleArmorStand(ArmorStand armorStand, Positionc positionc) {
+    public BubbleArmorStand(GroupedFakeArmorStand armorStand, Positionc positionc) {
         Objects.requireNonNull(positionc, "positionc");
         this.armorStand = armorStand;
         this.position = new Position(positionc);
@@ -85,5 +88,10 @@ public final class BubbleArmorStand implements RendererBubble, RendererPosition,
         if (destroyed) {
             throw new IllegalStateException("Bubble armor stand has already been destroyed");
         }
+    }
+
+    @Override
+    public double getHeight() {
+        return (HOLOGRAM_LINE_HEIGHT*armorStand.countLines()) + (Math.max(0, armorStand.countLines()-1)*armorStand.getLineSpacing());
     }
 }
