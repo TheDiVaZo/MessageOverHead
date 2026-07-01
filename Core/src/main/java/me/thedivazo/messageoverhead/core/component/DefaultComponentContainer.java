@@ -1,6 +1,7 @@
 package me.thedivazo.messageoverhead.core.component;
 
 import kotlin.collections.MapsKt;
+import me.thedivazo.messageoverhead.core.event.EventBus;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

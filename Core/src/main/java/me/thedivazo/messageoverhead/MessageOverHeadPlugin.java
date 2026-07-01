@@ -10,6 +10,8 @@ import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;
 import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.component.scope.OffsetComponentScoped;
+import me.thedivazo.messageoverhead.core.event.EventBus;
+import me.thedivazo.messageoverhead.core.event.SimpleEventBus;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.BukkitBubbleScheduler;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
@@ -45,6 +47,8 @@ public class MessageOverHeadPlugin extends JavaPlugin {
     private SpawnService spawnService;
     private LegacyPaperCommandManager<CommandSender> commandManager;
 
+    private final EventBus eventBus = new SimpleEventBus();
+
     @Override
     public void onEnable() {
         if (INSTANCE != null) {
@@ -60,7 +64,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
         this.componentService = new ComponentService(componentRegistry, bubbleContainer);
         this.profileService = new ProfileService(profileRegistry, componentRegistry, profileIndex);
-        this.spawnService = new SpawnService(bubbleScheduler, bubbleContainer, profileIndex, profileRegistry);
+        this.spawnService = new SpawnService(bubbleScheduler, bubbleContainer, profileIndex, profileRegistry, eventBus);
 
         registerDefaultProfile(componentRegistry);
 
@@ -89,7 +93,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
         BubbleProfile defaultProfile = BubbleProfile.create(
                 DEFAULT_PROFILE_ID,
-                new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25)),
+                new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25), eventBus),
                 componentFactories
         );
         profileService.register(defaultProfile);
@@ -120,5 +124,9 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     public SpawnService getSpawnService() {
         return spawnService;
+    }
+
+    public EventBus getEventBus() {
+        return eventBus;
     }
 }

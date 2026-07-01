@@ -7,6 +7,8 @@ import me.thedivazo.messageoverhead.core.BubbleContainer;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.component.ProfileComponent;
 import me.thedivazo.messageoverhead.core.component.ProfileComponentIndex;
+import me.thedivazo.messageoverhead.core.event.EventBus;
+import me.thedivazo.messageoverhead.core.event.SpawnBubbleEvent;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.SchedulableBubble;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
@@ -25,17 +27,20 @@ public final class SpawnService {
     private final BubbleContainer bubbleContainer;
     private final ProfileComponentIndex profileIndex;
     private final ProfileRegistry registry;
+    private final EventBus eventBus;
 
     public SpawnService(
             BubbleScheduler scheduler,
             BubbleContainer bubbleContainer,
             ProfileComponentIndex profileIndex,
-            ProfileRegistry registry
+            ProfileRegistry registry,
+            EventBus eventBus
     ) {
         this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
         this.bubbleContainer = Objects.requireNonNull(bubbleContainer, "bubbleContainer");
         this.profileIndex = Objects.requireNonNull(profileIndex, "profileIndex");
         this.registry = Objects.requireNonNull(registry, "registry");
+        this.eventBus = Objects.requireNonNull(eventBus, "eventBus");
     }
 
     public ActiveBubble spawn(Message message, Author author, ProfileId profileId) {
@@ -91,6 +96,7 @@ public final class SpawnService {
                 scheduler.remove(scheduledBubble.id());
                 throw new IllegalStateException("Scheduled bubble cannot be indexed");
             }
+            eventBus.post(new SpawnBubbleEvent(indexedBubble));
 
             return scheduledBubble;
         } catch (RuntimeException | Error exception) {

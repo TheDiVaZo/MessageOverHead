@@ -2,6 +2,8 @@ package me.thedivazo.messageoverhead.core;
 
 import me.thedivazo.messageoverhead.annotation.MainThread;
 import me.thedivazo.messageoverhead.core.component.*;
+import me.thedivazo.messageoverhead.core.event.EventBus;
+import me.thedivazo.messageoverhead.core.event.RemoveBubbleEvent;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.CapabilityContainer;
 import org.jetbrains.annotations.Nullable;
@@ -20,12 +22,14 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
     private boolean markRemoved;
 
     private final DefaultComponentContainer components;
+    private final EventBus eventBus;
 
-    ActiveBubbleController(Message message, Author author, RendererBubble renderer, ComponentRegistry registry) {
+    ActiveBubbleController(Message message, Author author, RendererBubble renderer, ComponentRegistry registry, EventBus eventBus) {
         this.message = message;
         this.author = author;
         this.renderer = renderer;
         this.components = new DefaultComponentContainer(registry, this);
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -59,6 +63,7 @@ final class ActiveBubbleController implements ActiveBubble, ComponentContext, Ca
         markRemoved = true;
         components.detachAllAndClose();
         renderer.destroy();
+        eventBus.post(new RemoveBubbleEvent(this));
     }
 
     void onTickEnd() {}
