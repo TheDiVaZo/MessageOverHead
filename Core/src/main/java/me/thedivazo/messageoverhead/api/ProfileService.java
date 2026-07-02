@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @MainThread
 public final class ProfileService {
@@ -26,12 +27,12 @@ public final class ProfileService {
         this.profileIndex = Objects.requireNonNull(profileIndex, "profileIndex");
     }
 
-    public synchronized void register(BubbleProfile profile) {
+    public void register(BubbleProfile profile) {
         validate(profile);
         registry.register(profile);
     }
 
-    public synchronized @Nullable BubbleProfile unregister(ProfileId id) {
+    public @Nullable BubbleProfile unregister(ProfileId id) {
         Objects.requireNonNull(id, "id");
 
         BubbleProfile profile = registry.unregister(id);
@@ -44,7 +45,7 @@ public final class ProfileService {
         return profile;
     }
 
-    public synchronized @Nullable BubbleProfile get(ProfileId id) {
+    public @Nullable BubbleProfile get(ProfileId id) {
         Objects.requireNonNull(id, "id");
 
         return registry.find(id);

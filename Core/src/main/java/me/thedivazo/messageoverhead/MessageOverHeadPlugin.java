@@ -75,7 +75,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         this.profileService = new ProfileService(profileRegistry, componentRegistry, profileIndex);
         this.spawnService = new SpawnService(bubbleScheduler, bubbleContainer, profileIndex, profileRegistry, eventBus);
 
-        registerDefaultProfile(componentRegistry);
+        profileRegistry.register(registerDefaultProfile(componentRegistry));
 
         commandManager = LegacyPaperCommandManager.createNative(
                 this,
@@ -93,7 +93,7 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         );
     }
 
-    private void registerDefaultProfile(ComponentRegistry componentRegistry) {
+    private BubbleProfile registerDefaultProfile(ComponentRegistry componentRegistry) {
         Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories = new LinkedHashMap<>();
         Map<String, ScopedFactory<Position>> positionScopedFactories = new LinkedHashMap<>();
         positionScopedFactories.put(
@@ -136,12 +136,11 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 LifetimeComponent.factory(120)
         );
 
-        BubbleProfile defaultProfile = BubbleProfile.create(
+        return BubbleProfile.create(
                 DEFAULT_PROFILE_ID,
                 new DefaultBubbleFactory(componentRegistry, new ArmorStandBubbleFactory(0.25), eventBus),
                 componentFactories
         );
-        profileService.register(defaultProfile);
     }
 
     @Override
