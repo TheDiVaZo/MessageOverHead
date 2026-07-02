@@ -4,5 +4,10 @@ main: me.thedivazo.messageoverhead.MessageOverHeadPlugin
 api-version: '1.19'
 depend:
   - ProtocolLib
+softdepend:
+  - CMI
+  - Essentials
+  - SuperVanish
+  - PremiumVanish
 authors:
   - TheDiVaZo

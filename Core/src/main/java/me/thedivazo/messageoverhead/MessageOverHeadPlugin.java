@@ -22,6 +22,10 @@ import me.thedivazo.messageoverhead.profile.ProfileId;
 import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import me.thedivazo.messageoverhead.util.Position;
+import me.thedivazo.messageoverhead.vanish.CMIVanishManager;
+import me.thedivazo.messageoverhead.vanish.EssentialsVanishManager;
+import me.thedivazo.messageoverhead.vanish.InvisibilityVanishManager;
+import me.thedivazo.messageoverhead.vanish.SuperVansihManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -101,11 +105,30 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 PositionComponent.key(),
                 PositionComponent.factory(positionScopedFactories)
         );
+        Map<String, ScopedFactory<ViewComponent.ViewState>> viewScopedFactories = new LinkedHashMap<>();
+        viewScopedFactories.put(
+                InvisibilityVanishManager.SCOPED_ID,
+                ignored -> new InvisibilityVanishManager()
+        );
+        viewScopedFactories.put(
+                CMIVanishManager.SCOPED_ID,
+                ignored -> new CMIVanishManager()
+        );
+        viewScopedFactories.put(
+                EssentialsVanishManager.SCOPED_ID,
+                ignored -> new EssentialsVanishManager()
+        );
+        viewScopedFactories.put(
+                SuperVansihManager.SCOPED_ID,
+                ignored -> new SuperVansihManager()
+        );
+
         componentFactories.put(
                 ViewComponent.key(),
                 ViewComponent.factory(
                         MessageOverHeadPlugin.DEFAULT_ONLINE_PLAYER_PROVIDER,
-                        new ViewComponent.Settings(20, 5)
+                        new ViewComponent.Settings(20, 5),
+                        viewScopedFactories
                 )
         );
         componentFactories.put(
