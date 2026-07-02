@@ -25,7 +25,7 @@ import me.thedivazo.messageoverhead.util.Position;
 import me.thedivazo.messageoverhead.vanish.CMIVanishManager;
 import me.thedivazo.messageoverhead.vanish.EssentialsVanishManager;
 import me.thedivazo.messageoverhead.vanish.InvisibilityVanishManager;
-import me.thedivazo.messageoverhead.vanish.SuperVansihManager;
+import me.thedivazo.messageoverhead.vanish.SuperVanishManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -119,8 +119,8 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 ignored -> new EssentialsVanishManager()
         );
         viewScopedFactories.put(
-                SuperVansihManager.SCOPED_ID,
-                ignored -> new SuperVansihManager()
+                SuperVanishManager.SCOPED_ID,
+                ignored -> new SuperVanishManager()
         );
 
         componentFactories.put(

@@ -2,7 +2,7 @@ package me.thedivazo.messageoverhead.vanish;
 
 import org.bukkit.entity.Player;
 
-public final class SuperVansihManager extends VanishManager {
+public final class SuperVanishManager extends VanishManager {
     public static final String SCOPED_ID = "super-vanish";
     private static final String VANISH_API_CLASS = "de.myzelyam.api.vanish.VanishAPI";
 
