@@ -5,16 +5,18 @@ import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.component.scope.BubbleScopeComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
+import me.thedivazo.messageoverhead.core.component.scope.ScopedFactory;
 import me.thedivazo.messageoverhead.core.render.capability.ViewCapability;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @MainThread
@@ -34,7 +36,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     private final Supplier<? extends Iterable<Viewer>> allPlayerProvider;
     private final ActiveBubble activeBubble;
     private final ViewCapability viewCapability;
-    private final List<ComponentScoped<ViewState>> components = new ArrayList<>();
+    private final Map<String, ComponentScoped<ViewState>> components = new LinkedHashMap<>();
     private final List<Viewer> visiblePlayers = new ArrayList<>();
     private final List<Viewer> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
 
@@ -69,13 +71,61 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     }
 
     @Override
-    public void attach(Function<ActiveBubble, ComponentScoped<ViewState>> scopedFactory) {
+    public @Nullable ComponentScoped<ViewState> attach(String id, ScopedFactory<ViewState> scopedFactory) {
         Objects.requireNonNull(scopedFactory, "scopedFactory");
-        addScoped(Objects.requireNonNull(scopedFactory.apply(activeBubble), "scopedFactory result"));
+        String scopedId = requireScopedId(id);
+        try {
+            return addScoped(scopedId, createScoped(scopedId, scopedFactory));
+        } catch (Exception | Error exception) {
+            exception.printStackTrace();
+            return null;
+        }
     }
 
-    private boolean addScoped(ComponentScoped<ViewState> componentScoped) {
-        return components.add(Objects.requireNonNull(componentScoped, "componentScoped"));
+    @Override
+    public @Nullable ComponentScoped<ViewState> detach(String id) {
+        ComponentScoped<ViewState> detached = components.remove(requireScopedId(id));
+        if (detached != null) {
+            detached.onDetached();
+        }
+        return detached;
+    }
+
+    @Override
+    public @Nullable ComponentScoped<ViewState> get(String id) {
+        return components.get(requireScopedId(id));
+    }
+
+    @Override
+    public boolean contains(String id) {
+        return components.containsKey(requireScopedId(id));
+    }
+
+    private ComponentScoped<ViewState> addScoped(String id, ComponentScoped<ViewState> componentScoped) {
+        String scopedId = requireScopedId(id);
+        Objects.requireNonNull(componentScoped, "componentScoped");
+        ComponentScoped<ViewState> previous = components.get(scopedId);
+        if (previous == componentScoped) {
+            return componentScoped;
+        }
+        componentScoped.onAttached(activeBubble);
+        components.put(scopedId, componentScoped);
+        if (previous != null) {
+            previous.onDetached();
+        }
+        return componentScoped;
+    }
+
+    private ComponentScoped<ViewState> createScoped(String id, ScopedFactory<ViewState> scopedFactory) throws Exception {
+        ComponentScoped<ViewState> componentScoped = scopedFactory.create(activeBubble);
+        if (componentScoped == null) {
+            throw new IllegalStateException("Scoped factory returned null for " + id);
+        }
+        return componentScoped;
+    }
+
+    private static String requireScopedId(String id) {
+        return Objects.requireNonNull(id, "id");
     }
 
     @Override
@@ -117,6 +167,18 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
             viewCapability.hide(player);
         }
         visiblePlayers.clear();
+        detachAllScoped();
+    }
+
+    private void detachAllScoped() {
+        for (ComponentScoped<ViewState> component : components.values()) {
+            try {
+                component.onDetached();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+        components.clear();
     }
 
     private boolean isInsideViewRadius(Viewer player, Positionc bubblePosition) {
@@ -132,7 +194,7 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         cachedViewState.setPlayer(player);
         cachedViewState.setVisible(true);
 
-        for (ComponentScoped<ViewState> component : components) {
+        for (ComponentScoped<ViewState> component : components.values()) {
             component.onTick(cachedViewState);
             if (!cachedViewState.isVisible()) {
                 return false;
@@ -183,7 +245,15 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     }
 
     public static Factory factory(Supplier<? extends Iterable<Viewer>> allPlayerProvider, Settings settings) {
-        return new Factory(allPlayerProvider, settings);
+        return new Factory(allPlayerProvider, settings, Map.of());
+    }
+
+    public static Factory factory(
+            Supplier<? extends Iterable<Viewer>> allPlayerProvider,
+            Settings settings,
+            Map<String, ScopedFactory<ViewState>> scopedFactories
+    ) {
+        return new Factory(allPlayerProvider, settings, scopedFactories);
     }
 
     public static ViewComponent attach(ActiveBubble activeBubble, Factory factory) {
@@ -205,15 +275,33 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     public static final class Factory implements BubbleComponentFactory<ViewComponent> {
         private final Supplier<? extends Iterable<Viewer>> allPlayerProvider;
         private final Settings settings;
+        private final Map<String, ScopedFactory<ViewState>> scopedFactories;
 
-        private Factory(Supplier<? extends Iterable<Viewer>> allPlayerProvider, Settings settings) {
+        private Factory(
+                Supplier<? extends Iterable<Viewer>> allPlayerProvider,
+                Settings settings,
+                Map<String, ScopedFactory<ViewState>> scopedFactories
+        ) {
             this.allPlayerProvider = Objects.requireNonNull(allPlayerProvider, "allPlayerProvider");
             this.settings = Objects.requireNonNull(settings, "settings");
+            Objects.requireNonNull(scopedFactories, "scopedFactories");
+            Map<String, ScopedFactory<ViewState>> scopedFactoriesCopy = new LinkedHashMap<>();
+            for (Map.Entry<String, ScopedFactory<ViewState>> entry : scopedFactories.entrySet()) {
+                scopedFactoriesCopy.put(
+                        requireScopedId(entry.getKey()),
+                        Objects.requireNonNull(entry.getValue(), "scopedFactory")
+                );
+            }
+            this.scopedFactories = Collections.unmodifiableMap(scopedFactoriesCopy);
         }
 
         @Override
         public ViewComponent create(ActiveBubble bubble) throws Exception {
-            return new ViewComponent(allPlayerProvider, bubble, bubble.capabilities().requireCapability(ViewCapability.class), settings);
+            ViewComponent component = new ViewComponent(allPlayerProvider, bubble, bubble.capabilities().requireCapability(ViewCapability.class), settings);
+            for (Map.Entry<String, ScopedFactory<ViewState>> entry : scopedFactories.entrySet()) {
+                component.addScoped(entry.getKey(), component.createScoped(entry.getKey(), entry.getValue()));
+            }
+            return component;
         }
     }
 }

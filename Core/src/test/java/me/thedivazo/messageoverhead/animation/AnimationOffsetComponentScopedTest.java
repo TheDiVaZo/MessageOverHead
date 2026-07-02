@@ -64,8 +64,46 @@ class AnimationOffsetComponentScopedTest {
     }
 
     @Test
+    void animatesFromCurrentOffsetWhenTargetOffsetChanges() {
+        AnimationOffsetComponentScoped scoped = new AnimationOffsetComponentScoped(4, 8.0, 0.0, 0.0);
+        Position position = new Position();
+
+        scoped.onTick(position);
+        assertPosition(position, 2.0, 0.0, 0.0);
+
+        position.zero();
+        scoped.onTick(position);
+        assertPosition(position, 4.0, 0.0, 0.0);
+
+        scoped.setTargetOffset(12.0, 6.0, -3.0);
+
+        position.zero();
+        scoped.onTick(position);
+        assertPosition(position, 6.0, 1.5, -0.75);
+
+        position.zero();
+        scoped.onTick(position);
+        assertPosition(position, 8.0, 3.0, -1.5);
+
+        position.zero();
+        scoped.onTick(position);
+        assertPosition(position, 10.0, 4.5, -2.25);
+
+        position.zero();
+        scoped.onTick(position);
+        assertPosition(position, 12.0, 6.0, -3.0);
+    }
+
+    @Test
     void rejectsNonPositiveTickDuration() {
         assertThrows(IllegalArgumentException.class, () -> new AnimationOffsetComponentScoped(0, 1.0, 1.0, 1.0));
+    }
+
+    @Test
+    void rejectsInvalidOffsetValues() {
+        AnimationOffsetComponentScoped scoped = new AnimationOffsetComponentScoped(4, 1.0, 1.0, 1.0);
+
+        assertThrows(IllegalArgumentException.class, () -> scoped.setTargetOffset(Double.NaN, 1.0, 1.0));
     }
 
     @Test

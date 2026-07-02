@@ -1,17 +1,32 @@
 package me.thedivazo.messageoverhead.animation;
 
+import me.thedivazo.messageoverhead.core.ActiveBubble;
+import me.thedivazo.messageoverhead.core.component.PositionComponent;
 import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
+import me.thedivazo.messageoverhead.core.component.scope.ScopedFactory;
 import me.thedivazo.messageoverhead.util.Position;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 public class AnimationOffsetComponentScoped implements ComponentScoped<Position> {
+    public static final String UP_ANIMATION_SCOPED_ID = "up-animation";
+    private static final int DEFAULT_TICKS = 15;
+    private static final ScopedFactory<Position> DEFAULT_FACTORY =
+            ignored -> new AnimationOffsetComponentScoped(DEFAULT_TICKS, 0, 0, 0);
+
     private final int ticks;
-    private final double offsetX;
-    private final double offsetY;
-    private final double offsetZ;
     private final CubicBezier speedCurve;
 
+    private double startOffsetX;
+    private double startOffsetY;
+    private double startOffsetZ;
+    private double targetOffsetX;
+    private double targetOffsetY;
+    private double targetOffsetZ;
+    private double currentOffsetX;
+    private double currentOffsetY;
+    private double currentOffsetZ;
     private int elapsedTicks;
 
     public AnimationOffsetComponentScoped(int ticks, double offsetX, double offsetY, double offsetZ) {
@@ -42,10 +57,58 @@ public class AnimationOffsetComponentScoped implements ComponentScoped<Position>
             throw new IllegalArgumentException("ticks must be positive");
         }
         this.ticks = ticks;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
         this.speedCurve = Objects.requireNonNull(speedCurve, "speedCurve");
+        setTargetOffset(offsetX, offsetY, offsetZ);
+    }
+
+    public void setTargetOffset(double offsetX, double offsetY, double offsetZ) {
+        validateFinite(offsetX, "offsetX");
+        validateFinite(offsetY, "offsetY");
+        validateFinite(offsetZ, "offsetZ");
+
+        startOffsetX = currentOffsetX;
+        startOffsetY = currentOffsetY;
+        startOffsetZ = currentOffsetZ;
+        targetOffsetX = offsetX;
+        targetOffsetY = offsetY;
+        targetOffsetZ = offsetZ;
+        elapsedTicks = 0;
+    }
+
+    public void setOffset(double offsetX, double offsetY, double offsetZ) {
+        setTargetOffset(offsetX, offsetY, offsetZ);
+    }
+
+    public double targetOffsetX() {
+        return targetOffsetX;
+    }
+
+    public double targetOffsetY() {
+        return targetOffsetY;
+    }
+
+    public double targetOffsetZ() {
+        return targetOffsetZ;
+    }
+
+    public static @Nullable AnimationOffsetComponentScoped getOrAttach(ActiveBubble bubble) {
+        Objects.requireNonNull(bubble, "bubble");
+        return getOrAttach(PositionComponent.getOrAttach(bubble));
+    }
+
+    public static @Nullable AnimationOffsetComponentScoped getOrAttach(PositionComponent positionComponent) {
+        Objects.requireNonNull(positionComponent, "positionComponent");
+
+        ComponentScoped<Position> scoped = positionComponent.get(UP_ANIMATION_SCOPED_ID);
+        if (scoped instanceof AnimationOffsetComponentScoped animationOffset) {
+            return animationOffset;
+        }
+
+        ComponentScoped<Position> attached = positionComponent.attach(UP_ANIMATION_SCOPED_ID, DEFAULT_FACTORY);
+        if (attached instanceof AnimationOffsetComponentScoped animationOffset) {
+            return animationOffset;
+        }
+        return null;
     }
 
     @Override
@@ -55,9 +118,22 @@ public class AnimationOffsetComponentScoped implements ComponentScoped<Position>
         }
 
         double progress = speedCurve.apply((double) elapsedTicks / ticks);
-        context.x += offsetX * progress;
-        context.y += offsetY * progress;
-        context.z += offsetZ * progress;
+        currentOffsetX = interpolate(startOffsetX, targetOffsetX, progress);
+        currentOffsetY = interpolate(startOffsetY, targetOffsetY, progress);
+        currentOffsetZ = interpolate(startOffsetZ, targetOffsetZ, progress);
+        context.x += currentOffsetX;
+        context.y += currentOffsetY;
+        context.z += currentOffsetZ;
+    }
+
+    private static double interpolate(double start, double target, double progress) {
+        return start + (target - start) * progress;
+    }
+
+    private static void validateFinite(double value, String name) {
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException(name + " must be finite");
+        }
     }
 
     public static final class CubicBezier {

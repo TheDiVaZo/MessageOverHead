@@ -1,10 +1,14 @@
 package me.thedivazo.messageoverhead.core.component.scope;
 
-import me.thedivazo.messageoverhead.core.ActiveBubble;
 import me.thedivazo.messageoverhead.core.component.BubbleComponent;
-
-import java.util.function.Function;
+import org.jetbrains.annotations.Nullable;
 
 public interface BubbleScopeComponent<C> extends BubbleComponent {
-    void attach(Function<ActiveBubble, ComponentScoped<C>> scopedFactory);
+    @Nullable ComponentScoped<C> attach(String id, ScopedFactory<C> scopedFactory);
+
+    @Nullable ComponentScoped<C> detach(String id);
+
+    @Nullable ComponentScoped<C> get(String id);
+
+    boolean contains(String id);
 }

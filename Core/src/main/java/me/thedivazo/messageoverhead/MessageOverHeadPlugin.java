@@ -11,6 +11,7 @@ import me.thedivazo.messageoverhead.core.DefaultBubbleFactory;
 import me.thedivazo.messageoverhead.core.OnlinePlayerProvider;
 import me.thedivazo.messageoverhead.core.component.*;
 import me.thedivazo.messageoverhead.core.component.scope.OffsetComponentScoped;
+import me.thedivazo.messageoverhead.core.component.scope.ScopedFactory;
 import me.thedivazo.messageoverhead.core.event.EventBus;
 import me.thedivazo.messageoverhead.core.event.SimpleEventBus;
 import me.thedivazo.messageoverhead.core.event.SpawnBubbleEvent;
@@ -20,6 +21,7 @@ import me.thedivazo.messageoverhead.profile.BubbleProfile;
 import me.thedivazo.messageoverhead.profile.ProfileId;
 import me.thedivazo.messageoverhead.profile.ProfileRegistry;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
+import me.thedivazo.messageoverhead.util.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,7 +30,6 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MessageOverHeadPlugin extends JavaPlugin {
@@ -90,11 +91,15 @@ public class MessageOverHeadPlugin extends JavaPlugin {
 
     private void registerDefaultProfile(ComponentRegistry componentRegistry) {
         Map<ComponentKey<?>, BubbleComponentFactory<?>> componentFactories = new LinkedHashMap<>();
+        Map<String, ScopedFactory<Position>> positionScopedFactories = new LinkedHashMap<>();
+        positionScopedFactories.put(
+                OffsetComponentScoped.DEFAULT_SCOPED_ID,
+                OffsetComponentScoped.factory(0, 2.5, 0)
+        );
+
         componentFactories.put(
                 PositionComponent.key(),
-                PositionComponent.factory(List.of(
-                        activeBubble -> new OffsetComponentScoped(0, 2.5, 0)
-                ))
+                PositionComponent.factory(positionScopedFactories)
         );
         componentFactories.put(
                 ViewComponent.key(),
