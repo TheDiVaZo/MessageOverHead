@@ -7,9 +7,13 @@ public interface ArmorStand {
 
     void updatePosition(Player player);
 
+    void updateMetadata(Player player);
+
     void hide(Player player);
 
     void destroy();
 
     void setPosition(double x, double y, double z);
+
+    void setText(String text);
 }

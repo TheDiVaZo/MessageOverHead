@@ -21,7 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -42,7 +44,8 @@ public final class FakeArmorStand implements ArmorStand {
     private final ProtocolManager protocolManager;
     private final MinecraftVersion serverVersion;
     private final ProtocolProfile protocolProfile;
-    private final String message;
+    private final Set<Player> visiblePlayers = Collections.newSetFromMap(new WeakHashMap<>());
+    private String message;
     private final int entityId;
     private final UUID entityUuid;
 
@@ -84,6 +87,7 @@ public final class FakeArmorStand implements ArmorStand {
             return;
         }
 
+        visiblePlayers.add(player);
         protocolManager.sendServerPacket(player, createSpawnPacket());
         protocolManager.sendServerPacket(player, createMetadataPacket());
     }
@@ -99,12 +103,23 @@ public final class FakeArmorStand implements ArmorStand {
     }
 
     @Override
+    public void updateMetadata(Player player) {
+        Objects.requireNonNull(player, "player");
+        if (destroyed || !visiblePlayers.contains(player)) {
+            return;
+        }
+
+        protocolManager.sendServerPacket(player, createMetadataPacket());
+    }
+
+    @Override
     public void hide(Player player) {
         Objects.requireNonNull(player, "player");
         if (destroyed) {
             return;
         }
 
+        visiblePlayers.remove(player);
         protocolManager.sendServerPacket(player, createDestroyPacket());
     }
 
@@ -115,6 +130,7 @@ public final class FakeArmorStand implements ArmorStand {
         }
 
         destroyed = true;
+        visiblePlayers.clear();
     }
 
     @Override
@@ -126,6 +142,15 @@ public final class FakeArmorStand implements ArmorStand {
         this.location.setX(x);
         this.location.setY(y);
         this.location.setZ(z);
+    }
+
+    @Override
+    public void setText(String text) {
+        if (destroyed) {
+            return;
+        }
+
+        this.message = Objects.requireNonNull(text, "text");
     }
 
     private PacketContainer createSpawnPacket() {

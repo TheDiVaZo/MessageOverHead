@@ -49,6 +49,19 @@ public class GroupedFakeArmorStand implements ArmorStand {
     }
 
     @Override
+    public void setText(String text) {
+        Objects.requireNonNull(text, "text");
+        if (destroyed) {
+            return;
+        }
+
+        String[] lines = text.split("\\R", -1);
+        for (int index = 0; index < stands.size(); index++) {
+            stands.get(index).setText(index < lines.length ? lines[index] : "");
+        }
+    }
+
+    @Override
     public void show(Player player) {
         Objects.requireNonNull(player, "player");
         if (destroyed || !visiblePlayers.add(player)) {
@@ -76,6 +89,16 @@ public class GroupedFakeArmorStand implements ArmorStand {
         }
 
         stands.forEach(stand -> stand.updatePosition(player));
+    }
+
+    @Override
+    public void updateMetadata(Player player) {
+        Objects.requireNonNull(player, "player");
+        if (destroyed || !visiblePlayers.contains(player)) {
+            return;
+        }
+
+        stands.forEach(stand -> stand.updateMetadata(player));
     }
 
     @Override

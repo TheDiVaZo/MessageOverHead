@@ -26,6 +26,8 @@ import me.thedivazo.messageoverhead.vanish.CMIVanishManager;
 import me.thedivazo.messageoverhead.vanish.EssentialsVanishManager;
 import me.thedivazo.messageoverhead.vanish.InvisibilityVanishManager;
 import me.thedivazo.messageoverhead.vanish.SuperVanishManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;

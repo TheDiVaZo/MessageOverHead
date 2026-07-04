@@ -1,20 +1,41 @@
 package me.thedivazo.messageoverhead.util;
 
+import kotlin.collections.CollectionsKt;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class ComponentTextUtil {
     private ComponentTextUtil() {
     }
 
-    public static List<Component> wrapMessage(Component message, int maxLineSize, int maxWordSize) {
-        if (message == null) {
-            throw new IllegalArgumentException("message не может быть null");
+    public static Component join(List<Component> list) {
+        Objects.requireNonNull(list, "list");
+        if (list.isEmpty()) {
+            return Component.empty();
         }
+        return CollectionsKt.reduce(list, (first, second) -> first.append(Component.newline()).append(second));
+    }
+
+    public static List<Component> split(Component component) {
+        if (component == null) {
+            throw new IllegalArgumentException("component cannot be null");
+        }
+
+        List<Component> lines = new ArrayList<>();
+        ComponentLine currentLine = new ComponentLine();
+
+        appendSplit(component, Style.empty(), currentLine, lines);
+        lines.add(currentLine.build());
+        return lines;
+    }
+
+    public static List<Component> wrapMessage(Component message, int maxLineSize, int maxWordSize) {
+        Objects.requireNonNull(message, "message");
 
         if (maxLineSize <= 0) {
             throw new IllegalArgumentException(
@@ -109,6 +130,57 @@ public final class ComponentTextUtil {
         for (Component child : component.children()) {
             appendWords(child, style, currentWord, words);
         }
+    }
+
+    private static void appendSplit(
+            Component component,
+            Style parentStyle,
+            ComponentLine currentLine,
+            List<Component> lines
+    ) {
+        Style style = parentStyle.merge(component.style(), Style.Merge.Strategy.ALWAYS);
+
+        if (component instanceof TextComponent textComponent) {
+            appendSplitContent(textComponent.content(), style, currentLine, lines);
+        }
+
+        for (Component child : component.children()) {
+            appendSplit(child, style, currentLine, lines);
+        }
+    }
+
+    private static void appendSplitContent(
+            String content,
+            Style style,
+            ComponentLine currentLine,
+            List<Component> lines
+    ) {
+        int start = 0;
+
+        for (int index = 0; index < content.length(); index++) {
+            if (content.charAt(index) != '\n') {
+                continue;
+            }
+
+            if (start < index) {
+                currentLine.append(text(content.substring(start, index), style), index - start);
+            }
+
+            lines.add(currentLine.build());
+            currentLine.clear();
+            start = index + 1;
+        }
+
+        if (start < content.length()) {
+            currentLine.append(text(content.substring(start), style), content.length() - start);
+        }
+    }
+
+    private static Component text(String content, Style style) {
+        return Component.text()
+                .content(content)
+                .style(style)
+                .build();
     }
 
     private static void appendContent(
@@ -234,6 +306,11 @@ public final class ComponentTextUtil {
         private void append(ComponentWord word) {
             parts.add(word.build());
             length += word.length();
+        }
+
+        private void append(Component component, int length) {
+            parts.add(component);
+            this.length += length;
         }
 
         private void clear() {
