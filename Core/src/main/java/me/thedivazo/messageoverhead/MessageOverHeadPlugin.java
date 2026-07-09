@@ -15,6 +15,8 @@ import me.thedivazo.messageoverhead.core.component.scope.ScopedFactory;
 import me.thedivazo.messageoverhead.core.event.EventBus;
 import me.thedivazo.messageoverhead.core.event.SimpleEventBus;
 import me.thedivazo.messageoverhead.core.event.SpawnBubbleEvent;
+import me.thedivazo.messageoverhead.core.message.MessageFactory;
+import me.thedivazo.messageoverhead.core.message.WrapMessageFactory;
 import me.thedivazo.messageoverhead.core.tick.BubbleScheduler;
 import me.thedivazo.messageoverhead.core.tick.BukkitBubbleScheduler;
 import me.thedivazo.messageoverhead.profile.BubbleProfile;
@@ -83,7 +85,14 @@ public class MessageOverHeadPlugin extends JavaPlugin {
                 this,
                 ExecutionCoordinator.simpleCoordinator()
         );
-        BubbleTestCommand.register(commandManager, spawnService, DEFAULT_PROFILE_ID);
+
+        MessageFactory messageFactory = new WrapMessageFactory(
+                Component::text,
+                24,
+                18
+
+        );
+        BubbleTestCommand.register(commandManager, spawnService, DEFAULT_PROFILE_ID, messageFactory);
 
         eventBus.subscribe(SpawnBubbleEvent.class, new AnimationUpHandler(spawnService));
 

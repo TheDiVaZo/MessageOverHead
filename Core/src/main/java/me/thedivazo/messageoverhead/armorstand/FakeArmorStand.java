@@ -10,9 +10,9 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
-import me.thedivazo.messageoverhead.core.text.LegacyTextWrapper;
-import me.thedivazo.messageoverhead.core.text.TextWrapper;
+import me.thedivazo.messageoverhead.util.AdventureUtil;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -23,9 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -57,12 +55,13 @@ public final class FakeArmorStand implements ArmorStand {
     private boolean invisible = true;
     private boolean destroyed;
 
-    public static final Factory FACTORY = text -> new FakeArmorStand(text, new Location(null, 0,0,0));
+    public static final Factory FACTORY = (text, version) ->
+            new FakeArmorStand(AdventureUtil.toLegacySectionChar(text, version));
 
-    public FakeArmorStand(String message, Location location) {
+    public FakeArmorStand(String message) {
         this(
                 message,
-                location,
+                new Location(null, 0,0,0),
                 ProtocolLibrary.getProtocolManager(),
                 MessageOverHeadPlugin.SERVER_VERSION
         );
@@ -75,7 +74,7 @@ public final class FakeArmorStand implements ArmorStand {
             MinecraftVersion serverVersion
     ) {
         this.message = Objects.requireNonNull(message, "message");
-        this.location = Objects.requireNonNull(location, "location").clone();
+        this.location = Objects.requireNonNull(location, "location");
         this.protocolManager = Objects.requireNonNull(protocolManager, "protocolManager");
         this.serverVersion = Objects.requireNonNull(serverVersion, "serverVersion");
         this.protocolProfile = ProtocolProfile.forVersion(serverVersion);
@@ -144,12 +143,12 @@ public final class FakeArmorStand implements ArmorStand {
     }
 
     @Override
-    public void setText(String text) {
+    public void setText(Component text) {
         if (destroyed) {
             return;
         }
 
-        this.message = Objects.requireNonNull(text, "text");
+        this.message = AdventureUtil.toLegacySectionChar(Objects.requireNonNull(text, "text"), serverVersion);
     }
 
     private PacketContainer createSpawnPacket() {

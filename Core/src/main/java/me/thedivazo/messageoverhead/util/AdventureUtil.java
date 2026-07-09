@@ -1,9 +1,9 @@
 package me.thedivazo.messageoverhead.util;
 
-import kotlin.collections.CollectionsKt;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.intellij.lang.annotations.RegExp;
 
 import java.util.ArrayList;
@@ -11,6 +11,25 @@ import java.util.List;
 import java.util.Objects;
 
 public enum AdventureUtil {;
+
+    private static final LegacyComponentSerializer LEGACY_SERIALIZER =
+            LegacyComponentSerializer.legacySection();
+    private static final LegacyComponentSerializer RGB_LEGACY_SERIALIZER =
+            LegacyComponentSerializer.builder()
+                    .character(LegacyComponentSerializer.SECTION_CHAR)
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build();
+
+    public static String toLegacySectionChar(Component text, MinecraftVersion serverVersion) {
+        LegacyComponentSerializer serializer =
+                serverVersion.isAtLeast(MinecraftVersion.VERSION_1_16)
+                        ? RGB_LEGACY_SERIALIZER
+                        : LEGACY_SERIALIZER;
+        return serializer.serialize(text);
+    }
+
+    // SPLIT UTILS
 
     public static List<Component> split(Component component, @RegExp String separator) {
         if (component == null) {

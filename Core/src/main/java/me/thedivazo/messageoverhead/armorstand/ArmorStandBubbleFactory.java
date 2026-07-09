@@ -4,9 +4,7 @@ import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.RendererFactory;
-import me.thedivazo.messageoverhead.core.text.PaperComponentWrapper;
 import me.thedivazo.messageoverhead.util.Positionc;
-import org.bukkit.Location;
 
 public class ArmorStandBubbleFactory implements RendererFactory {
 
@@ -19,7 +17,7 @@ public class ArmorStandBubbleFactory implements RendererFactory {
     @Override
     public RendererBubble create(Message message, Positionc positionc) {
         GroupedArmorStand armorStand = new GroupedArmorStand(
-                new PaperComponentWrapper(message.component()),
+                message.lines(),
                 FakeArmorStand.FACTORY,
                 lineSpacing,
                 positionc,

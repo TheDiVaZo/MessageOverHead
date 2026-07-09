@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.armorstand;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.HeightCapability;
@@ -19,7 +20,7 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
 
     private final GroupedArmorStand armorStand;
     private final Position position;
-    private final Set<Viewer> viewers = new HashSet<>();
+    private final Set<Viewer> viewers = new ObjectOpenHashSet<>();
 
     private boolean destroyed;
 
@@ -51,7 +52,8 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
 
     @Override
     public void updateAll() {
-        viewers.forEach(viewer -> armorStand.updatePosition(viewer.getPlayer()));
+        viewers.forEach(viewer -> armorStand.update(viewer.getPlayer()));
+        armorStand.endPlayersUpdate();
     }
 
     @Override

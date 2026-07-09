@@ -1,6 +1,7 @@
 package me.thedivazo.messageoverhead.armorstand;
 
-import me.thedivazo.messageoverhead.core.text.LegacyTextWrapper;
+import me.thedivazo.messageoverhead.util.MinecraftVersion;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public interface ArmorStand {
@@ -16,8 +17,8 @@ public interface ArmorStand {
 
     void setPosition(double x, double y, double z);
 
-    void setText(String legacyColoredText);
+    void setText(Component v);
     interface Factory {
-        ArmorStand create(String legacyColoredText);
+        ArmorStand create(Component c, MinecraftVersion serverVersion);
     }
 }
