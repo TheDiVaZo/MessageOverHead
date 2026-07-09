@@ -9,7 +9,7 @@ import me.thedivazo.messageoverhead.util.Position;
 import me.thedivazo.messageoverhead.util.Positionc;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Armor stand implementation of the bubble renderer contracts.
@@ -17,12 +17,13 @@ import java.util.Objects;
 public final class BubbleArmorStand implements RendererBubble, PositionCapability, ViewCapability, HeightCapability {
     private static final double HOLOGRAM_LINE_HEIGHT = 0.289;
 
-    private final GroupedFakeArmorStand armorStand;
+    private final GroupedArmorStand armorStand;
     private final Position position;
+    private final Set<Viewer> viewers = new HashSet<>();
 
     private boolean destroyed;
 
-    public BubbleArmorStand(GroupedFakeArmorStand armorStand, Positionc positionc) {
+    public BubbleArmorStand(GroupedArmorStand armorStand, Positionc positionc) {
         Objects.requireNonNull(positionc, "positionc");
         this.armorStand = armorStand;
         this.position = new Position(positionc);
@@ -32,7 +33,9 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
     public void show(Viewer player) {
         Objects.requireNonNull(player, "player");
         ensureActive();
-        armorStand.show(player.getPlayer());
+        if (viewers.add(player)) {
+            armorStand.show(player.getPlayer());
+        }
     }
 
     @Override
@@ -41,16 +44,19 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
         if (destroyed) {
             return;
         }
-        armorStand.hide(player.getPlayer());
+        if (viewers.remove(player)) {
+            armorStand.hide(player.getPlayer());
+        }
     }
 
     @Override
-    public void update(Viewer player) {
-        Objects.requireNonNull(player, "player");
-        if (destroyed) {
-            return;
-        }
-        armorStand.updatePosition(player.getPlayer());
+    public void updateAll() {
+        viewers.forEach(viewer -> armorStand.updatePosition(viewer.getPlayer()));
+    }
+
+    @Override
+    public Collection<Viewer> viewers() {
+        return Collections.unmodifiableSet(viewers);
     }
 
     @Override

@@ -10,6 +10,8 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
+import me.thedivazo.messageoverhead.core.text.LegacyTextWrapper;
+import me.thedivazo.messageoverhead.core.text.TextWrapper;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -44,7 +46,6 @@ public final class FakeArmorStand implements ArmorStand {
     private final ProtocolManager protocolManager;
     private final MinecraftVersion serverVersion;
     private final ProtocolProfile protocolProfile;
-    private final Set<Player> visiblePlayers = Collections.newSetFromMap(new WeakHashMap<>());
     private String message;
     private final int entityId;
     private final UUID entityUuid;
@@ -55,6 +56,8 @@ public final class FakeArmorStand implements ArmorStand {
     private boolean marker = true;
     private boolean invisible = true;
     private boolean destroyed;
+
+    public static final Factory FACTORY = text -> new FakeArmorStand(text, new Location(null, 0,0,0));
 
     public FakeArmorStand(String message, Location location) {
         this(
@@ -87,7 +90,6 @@ public final class FakeArmorStand implements ArmorStand {
             return;
         }
 
-        visiblePlayers.add(player);
         protocolManager.sendServerPacket(player, createSpawnPacket());
         protocolManager.sendServerPacket(player, createMetadataPacket());
     }
@@ -104,8 +106,7 @@ public final class FakeArmorStand implements ArmorStand {
 
     @Override
     public void updateMetadata(Player player) {
-        Objects.requireNonNull(player, "player");
-        if (destroyed || !visiblePlayers.contains(player)) {
+        if (destroyed) {
             return;
         }
 
@@ -119,7 +120,6 @@ public final class FakeArmorStand implements ArmorStand {
             return;
         }
 
-        visiblePlayers.remove(player);
         protocolManager.sendServerPacket(player, createDestroyPacket());
     }
 
@@ -130,7 +130,6 @@ public final class FakeArmorStand implements ArmorStand {
         }
 
         destroyed = true;
-        visiblePlayers.clear();
     }
 
     @Override

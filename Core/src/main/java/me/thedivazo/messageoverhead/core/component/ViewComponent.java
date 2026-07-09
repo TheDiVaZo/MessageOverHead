@@ -8,15 +8,10 @@ import me.thedivazo.messageoverhead.core.component.scope.ComponentScoped;
 import me.thedivazo.messageoverhead.core.component.scope.ScopedFactory;
 import me.thedivazo.messageoverhead.core.render.capability.ViewCapability;
 import me.thedivazo.messageoverhead.util.Positionc;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 @MainThread
@@ -37,8 +32,6 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     private final ActiveBubble activeBubble;
     private final ViewCapability viewCapability;
     private final Map<String, ComponentScoped<ViewState>> components = new LinkedHashMap<>();
-    private final List<Viewer> visiblePlayers = new ArrayList<>();
-    private final List<Viewer> visiblePlayersView = Collections.unmodifiableList(visiblePlayers);
 
     private final ViewState cachedViewState = new ViewState();
 
@@ -62,12 +55,12 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
         return settings.updateIntervalTicks();
     }
 
-    public List<Viewer> visiblePlayers() {
-        return visiblePlayersView;
+    public Collection<Viewer> visiblePlayers() {
+        return viewCapability.viewers();
     }
 
     public boolean isVisible(Viewer player) {
-        return visiblePlayers.contains(player);
+        return viewCapability.viewers().contains(player);
     }
 
     @Override
@@ -131,10 +124,9 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
     @Override
     public void onTick() {
         if (activeBubble.ageTicks() % settings.updateIntervalTicks() != 0) {
-            visiblePlayers.forEach(viewCapability::update);
+            viewCapability.updateAll();
             return;
         }
-
         List<Viewer> nextVisiblePlayers = new ArrayList<>();
         Positionc bubblePosition = activeBubble.author().getPosition();
 
@@ -144,29 +136,29 @@ public class ViewComponent implements BubbleScopeComponent<ViewComponent.ViewSta
             }
 
             nextVisiblePlayers.add(player);
-            if (visiblePlayers.contains(player)) {
-                viewCapability.update(player);
-            } else {
+            if (!viewCapability.viewers().contains(player)) {
                 viewCapability.show(player);
             }
         }
 
-        for (Viewer player : visiblePlayers) {
+        List<Viewer> viewers = List.copyOf(viewCapability.viewers());
+        for (int i = 0; i < viewers.size(); i++) {
+            Viewer player = viewers.get(i);
             if (!nextVisiblePlayers.contains(player)) {
                 viewCapability.hide(player);
             }
         }
 
-        visiblePlayers.clear();
-        visiblePlayers.addAll(nextVisiblePlayers);
+        viewCapability.updateAll();
     }
 
     @Override
     public void onDetached() {
-        for (Viewer player : visiblePlayers) {
+        List<Viewer> viewers = List.copyOf(viewCapability.viewers());
+        for (int i = 0; i < viewers.size(); i++) {
+            Viewer player = viewers.get(i);
             viewCapability.hide(player);
         }
-        visiblePlayers.clear();
         detachAllScoped();
     }
 

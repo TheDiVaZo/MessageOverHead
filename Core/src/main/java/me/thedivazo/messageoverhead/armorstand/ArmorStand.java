@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead.armorstand;
 
+import me.thedivazo.messageoverhead.core.text.LegacyTextWrapper;
 import org.bukkit.entity.Player;
 
 public interface ArmorStand {
@@ -15,5 +16,8 @@ public interface ArmorStand {
 
     void setPosition(double x, double y, double z);
 
-    void setText(String text);
+    void setText(String legacyColoredText);
+    interface Factory {
+        ArmorStand create(String legacyColoredText);
+    }
 }

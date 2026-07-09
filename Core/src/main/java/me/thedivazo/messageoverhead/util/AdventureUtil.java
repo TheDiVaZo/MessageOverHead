@@ -4,24 +4,15 @@ import kotlin.collections.CollectionsKt;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
+import org.intellij.lang.annotations.RegExp;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public final class ComponentTextUtil {
-    private ComponentTextUtil() {
-    }
+public enum AdventureUtil {;
 
-    public static Component join(List<Component> list) {
-        Objects.requireNonNull(list, "list");
-        if (list.isEmpty()) {
-            return Component.empty();
-        }
-        return CollectionsKt.reduce(list, (first, second) -> first.append(Component.newline()).append(second));
-    }
-
-    public static List<Component> split(Component component) {
+    public static List<Component> split(Component component, @RegExp String separator) {
         if (component == null) {
             throw new IllegalArgumentException("component cannot be null");
         }
@@ -29,7 +20,7 @@ public final class ComponentTextUtil {
         List<Component> lines = new ArrayList<>();
         ComponentLine currentLine = new ComponentLine();
 
-        appendSplit(component, Style.empty(), currentLine, lines);
+        appendSplit(component, Style.empty(), currentLine, lines, separator);
         lines.add(currentLine.build());
         return lines;
     }
@@ -136,16 +127,17 @@ public final class ComponentTextUtil {
             Component component,
             Style parentStyle,
             ComponentLine currentLine,
-            List<Component> lines
+            List<Component> lines,
+            String separator
     ) {
         Style style = parentStyle.merge(component.style(), Style.Merge.Strategy.ALWAYS);
 
         if (component instanceof TextComponent textComponent) {
-            appendSplitContent(textComponent.content(), style, currentLine, lines);
+            appendSplitContent(textComponent.content(), style, currentLine, lines, separator);
         }
 
         for (Component child : component.children()) {
-            appendSplit(child, style, currentLine, lines);
+            appendSplit(child, style, currentLine, lines, separator);
         }
     }
 
@@ -153,26 +145,22 @@ public final class ComponentTextUtil {
             String content,
             Style style,
             ComponentLine currentLine,
-            List<Component> lines
+            List<Component> lines,
+            String separator
     ) {
-        int start = 0;
+        String[] parts = content.split(separator, -1);
 
-        for (int index = 0; index < content.length(); index++) {
-            if (content.charAt(index) != '\n') {
-                continue;
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+
+            if (!part.isEmpty()) {
+                currentLine.append(text(part, style), part.length());
             }
 
-            if (start < index) {
-                currentLine.append(text(content.substring(start, index), style), index - start);
+            if (i < parts.length - 1) {
+                lines.add(currentLine.build());
+                currentLine.clear();
             }
-
-            lines.add(currentLine.build());
-            currentLine.clear();
-            start = index + 1;
-        }
-
-        if (start < content.length()) {
-            currentLine.append(text(content.substring(start), style), content.length() - start);
         }
     }
 
