@@ -9,7 +9,6 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
-import me.thedivazo.messageoverhead.MessageOverHeadPlugin;
 import me.thedivazo.messageoverhead.util.AdventureUtil;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import net.kyori.adventure.text.Component;
@@ -56,14 +55,14 @@ public final class FakeArmorStand implements ArmorStand {
     private boolean destroyed;
 
     public static final Factory FACTORY = (text, version) ->
-            new FakeArmorStand(AdventureUtil.toLegacySectionChar(text, version));
+            new FakeArmorStand(AdventureUtil.toLegacySectionChar(text, version), version);
 
-    public FakeArmorStand(String message) {
+    public FakeArmorStand(String message, MinecraftVersion version) {
         this(
                 message,
                 new Location(null, 0,0,0),
                 ProtocolLibrary.getProtocolManager(),
-                MessageOverHeadPlugin.SERVER_VERSION
+                version
         );
     }
 

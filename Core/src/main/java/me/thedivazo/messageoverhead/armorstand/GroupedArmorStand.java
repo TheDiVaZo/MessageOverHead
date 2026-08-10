@@ -1,13 +1,11 @@
 package me.thedivazo.messageoverhead.armorstand;
 
-import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import me.thedivazo.messageoverhead.util.MinecraftVersion;
 import me.thedivazo.messageoverhead.util.Position;
 import me.thedivazo.messageoverhead.util.Positionc;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -16,7 +14,9 @@ public class GroupedArmorStand {
     private final ArmorStand.Factory factory;
     private final LineLayout layout;
 
-    private final Int2ObjectSortedMap<ArmorStand> actualStands = new Int2ObjectAVLTreeMap<>(Integer::compareTo);
+    private final List<ArmorStand> linesStands = new ArrayList<>();
+    private final List<Component> linesTexts = new ArrayList<>();
+    private final List<Component> unmodifiableLines = Collections.unmodifiableList(linesTexts);
     private final Set<ArmorStandAction> actionInNextUpdate = new ObjectLinkedOpenHashSet<>();
 
     private final Position position;
@@ -34,11 +34,11 @@ public class GroupedArmorStand {
         this.position = new Position(Objects.requireNonNull(position, "position"));
         this.serverVersion = Objects.requireNonNull(serverVersion, "serverVersion");
 
-        setLines(Objects.requireNonNull(text, "text"));
+        initializeLines(text);
     }
 
     public int countLines() {
-        return actualStands.size();
+        return linesStands.size();
     }
 
     public double getLineSpacing() {
@@ -60,7 +60,10 @@ public class GroupedArmorStand {
         if (destroyed) {
             return;
         }
-        actualStands.values().forEach(stand -> stand.show(player));
+        for (int i = 0; i < linesStands.size(); i++) {
+            ArmorStand stand = linesStands.get(i);
+            stand.show(player);
+        }
     }
 
     public void hide(Player player) {
@@ -68,51 +71,130 @@ public class GroupedArmorStand {
         if (destroyed) {
             return;
         }
-        actualStands.values().forEach(stand -> stand.hide(player));
+        for (int i = 0; i < linesStands.size(); i++) {
+            ArmorStand stand = linesStands.get(i);
+            stand.hide(player);
+        }
     }
 
     public void updatePosition(Player player) {
-        actualStands.values().forEach(stand -> stand.updatePosition(player));
+        for (int i = 0; i < linesStands.size(); i++) {
+            ArmorStand stand = linesStands.get(i);
+            stand.updatePosition(player);
+        }
     }
 
-    public void setText(List<Component> lines) {
-        int size = lines.size();
-        Iterator<Int2ObjectMap.Entry<ArmorStand>> iterator = actualStands.int2ObjectEntrySet().iterator();
-        while (iterator.hasNext()) {
-            Int2ObjectMap.Entry<ArmorStand> entry = iterator.next();
-            if (entry.getIntKey() >= size) {
-                actionInNextUpdate.add(ArmorStandAction.remove(entry.getValue()));
-                iterator.remove();
-            }
-        }
-        setLines(lines);
+    public List<Component> getLines() {
+        return unmodifiableLines;
     }
-    private void setLines(List<Component> lines) {
+
+    public Component getLine(int index) {
+        return linesTexts.get(index);
+    }
+
+    public void setLines(List<Component> lines) {
+        ensureActive();
+
+        List<Component> nextLines = copyLines(lines);
+        int sharedLineCount = Math.min(linesStands.size(), nextLines.size());
+
+        for (int i = 0; i < sharedLineCount; i++) {
+            updateLineInternal(i, nextLines.get(i));
+        }
+
+        for (int i = linesStands.size(); i < nextLines.size(); i++) {
+            addLineInternal(i, nextLines.get(i));
+        }
+
+        for (int i = linesStands.size() - 1; i >= nextLines.size(); i--) {
+            removeLineInternal(i);
+        }
+
+        recalculatePosition();
+    }
+
+    public void setLine(int index, Component line) {
+        ensureActive();
+
+        updateLineInternal(index, line);
+        recalculatePosition();
+    }
+
+    public void insertLine(int index, Component line) {
+        ensureActive();
+
+        addLineInternal(index, line);
+        recalculatePosition();
+    }
+
+    public Component removeLine(int index) {
+        ensureActive();
+
+        Component removedLine = removeLineInternal(index);
+        recalculatePosition();
+        return removedLine;
+    }
+
+    public void addLine(Component line) {
+        insertLine(linesStands.size(), line);
+    }
+
+    private void ensureActive() {
+        if (destroyed) {
+            throw new IllegalStateException("Grouped armor stand has already been destroyed");
+        }
+    }
+
+    private void initializeLines(List<Component> lines) {
+        List<Component> initialLines = copyLines(lines);
+        for (int i = 0; i < initialLines.size(); i++) {
+            Component line = initialLines.get(i);
+            linesTexts.add(line);
+            linesStands.add(factory.create(line, serverVersion));
+        }
+        recalculatePosition();
+    }
+
+    private void addLineInternal(int index, Component line) {
+        Objects.requireNonNull(line, "line");
+        if (index < 0 || index > linesStands.size()) {
+            throw new IndexOutOfBoundsException("invalid index: " + index + ", actual size: " + linesStands.size());
+        }
+
+        ArmorStand stand = factory.create(line, serverVersion);
+        linesStands.add(index, stand);
+        linesTexts.add(index, line);
+        actionInNextUpdate.add(ArmorStandAction.add(stand));
+    }
+
+    private Component removeLineInternal(int index) {
+        Component removedLine = linesTexts.remove(index);
+        ArmorStand stand = linesStands.remove(index);
+        actionInNextUpdate.add(ArmorStandAction.remove(stand));
+        return removedLine;
+    }
+
+    private void updateLineInternal(int index, Component line) {
+        Objects.requireNonNull(line, "line");
+        Component previousLine = linesTexts.get(index);
+        if (Objects.equals(previousLine, line)) {
+            linesTexts.set(index, line);
+            return;
+        }
+
+        ArmorStand stand = linesStands.get(index);
+        stand.setText(line);
+        linesTexts.set(index, line);
+        actionInNextUpdate.add(ArmorStandAction.update(stand));
+    }
+
+    private static List<Component> copyLines(List<Component> lines) {
+        Objects.requireNonNull(lines, "lines");
+        List<Component> copy = new ArrayList<>(lines.size());
         for (int i = 0; i < lines.size(); i++) {
-            setLine(i, lines.get(i));
+            copy.add(Objects.requireNonNull(lines.get(i), "lines[" + i + "]"));
         }
-        recalculatePosition();
-    }
-    public void setText(int number, @Nullable Component line) {
-        setLine(number, line);
-        recalculatePosition();
-    }
-    private void setLine(int number, @Nullable Component line) {
-        if (number < 0) throw new IllegalArgumentException("number < 0");
-
-        ArmorStand prevArmorStand = actualStands.get(number);
-        if (prevArmorStand != null && line == null) {
-            actionInNextUpdate.add(ArmorStandAction.remove(prevArmorStand));
-        }
-        else if (prevArmorStand != null) {
-            prevArmorStand.setText(line);
-            actionInNextUpdate.add(ArmorStandAction.update(prevArmorStand));
-        }
-        else if (line != null) {
-            ArmorStand stand = factory.create(line, serverVersion);
-            actualStands.put(number, stand);
-            actionInNextUpdate.add(ArmorStandAction.add(stand));
-        }
+        return copy;
     }
 
     public void update(Player player) {
@@ -120,7 +202,7 @@ public class GroupedArmorStand {
         actionInNextUpdate.forEach(actionStand -> actionStand.execute(player));
     }
 
-    public void endPlayersUpdate() {
+    public void onEndPlayersUpdate() {
         actionInNextUpdate.clear();
     }
 
@@ -130,19 +212,25 @@ public class GroupedArmorStand {
         }
 
         destroyed = true;
-        actualStands.values().forEach(ArmorStand::destroy);
+        for (int i = 0; i < linesStands.size(); i++) {
+            ArmorStand actualStand = linesStands.get(i);
+            actualStand.destroy();
+        }
+        actionInNextUpdate.clear();
+        linesStands.clear();
+        linesTexts.clear();
     }
 
     private void recalculatePosition() {
-        if (actualStands.isEmpty()) {
+        if (linesStands.isEmpty()) {
             return;
         }
 
-        int lastIndex = actualStands.lastIntKey();
-        actualStands.int2ObjectEntrySet().forEach(entry -> {
-            Position linePosition = layout.positionForLine(position, lastIndex, entry.getIntKey());
-            entry.getValue().setPosition(linePosition.x, linePosition.y, linePosition.z);
-        });
+        for (int i = linesStands.size() - 1; i >= 0; i--) {
+            ArmorStand actualStand = linesStands.get(i);
+            Position linePosition = layout.positionForLine(position, linesStands.size() - 1, i);
+            actualStand.setPosition(linePosition.x, linePosition.y, linePosition.z);
+        }
     }
 
     private record ArmorStandAction(Action action, ArmorStand stand) {

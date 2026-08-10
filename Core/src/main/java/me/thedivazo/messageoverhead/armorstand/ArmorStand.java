@@ -17,7 +17,8 @@ public interface ArmorStand {
 
     void setPosition(double x, double y, double z);
 
-    void setText(Component v);
+    void setText(Component text);
+
     interface Factory {
         ArmorStand create(Component c, MinecraftVersion serverVersion);
     }

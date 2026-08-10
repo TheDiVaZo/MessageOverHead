@@ -5,9 +5,11 @@ import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.HeightCapability;
 import me.thedivazo.messageoverhead.core.render.capability.PositionCapability;
+import me.thedivazo.messageoverhead.core.render.capability.TextCapability;
 import me.thedivazo.messageoverhead.core.render.capability.ViewCapability;
 import me.thedivazo.messageoverhead.util.Position;
 import me.thedivazo.messageoverhead.util.Positionc;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -15,7 +17,7 @@ import java.util.*;
 /**
  * Armor stand implementation of the bubble renderer contracts.
  */
-public final class BubbleArmorStand implements RendererBubble, PositionCapability, ViewCapability, HeightCapability {
+public final class BubbleArmorStand implements RendererBubble, PositionCapability, ViewCapability, HeightCapability, TextCapability {
     private static final double HOLOGRAM_LINE_HEIGHT = 0.289;
 
     private final GroupedArmorStand armorStand;
@@ -53,12 +55,14 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
     @Override
     public void updateAll() {
         viewers.forEach(viewer -> armorStand.update(viewer.getPlayer()));
-        armorStand.endPlayersUpdate();
+        armorStand.onEndPlayersUpdate();
     }
+
+    private final Collection<Viewer> unmodifiableViewers = Collections.unmodifiableCollection(viewers);
 
     @Override
     public Collection<Viewer> viewers() {
-        return Collections.unmodifiableSet(viewers);
+        return unmodifiableViewers;
     }
 
     @Override
@@ -101,5 +105,45 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
     @Override
     public double getHeight() {
         return (Math.max(0, armorStand.countLines()-1)*armorStand.getLineSpacing()) + HOLOGRAM_LINE_HEIGHT;
+    }
+
+    @Override
+    public Component getLine(int index) {
+        return armorStand.getLine(index);
+    }
+
+    @Override
+    public List<Component> getLines() {
+        return armorStand.getLines();
+    }
+
+    @Override
+    public void setLines(List<Component> components) {
+        ensureActive();
+        armorStand.setLines(components);
+    }
+
+    @Override
+    public void insertLine(int index, Component component) {
+        ensureActive();
+        armorStand.insertLine(index, component);
+    }
+
+    @Override
+    public Component removeLine(int index) {
+        ensureActive();
+        return armorStand.removeLine(index);
+    }
+
+    @Override
+    public void setLine(int index, Component component) {
+        ensureActive();
+        armorStand.setLine(index, component);
+    }
+
+    @Override
+    public void addLine(Component component) {
+        ensureActive();
+        armorStand.addLine(component);
     }
 }

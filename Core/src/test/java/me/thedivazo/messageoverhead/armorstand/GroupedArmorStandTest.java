@@ -23,7 +23,7 @@ class GroupedArmorStandTest {
                 List.of(Component.text("top"), Component.text("bottom")),
                 (component, version) -> {
                     assertSame(serverVersion, version);
-                    CapturingArmorStand stand = new CapturingArmorStand();
+                    CapturingArmorStand stand = new CapturingArmorStand(component);
                     stands.add(stand);
                     return stand;
                 },
@@ -46,13 +46,117 @@ class GroupedArmorStandTest {
     void acceptsEmptyLineList() {
         GroupedArmorStand groupedArmorStand = assertDoesNotThrow(() -> new GroupedArmorStand(
                 List.of(),
-                (component, version) -> new CapturingArmorStand(),
+                (component, version) -> new CapturingArmorStand(component),
                 0.25,
                 new Position(1.0, 5.0, 2.0),
                 MinecraftVersion.VERSION_1_19_3
         ));
 
         assertEquals(0, groupedArmorStand.countLines());
+    }
+
+    @Test
+    void supportsLiveLineEditsAndKeepsTextSnapshotSynchronized() {
+        List<CapturingArmorStand> stands = new ArrayList<>();
+        GroupedArmorStand groupedArmorStand = groupedArmorStand(
+                List.of(Component.text("one"), Component.text("two")),
+                stands
+        );
+
+        Component updated = Component.text("updated");
+        Component added = Component.text("three");
+
+        groupedArmorStand.setLine(1, updated);
+        groupedArmorStand.addLine(added);
+        Component removed = groupedArmorStand.removeLine(0);
+
+        assertEquals(Component.text("one"), removed);
+        assertEquals(List.of(updated, added), groupedArmorStand.getLines());
+        assertEquals(2, groupedArmorStand.countLines());
+        assertEquals(updated, stands.get(1).text);
+        assertEquals(added, stands.get(2).text);
+    }
+
+    @Test
+    void replacesAllLinesByGrowingAndShrinkingStandList() {
+        List<CapturingArmorStand> stands = new ArrayList<>();
+        GroupedArmorStand groupedArmorStand = groupedArmorStand(
+                List.of(Component.text("one")),
+                stands
+        );
+
+        groupedArmorStand.setLines(List.of(
+                Component.text("alpha"),
+                Component.text("beta"),
+                Component.text("gamma")
+        ));
+
+        assertEquals(3, groupedArmorStand.countLines());
+        assertEquals(List.of(
+                Component.text("alpha"),
+                Component.text("beta"),
+                Component.text("gamma")
+        ), groupedArmorStand.getLines());
+        assertEquals(3, stands.size());
+
+        groupedArmorStand.update(null);
+        groupedArmorStand.onEndPlayersUpdate();
+
+        groupedArmorStand.setLines(List.of(Component.text("final")));
+        groupedArmorStand.update(null);
+
+        assertEquals(1, groupedArmorStand.countLines());
+        assertEquals(List.of(Component.text("final")), groupedArmorStand.getLines());
+        assertEquals(1, stands.get(1).hideCount);
+        assertEquals(1, stands.get(2).hideCount);
+    }
+
+    @Test
+    void queuesLiveEditActionsUntilEndOfPlayersUpdate() {
+        List<CapturingArmorStand> stands = new ArrayList<>();
+        GroupedArmorStand groupedArmorStand = groupedArmorStand(
+                List.of(Component.text("one")),
+                stands
+        );
+
+        groupedArmorStand.update(null);
+        assertEquals(0, stands.get(0).showCount);
+        assertEquals(0, stands.get(0).metadataUpdateCount);
+
+        groupedArmorStand.setLine(0, Component.text("two"));
+        groupedArmorStand.update(null);
+        assertEquals(1, stands.get(0).metadataUpdateCount);
+
+        groupedArmorStand.onEndPlayersUpdate();
+        groupedArmorStand.update(null);
+        assertEquals(1, stands.get(0).metadataUpdateCount);
+
+        groupedArmorStand.addLine(Component.text("three"));
+        CapturingArmorStand addedStand = stands.get(1);
+        groupedArmorStand.update(null);
+        assertEquals(1, addedStand.showCount);
+
+        groupedArmorStand.onEndPlayersUpdate();
+        groupedArmorStand.removeLine(1);
+        groupedArmorStand.update(null);
+        assertEquals(1, addedStand.hideCount);
+    }
+
+    private static GroupedArmorStand groupedArmorStand(
+            List<Component> lines,
+            List<CapturingArmorStand> stands
+    ) {
+        return new GroupedArmorStand(
+                lines,
+                (component, version) -> {
+                    CapturingArmorStand stand = new CapturingArmorStand(component);
+                    stands.add(stand);
+                    return stand;
+                },
+                0.25,
+                new Position(1.0, 5.0, 2.0),
+                MinecraftVersion.VERSION_1_19_3
+        );
     }
 
     private static void assertPosition(CapturingArmorStand stand, double x, double y, double z) {
@@ -65,9 +169,18 @@ class GroupedArmorStandTest {
         private double x;
         private double y;
         private double z;
+        private Component text;
+        private int showCount;
+        private int hideCount;
+        private int metadataUpdateCount;
+
+        private CapturingArmorStand(Component text) {
+            this.text = text;
+        }
 
         @Override
         public void show(Player player) {
+            showCount++;
         }
 
         @Override
@@ -76,10 +189,12 @@ class GroupedArmorStandTest {
 
         @Override
         public void updateMetadata(Player player) {
+            metadataUpdateCount++;
         }
 
         @Override
         public void hide(Player player) {
+            hideCount++;
         }
 
         @Override
@@ -94,7 +209,8 @@ class GroupedArmorStandTest {
         }
 
         @Override
-        public void setText(Component v) {
+        public void setText(Component text) {
+            this.text = text;
         }
     }
 }

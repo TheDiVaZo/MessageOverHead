@@ -2,10 +2,14 @@ package me.thedivazo.messageoverhead.core.render.capability;
 
 import net.kyori.adventure.text.Component;
 
-public interface TextCapability {
-    Component text();
+import java.util.List;
 
-    interface Editable extends TextCapability {
-        void setText(Component text);
-    }
+public interface TextCapability {
+    Component getLine(int index);
+    List<Component> getLines();
+    void setLines(List<Component> components);
+    void insertLine(int index, Component component);
+    Component removeLine(int index);
+    void setLine(int index, Component component);
+    void addLine(Component component);
 }

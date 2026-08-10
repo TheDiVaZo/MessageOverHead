@@ -23,6 +23,6 @@ public class WrapMessageFactory implements MessageFactory {
     @Override
     public Message create(Author author, String message) {
         Component text = deserializer.apply(message);
-        return new Message(text, AdventureUtil.wrapMessage(text, maxLineSize, maxWorldSize));
+        return new Message(AdventureUtil.wrapMessage(text, maxLineSize, maxWorldSize));
     }
 }
