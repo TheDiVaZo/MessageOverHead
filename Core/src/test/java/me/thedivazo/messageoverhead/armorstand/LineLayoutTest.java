@@ -8,19 +8,37 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LineLayoutTest {
     @Test
-    void calculatesLinePositionRelativeToBasePosition() {
+    void placesSingleLineAtBasePosition() {
         GroupedArmorStand.LineLayout layout = new GroupedArmorStand.LineLayout(0.25);
-        Position position = layout.positionForLine(new Position(1.0, 5.0, 2.0), 1, 0);
+        Position position = layout.positionForLine(new Position(1.0, 5.0, 2.0), 0, 0);
 
         assertPosition(position, 1.0, 5.0, 2.0);
     }
 
     @Test
-    void appliesSpacingForLowerLines() {
+    void placesBottomLineAtBasePosition() {
         GroupedArmorStand.LineLayout layout = new GroupedArmorStand.LineLayout(0.25);
         Position position = layout.positionForLine(new Position(1.0, 5.0, 2.0), 1, 1);
 
-        assertPosition(position, 1.0, 4.75, 2.0);
+        assertPosition(position, 1.0, 5.0, 2.0);
+    }
+
+    @Test
+    void stacksHigherLinesAboveBasePosition() {
+        GroupedArmorStand.LineLayout layout = new GroupedArmorStand.LineLayout(0.25);
+
+        assertPosition(
+                layout.positionForLine(new Position(1.0, 5.0, 2.0), 2, 0),
+                1.0, 5.5, 2.0
+        );
+        assertPosition(
+                layout.positionForLine(new Position(1.0, 5.0, 2.0), 2, 1),
+                1.0, 5.25, 2.0
+        );
+        assertPosition(
+                layout.positionForLine(new Position(1.0, 5.0, 2.0), 2, 2),
+                1.0, 5.0, 2.0
+        );
     }
 
     @Test

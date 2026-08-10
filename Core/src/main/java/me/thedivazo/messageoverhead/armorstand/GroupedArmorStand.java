@@ -286,7 +286,7 @@ public class GroupedArmorStand {
         }
 
         private double yOffset(int lastLineIndex, int lineIndex) {
-            return lineSpacing * (lastLineIndex - lineIndex - 1);
+            return lineSpacing * (lastLineIndex - lineIndex);
         }
     }
 }

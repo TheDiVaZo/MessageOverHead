@@ -33,13 +33,13 @@ class GroupedArmorStandTest {
         );
 
         assertEquals(2, groupedArmorStand.countLines());
-        assertPosition(stands.get(0), 1.0, 5.0, 2.0);
-        assertPosition(stands.get(1), 1.0, 4.75, 2.0);
+        assertPosition(stands.get(0), 1.0, 5.25, 2.0);
+        assertPosition(stands.get(1), 1.0, 5.0, 2.0);
 
         groupedArmorStand.setPosition(3.0, 7.0, 4.0);
 
-        assertPosition(stands.get(0), 3.0, 7.0, 4.0);
-        assertPosition(stands.get(1), 3.0, 6.75, 4.0);
+        assertPosition(stands.get(0), 3.0, 7.25, 4.0);
+        assertPosition(stands.get(1), 3.0, 7.0, 4.0);
     }
 
     @Test
