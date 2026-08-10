@@ -38,7 +38,7 @@ public class GroupedArmorStand {
     }
 
     public int countLines() {
-        return linesStands.size();
+        return linesTexts.size();
     }
 
     public double getLineSpacing() {

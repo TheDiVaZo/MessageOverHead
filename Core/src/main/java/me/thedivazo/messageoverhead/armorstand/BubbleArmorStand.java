@@ -1,6 +1,7 @@
 package me.thedivazo.messageoverhead.armorstand;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import me.thedivazo.messageoverhead.core.Message;
 import me.thedivazo.messageoverhead.core.Viewer;
 import me.thedivazo.messageoverhead.core.render.RendererBubble;
 import me.thedivazo.messageoverhead.core.render.capability.HeightCapability;
@@ -20,13 +21,15 @@ import java.util.*;
 public final class BubbleArmorStand implements RendererBubble, PositionCapability, ViewCapability, HeightCapability, TextCapability {
     private static final double HOLOGRAM_LINE_HEIGHT = 0.289;
 
+    private final Message message;
     private final GroupedArmorStand armorStand;
     private final Position position;
     private final Set<Viewer> viewers = new ObjectOpenHashSet<>();
 
     private boolean destroyed;
 
-    public BubbleArmorStand(GroupedArmorStand armorStand, Positionc positionc) {
+    public BubbleArmorStand(Message message, GroupedArmorStand armorStand, Positionc positionc) {
+        this.message = message;
         Objects.requireNonNull(positionc, "positionc");
         this.armorStand = armorStand;
         this.position = new Position(positionc);
@@ -104,7 +107,7 @@ public final class BubbleArmorStand implements RendererBubble, PositionCapabilit
 
     @Override
     public double getHeight() {
-        return (Math.max(0, armorStand.countLines()-1)*armorStand.getLineSpacing()) + HOLOGRAM_LINE_HEIGHT;
+        return (Math.max(0, message.lines().size()-1)*armorStand.getLineSpacing()) + HOLOGRAM_LINE_HEIGHT;
     }
 
     @Override

@@ -23,6 +23,6 @@ public class ArmorStandBubbleFactory implements RendererFactory {
                 positionc,
                 MessageOverHeadPlugin.SERVER_VERSION
         );
-        return new BubbleArmorStand(armorStand, positionc);
+        return new BubbleArmorStand(message, armorStand, positionc);
     }
 }

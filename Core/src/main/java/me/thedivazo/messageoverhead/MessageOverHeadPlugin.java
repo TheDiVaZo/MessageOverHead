@@ -1,5 +1,6 @@
 package me.thedivazo.messageoverhead;
 
+import me.thedivazo.messageoverhead.animation.AnimationTypingTextComponentScoped;
 import me.thedivazo.messageoverhead.animation.AnimationUpHandler;
 import me.thedivazo.messageoverhead.api.ComponentService;
 import me.thedivazo.messageoverhead.api.ProfileService;
@@ -108,17 +109,23 @@ public class MessageOverHeadPlugin extends JavaPlugin {
         Map<String, ScopedFactory<Position>> positionScopedFactories = new LinkedHashMap<>();
         positionScopedFactories.put(
                 OffsetComponentScoped.DEFAULT_SCOPED_ID,
-                OffsetComponentScoped.factory(0, 2.5, 0)
+                OffsetComponentScoped.factory(0, 2.2, 0)
         );
-
         componentFactories.put(
                 PositionComponent.key(),
                 PositionComponent.factory(positionScopedFactories)
         );
+
+        Map<String, ScopedFactory<TextComponent.TextState>> textScopedFactories = new LinkedHashMap<>();
+        textScopedFactories.put(
+                AnimationTypingTextComponentScoped.DEFAULT_SCOPED_ID,
+                AnimationTypingTextComponentScoped.factory(new AnimationTypingTextComponentScoped.Settings(1))
+        );
         componentFactories.put(
                 TextComponent.key(),
-                TextComponent.factory()
+                TextComponent.factory(textScopedFactories)
         );
+
         Map<String, ScopedFactory<ViewComponent.ViewState>> viewScopedFactories = new LinkedHashMap<>();
         viewScopedFactories.put(
                 InvisibilityVanishManager.SCOPED_ID,
