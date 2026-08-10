@@ -23,6 +23,7 @@ public final class ComponentService {
         this.bubbleContainer = Objects.requireNonNull(bubbleContainer, "bubbleContainer");
         registerPluginComponent(ViewComponent.key());
         registerPluginComponent(PositionComponent.key());
+        registerPluginComponent(TextComponent.key());
         registerPluginComponent(LifetimeComponent.key());
         registerPluginComponent(ProfileComponent.key());
     }
